@@ -176,7 +176,8 @@ function renderAll() {
 }
 
 function updateHeaderLabels() {
-  if (currentLang === "en") {
+  const isEn = currentLang === "en";
+  if (isEn) {
     if (appTitleEl) appTitleEl.textContent = "CCNA 200-301 Curriculum";
     if (searchInputEl) searchInputEl.placeholder = "Filter lessons, CLI, labs...";
     if (tabModulesBtn) tabModulesBtn.innerHTML = `<span class="tab-label">Modules</span><span class="tab-pill">17</span>`;
@@ -189,6 +190,44 @@ function updateHeaderLabels() {
     if (tabLabsBtn) tabLabsBtn.innerHTML = `<span class="tab-label">Bài Lab</span><span class="tab-pill">35</span>`;
     if (tabMasteryBtn) tabMasteryBtn.innerHTML = `<span class="tab-label">Chuyên đề</span><span class="tab-pill">10</span>`;
   }
+
+  const notesBtnText = document.querySelector("#open-notes-btn .btn-text");
+  if (notesBtnText) notesBtnText.textContent = isEn ? "Notes" : "Ghi chú";
+  const flashcardBtnText = document.querySelector("#open-flashcards-btn .btn-text");
+  if (flashcardBtnText) flashcardBtnText.textContent = isEn ? "Flashcards" : "Flashcard";
+  const zenBtnText = document.querySelector("#zen-mode-btn .btn-text");
+  if (zenBtnText) zenBtnText.textContent = isEn ? "Zen Mode" : "Tập trung";
+
+  // Flashcard modal controls translation
+  const flashcardBadge = document.getElementById("flashcard-badge-label");
+  if (flashcardBadge) flashcardBadge.textContent = isEn ? "FLASHCARD STUDY DECK" : "FLASHCARDS ÔN TẬP";
+  const shuffleLabel = document.getElementById("flashcard-shuffle-label");
+  if (shuffleLabel) shuffleLabel.textContent = isEn ? "Shuffle" : "Trộn thẻ";
+
+  const scopeSelect = document.getElementById("flashcard-scope-select");
+  if (scopeSelect) {
+    const curVal = scopeSelect.value;
+    scopeSelect.innerHTML = isEn
+      ? `<option value="current">Current Module</option><option value="all">All 17 CCNA Modules (400+ Cards)</option>`
+      : `<option value="current">Bài học hiện tại</option><option value="all">Toàn bộ 17 Học phần CCNA (400+ Thẻ)</option>`;
+    scopeSelect.value = curVal || "current";
+  }
+
+  const catSelect = document.getElementById("flashcard-category-select");
+  if (catSelect) {
+    const curVal = catSelect.value;
+    catSelect.innerHTML = isEn
+      ? `<option value="all">All Card Types</option><option value="cli">Cisco IOS CLI Commands</option><option value="quiz">CCNA Exam Quizzes</option><option value="concepts">Concepts &amp; Glossary</option><option value="skills">Field Skills &amp; Issues</option>`
+      : `<option value="all">Tất cả dạng thẻ</option><option value="cli">Lệnh Cisco IOS CLI</option><option value="quiz">Trắc nghiệm thi CCNA</option><option value="concepts">Khái niệm &amp; Thuật ngữ</option><option value="skills">Thực chiến &amp; Sự cố</option>`;
+    catSelect.value = curVal || "all";
+  }
+
+  const prevBtn = document.getElementById("flashcard-prev-btn");
+  if (prevBtn) prevBtn.textContent = isEn ? "← Previous" : "← Thẻ trước";
+  const flipBtn = document.getElementById("flashcard-flip-btn");
+  if (flipBtn) flipBtn.textContent = isEn ? "Flip (Space)" : "Lật thẻ (Space)";
+  const nextBtn = document.getElementById("flashcard-next-btn");
+  if (nextBtn) nextBtn.textContent = isEn ? "Next →" : "Thẻ tiếp →";
 }
 
 function escapeHtml(str) {
@@ -313,6 +352,7 @@ function renderSidebar(items) {
   `;
 
   if (currentMode === "mastery") {
+    const isEn = currentLang === "en";
     const allLi = document.createElement("li");
     const allBtn = document.createElement("button");
     allBtn.type = "button";
@@ -320,8 +360,8 @@ function renderSidebar(items) {
     allBtn.innerHTML = `
       <span class="module-num">ALL</span>
       <span class="module-name">
-        Toàn bộ 10 Chuyên đề tổng hợp
-        <span class="module-name-sub">Chuẩn đề thi v1.1 &amp; v2.0 và Thực tế</span>
+        ${isEn ? "All 10 Exam Mastery Topics" : "Toàn bộ 10 Chuyên đề tổng hợp"}
+        <span class="module-name-sub">${isEn ? "CCNA v1.1 &amp; v2.0 Exam &amp; Production" : "Chuẩn đề thi v1.1 &amp; v2.0 và Thực tế"}</span>
       </span>
     `;
     allBtn.addEventListener("click", () => {
@@ -343,7 +383,7 @@ function renderSidebar(items) {
       btn.innerHTML = `
         <span class="module-num">${String(m.id).padStart(2, "0")}</span>
         <span class="module-name">
-          ${escapeHtml(m.title_vi)}
+          ${escapeHtml(isEn ? (m.title_en || m.title_vi) : m.title_vi)}
           <span class="module-name-sub">${escapeHtml(m.badge)}</span>
         </span>
         ${isCompleted ? checkSvg : ""}
@@ -362,6 +402,7 @@ function renderSidebar(items) {
   }
 
   if (currentMode === "labs") {
+    const isEn = currentLang === "en";
     // Top button: View All 35 Labs
     const allLi = document.createElement("li");
     const allBtn = document.createElement("button");
@@ -370,7 +411,7 @@ function renderSidebar(items) {
     allBtn.innerHTML = `
       <span class="module-num">ALL</span>
       <span class="module-name">
-        Tất cả 35 bài thực hành Lab
+        ${isEn ? "All 35 Cisco Hands-On Labs" : "Tất cả 35 bài thực hành Lab"}
         <span class="module-name-sub">Cisco Packet Tracer (Lab 01 &rarr; Lab 35)</span>
       </span>
     `;
@@ -390,11 +431,12 @@ function renderSidebar(items) {
       btn.type = "button";
       const isCompleted = !!completedItems["lab-" + lab.id];
       btn.className = `module-item${lab.id === activeLabId ? " active" : ""}${isCompleted ? " completed" : ""}`;
+      const labTitle = isEn ? (lab.title_en || lab.title_vi.replace(/^Lab \d+:\s*/, "")) : lab.title_vi.replace(/^Lab \d+:\s*/, "");
       btn.innerHTML = `
         <span class="module-num">${String(lab.id).padStart(2, "0")}</span>
         <span class="module-name">
-          ${escapeHtml(lab.title_vi.replace(/^Lab \d+:\s*/, ""))}
-          <span class="module-name-sub">Học phần ${lab.moduleId} • ${escapeHtml(lab.level)}</span>
+          ${escapeHtml(labTitle)}
+          <span class="module-name-sub">${isEn ? `Module ${lab.moduleId}` : `Học phần ${lab.moduleId}`} • ${escapeHtml(lab.level)}</span>
         </span>
         ${isCompleted ? checkSvg : ""}
       `;
@@ -788,28 +830,26 @@ function selectModule(id) {
 
   const mainTitle = currentLang === "en" ? mod.title : mod.title_vi || mod.title;
   const subTitle = currentLang === "both" ? mod.title : "";
-  const kickerText =
-    currentLang === "en"
-      ? `CCNA 1 v7.0 (200-301) • MODULE ${mod.id} OF ${modulesData.length}`
-      : `GIÁO TRÌNH CCNA 1 v7.0 • HỌC PHẦN ${mod.id} / ${modulesData.length}`;
+  const isEn = currentLang === "en";
+  const kickerText = isEn
+    ? `CCNA 1 v7.0 (200-301) • MODULE ${mod.id} OF ${modulesData.length}`
+    : `GIÁO TRÌNH CCNA 1 v7.0 • HỌC PHẦN ${mod.id} / ${modulesData.length}`;
 
   // 1. Beginner Guide (From Zero) + Real-Life Analogy
   let beginnerSectionHtml = "";
-  const bgList =
-    currentLang === "en"
-      ? mod.beginnerGuide_en || []
-      : mod.beginnerGuide_vi || [];
+  const bgList = isEn
+    ? (mod.beginnerGuide_en && mod.beginnerGuide_en.length > 0 ? mod.beginnerGuide_en : mod.beginnerGuide_vi || [])
+    : (mod.beginnerGuide_vi || []);
   const bgListSecondary = mod.beginnerGuide_en || [];
 
-  const analogyHtml =
-    currentLang !== "en" && mod.analogy_vi
-      ? `
+  const analogyHtml = mod.analogy_vi
+    ? `
       <div class="analogy-box">
-        <div class="analogy-title">💡 Ví dụ liên hệ thực tế đời thường cho người mới</div>
+        <div class="analogy-title">💡 ${isEn ? "Real-World Metaphor & Intuitive Analogy" : "Ví dụ liên hệ thực tế đời thường cho người mới"}</div>
         <div class="analogy-text">${formatRichText(mod.analogy_vi)}</div>
       </div>
     `
-      : "";
+    : "";
 
   if (bgList.length > 0 || analogyHtml) {
     const bgItemsHtml = bgList
@@ -824,7 +864,7 @@ function selectModule(id) {
 
     beginnerSectionHtml = wrapSectionBlock(
       "heading-beginner",
-      `<span>${currentLang === "en" ? "Part 1: Foundation for Beginners" : "Phần 1: Nền tảng nhập môn căn bản"}</span>`,
+      `<span>${isEn ? "Part 1: Absolute Beginner Practical Guide & Foundations" : "Phần 1: Nền tảng nhập môn căn bản cho người mới bắt đầu"}</span>`,
       `<ul class="beginner-list">${bgItemsHtml}</ul>${analogyHtml}`
     );
   }
@@ -833,24 +873,17 @@ function selectModule(id) {
   const visualData = typeof MODULE_VISUALS !== "undefined" ? MODULE_VISUALS[mod.id] : null;
   let visualSectionHtml = "";
   if (visualData) {
-    const portAnatomySvgHtml =
-      currentLang !== "en" && typeof renderMultiAnglePortAnatomySvg === "function"
-        ? `<div class="svg-diagram-wrapper">${renderMultiAnglePortAnatomySvg(mod.id)}</div>`
-        : "";
+    const portAnatomySvgHtml = typeof renderMultiAnglePortAnatomySvg === "function"
+      ? `<div class="svg-diagram-wrapper">${renderMultiAnglePortAnatomySvg(mod.id)}</div>`
+      : "";
 
-    const hardwareSvgHtml =
-      currentLang === "en"
-        ? ""
-        : visualData.hardwareSvg
-        ? `<div class="svg-diagram-wrapper">${visualData.hardwareSvg}</div>`
-        : "";
+    const hardwareSvgHtml = visualData.hardwareSvg
+      ? `<div class="svg-diagram-wrapper">${visualData.hardwareSvg}</div>`
+      : "";
 
-    const svgDiagramHtml =
-      currentLang === "en"
-        ? ""
-        : visualData.svg
-        ? `<div class="svg-diagram-wrapper">${visualData.svg}</div>`
-        : "";
+    const svgDiagramHtml = visualData.svg
+      ? `<div class="svg-diagram-wrapper">${visualData.svg}</div>`
+      : "";
 
     const photosHtml =
       visualData.photos && visualData.photos.length > 0
@@ -858,14 +891,12 @@ function selectModule(id) {
         <div class="real-photos-grid">
           ${visualData.photos
             .map((p) => {
-              const pTitle =
-                currentLang === "en"
-                  ? p.title_en || p.title_vi
-                  : p.title_vi;
-              const pDesc =
-                currentLang === "en"
-                  ? p.desc_en || p.desc_vi
-                  : p.desc_vi;
+              const pTitle = isEn
+                ? p.title_en || p.title_vi
+                : p.title_vi;
+              const pDesc = isEn
+                ? p.desc_en || p.desc_vi
+                : p.desc_vi;
               const pEnSub =
                 currentLang === "both" && p.title_en
                   ? `<div class="concept-en-sub">🇬🇧 <strong>${escapeHtml(p.title_en)}:</strong> ${escapeHtml(p.desc_en || "")}</div>`
@@ -874,7 +905,7 @@ function selectModule(id) {
                 <figure class="photo-card" data-fullsrc="${escapeHtml(p.url)}" data-title="${escapeHtml(pTitle)}" data-desc="${escapeHtml(pDesc)}">
                   <div class="photo-img-wrap">
                     <img src="${escapeHtml(p.url)}" alt="${escapeHtml(pTitle)}" loading="lazy" />
-                    <span class="photo-zoom-hint">Phóng to ảnh</span>
+                    <span class="photo-zoom-hint">${isEn ? "Click to enlarge" : "Phóng to ảnh"}</span>
                   </div>
                   <figcaption class="photo-caption">
                     <strong>${escapeHtml(pTitle)}</strong>
@@ -892,7 +923,7 @@ function selectModule(id) {
     visualSectionHtml = wrapSectionBlock(
       "heading-visual",
       `<span>${
-        currentLang === "en"
+        isEn
           ? `Part 2: Hardware Photos, Ports & Architecture Diagrams (${(visualData.photos || []).length} Photos)`
           : `Phần 2: Hình ảnh thực tế thiết bị & Cổng kết nối (${(visualData.photos || []).length} ảnh minh họa)`
       }</span>`,
@@ -904,8 +935,8 @@ function selectModule(id) {
   let overviewHtml = "";
   if (currentLang === "vi") {
     overviewHtml = `<p class="overview-text">${formatRichText(mod.overview_vi || mod.overview)}</p>`;
-  } else if (currentLang === "en") {
-    overviewHtml = `<p class="overview-text">${formatRichText(mod.overview)}</p>`;
+  } else if (isEn) {
+    overviewHtml = `<p class="overview-text">${formatRichText(mod.overview || mod.overview_vi)}</p>`;
   } else {
     overviewHtml = `
       <p class="overview-text">🇻🇳 ${formatRichText(mod.overview_vi || mod.overview)}</p>
@@ -913,9 +944,10 @@ function selectModule(id) {
     `;
   }
 
-  const primaryConcepts =
-    currentLang === "en" ? mod.keyConcepts : mod.keyConcepts_vi || mod.keyConcepts;
-  const secondaryConcepts = mod.keyConcepts;
+  const primaryConcepts = isEn
+    ? (mod.keyConcepts && mod.keyConcepts.length > 0 ? mod.keyConcepts : mod.keyConcepts_vi || [])
+    : (mod.keyConcepts_vi || mod.keyConcepts || []);
+  const secondaryConcepts = mod.keyConcepts || [];
 
   const conceptsHtml = primaryConcepts
     .map((concept, idx) => {
@@ -935,7 +967,7 @@ function selectModule(id) {
   const overviewSectionHtml = wrapSectionBlock(
     "heading-overview",
     `<span>${
-      currentLang === "en"
+      isEn
         ? `Part 3: Core Theory & Key Technical Concepts (${primaryConcepts.length})`
         : `Phần 3: Lý thuyết cốt lõi & Nguyên lý kỹ thuật (${primaryConcepts.length} nội dung trọng tâm)`
     }</span>`,
@@ -948,23 +980,23 @@ function selectModule(id) {
       ? MODULE_DEEP_GLOSSARY[mod.id]
       : [];
   let glossarySectionHtml = "";
-  if (currentLang !== "en" && glossaryEntries.length > 0) {
+  if (glossaryEntries.length > 0) {
     const cardsHtml = glossaryEntries
       .map(
         (g, idx) => `
         <div class="glossary-card">
           <div class="glossary-term">
-            <span class="pt-badge">MỤC ${idx + 1}</span>
+            <span class="pt-badge">${isEn ? `TERM ${idx + 1}` : `MỤC ${idx + 1}`}</span>
             <span>${escapeHtml(g.term)}</span>
           </div>
           <div class="glossary-simple">
-            <strong>Khái niệm căn bản:</strong> ${formatRichText(g.simple_vi)}
+            <strong>${isEn ? "Core Definition:" : "Khái niệm căn bản:"}</strong> ${formatRichText(g.simple_vi)}
           </div>
           <div class="glossary-detail">
-            <strong>Phân tích chuyên sâu &amp; Nguyên lý:</strong> ${formatRichText(g.detail_vi)}
+            <strong>${isEn ? "Technical Deep Dive & Architecture:" : "Phân tích chuyên sâu & Nguyên lý:"}</strong> ${formatRichText(g.detail_vi)}
           </div>
           <div class="glossary-example">
-            <strong>Ứng dụng &amp; Lưu ý thi CCNA:</strong> ${formatRichText(g.example_vi)}
+            <strong>${isEn ? "CCNA Exam & Real-World Note:" : "Ứng dụng & Lưu ý thi CCNA:"}</strong> ${formatRichText(g.example_vi)}
           </div>
         </div>
       `
@@ -973,17 +1005,20 @@ function selectModule(id) {
 
     glossarySectionHtml = wrapSectionBlock(
       "heading-glossary",
-      `<span>Phần 4: Giải thích thuật ngữ &amp; Khái niệm chuyên sâu (${glossaryEntries.length} chủ đề)</span>`,
+      `<span>${
+        isEn
+          ? `Part 4: Key Technical Glossary & In-Depth Terminology (${glossaryEntries.length} Terms)`
+          : `Phần 4: Giải thích thuật ngữ & Khái niệm chuyên sâu (${glossaryEntries.length} chủ đề)`
+      }</span>`,
       `<div class="glossary-grid">${cardsHtml}</div>`
     );
   }
 
   // 5. Advanced Expansion Topics
   let advancedSectionHtml = "";
-  const advList =
-    currentLang === "en"
-      ? mod.advancedTopics_en || []
-      : mod.advancedTopics_vi || [];
+  const advList = isEn
+    ? (mod.advancedTopics_en && mod.advancedTopics_en.length > 0 ? mod.advancedTopics_en : mod.advancedTopics_vi || [])
+    : (mod.advancedTopics_vi || []);
   const advListSecondary = mod.advancedTopics_en || [];
 
   if (advList.length > 0) {
@@ -1000,9 +1035,9 @@ function selectModule(id) {
     advancedSectionHtml = wrapSectionBlock(
       "heading-advanced",
       `<span>${
-        currentLang === "en"
+        isEn
           ? `Part 5: Advanced Deep Dive (${advList.length} Topics)`
-          : `Phần 5: Kiến thức mở rộng &amp; Cơ chế chuyên sâu (${advList.length} chủ đề)`
+          : `Phần 5: Kiến thức mở rộng & Cơ chế chuyên sâu (${advList.length} chủ đề)`
       }</span>`,
       `<ul class="advanced-list">${advItemsHtml}</ul>`
     );
@@ -1010,8 +1045,12 @@ function selectModule(id) {
 
   // 6. Technical Comparison Table
   let tableSectionHtml = "";
-  if (currentLang !== "en" && mod.comparisonTable && mod.comparisonTable.rows) {
-    const headersHtml = mod.comparisonTable.headers_vi
+  if (mod.comparisonTable && mod.comparisonTable.rows) {
+    const defaultEnHeaders = ["Technology / Standard", "Technical Specification", "Actual Bandwidth / Speed", "Enterprise & Exam Use-Case"];
+    const headers = isEn
+      ? (mod.comparisonTable.headers_en || defaultEnHeaders)
+      : (mod.comparisonTable.headers_vi || defaultEnHeaders);
+    const headersHtml = headers
       .map((h) => `<th>${formatRichText(h)}</th>`)
       .join("");
     const rowsHtml = mod.comparisonTable.rows
@@ -1021,9 +1060,13 @@ function selectModule(id) {
       )
       .join("");
 
+    const tblTitle = isEn
+      ? (mod.comparisonTable.title_en || "Technical Comparison & Reference Table")
+      : (mod.comparisonTable.title_vi || "Bảng So Sánh Kỹ Thuật");
+
     tableSectionHtml = wrapSectionBlock(
       "heading-table",
-      `<span>Phần 6: ${escapeHtml(mod.comparisonTable.title_vi)}</span>`,
+      `<span>${isEn ? `Part 6: ${escapeHtml(tblTitle)}` : `Phần 6: ${escapeHtml(tblTitle)}`}</span>`,
       `<div class="table-responsive">
         <table class="tech-table">
           <thead><tr>${headersHtml}</tr></thead>
@@ -1035,22 +1078,24 @@ function selectModule(id) {
 
   // 7. Real-World Network Engineer Job Skills
   let jobSkillsHtml = "";
-  if (currentLang !== "en" && mod.jobSkills_vi && mod.jobSkills_vi.length > 0) {
-    const itemsHtml = mod.jobSkills_vi
+  const jobList = isEn
+    ? (mod.jobSkills_en && mod.jobSkills_en.length > 0 ? mod.jobSkills_en : mod.jobSkills_vi || [])
+    : (mod.jobSkills_vi || []);
+  if (jobList.length > 0) {
+    const itemsHtml = jobList
       .map((skill) => `<li class="job-skill-item">${formatRichText(skill)}</li>`)
       .join("");
     jobSkillsHtml = wrapSectionBlock(
       "heading-job",
-      `<span>Phần 7: Kinh nghiệm thực chiến khi đi làm kỹ sư mạng</span>`,
+      `<span>${isEn ? "Part 7: Real-World Network Engineer Field Experience & Practices" : "Phần 7: Kinh nghiệm thực chiến khi đi làm kỹ sư mạng"}</span>`,
       `<ul class="job-skills-list">${itemsHtml}</ul>`
     );
   }
 
   // 8. Step-by-step Worked Example
-  const rawExample =
-    currentLang === "en"
-      ? mod.realWorldExample
-      : mod.realWorldExample_vi || mod.realWorldExample;
+  const rawExample = isEn
+    ? mod.realWorldExample || mod.realWorldExample_vi
+    : mod.realWorldExample_vi || mod.realWorldExample;
   let exampleSectionHtml = "";
   if (rawExample) {
     const exampleLines = rawExample
@@ -1068,7 +1113,7 @@ function selectModule(id) {
     exampleSectionHtml = wrapSectionBlock(
       "heading-example",
       `<span>${
-        currentLang === "en"
+        isEn
           ? "Part 8: Practical Example & Step-by-Step Walkthrough"
           : "Phần 8: Ví dụ minh họa thực tế & Lời giải chi tiết"
       }</span>`,
@@ -1091,18 +1136,21 @@ function selectModule(id) {
     const labCards = moduleLabs.map((l) => renderSinglePacketTracerLabCard(l)).join("");
     moduleLabsHtml = wrapSectionBlock(
       "heading-pt-labs",
-      `<span>Phần 9: Bài thực hành Cisco Packet Tracer (${moduleLabs.length} bài Lab)</span>`,
+      `<span>${isEn ? `Part 9: Cisco Packet Tracer Hands-On Labs (${moduleLabs.length} Labs)` : `Phần 9: Bài thực hành Cisco Packet Tracer (${moduleLabs.length} bài Lab)`}</span>`,
       `<div class="pt-labs-wrapper">${labCards}</div>`,
-      `<button type="button" class="copy-btn" id="view-all-30-labs-btn" style="pointer-events: auto;">Xem tất cả 35 Lab &rarr;</button>`
+      `<button type="button" class="copy-btn" id="view-all-30-labs-btn" style="pointer-events: auto;">${isEn ? "View all 35 Labs &rarr;" : "Xem tất cả 35 Lab &rarr;"}</button>`
     );
   }
 
   // 10. Interactive CCNA 200-301 Exam Quiz
   let quizSectionHtml = "";
-  if (currentLang !== "en" && mod.quiz && mod.quiz.length > 0) {
+  if (mod.quiz && mod.quiz.length > 0) {
     const quizCardsHtml = mod.quiz
       .map((q, qIdx) => {
-        const optsHtml = q.options_vi
+        const qText = isEn ? (q.question_en || q.question_vi) : q.question_vi;
+        const opts = isEn ? (q.options_en || q.options_vi) : q.options_vi;
+        const expText = isEn ? (q.explanation_en || q.explanation_vi) : q.explanation_vi;
+        const optsHtml = opts
           .map(
             (opt, oIdx) => `
             <button type="button" class="quiz-opt-btn" data-qidx="${qIdx}" data-oidx="${oIdx}" data-ans="${q.answerIndex}">
@@ -1113,10 +1161,10 @@ function selectModule(id) {
           .join("");
         return `
           <div class="quiz-card" id="quiz-card-${qIdx}">
-            <div class="quiz-question">${formatRichText(q.question_vi)}</div>
+            <div class="quiz-question">${formatRichText(qText)}</div>
             <div class="quiz-options">${optsHtml}</div>
             <div class="quiz-explanation" id="quiz-exp-${qIdx}">
-              <strong>Giải thích chi tiết:</strong> ${formatRichText(q.explanation_vi)}
+              <strong>${isEn ? "Detailed Explanation:" : "Giải thích chi tiết:"}</strong> ${formatRichText(expText)}
             </div>
           </div>
         `;
@@ -1125,7 +1173,7 @@ function selectModule(id) {
 
     quizSectionHtml = wrapSectionBlock(
       "heading-quiz",
-      `<span>Phần 11: Câu hỏi trắc nghiệm ôn thi CCNA (${mod.quiz.length} câu)</span>`,
+      `<span>${isEn ? `Part 11: CCNA Practice Exam Quiz (${mod.quiz.length} Questions)` : `Phần 11: Câu hỏi trắc nghiệm ôn thi CCNA (${mod.quiz.length} câu)`}</span>`,
       `<div class="quiz-container">${quizCardsHtml}</div>`
     );
   }
@@ -1135,13 +1183,13 @@ function selectModule(id) {
     commandsSectionHtml = wrapSectionBlock(
       "heading-commands",
       `<span>${
-        currentLang === "en"
+        isEn
           ? "Part 10: Cisco IOS CLI Commands & Reference"
           : "Phần 10: Tập lệnh thực hành Cisco IOS CLI & Tra cứu"
       }</span>`,
       `<pre class="cli-block"><code id="cli-code">${formatCliCommands(mod.commands)}</code></pre>`,
       `<button type="button" class="copy-btn" id="copy-cli-btn" style="pointer-events: auto;">${
-        currentLang === "en" ? "Copy Commands" : "Sao chép lệnh"
+        isEn ? "Copy Commands" : "Sao chép lệnh"
       }</button>`
     );
   }
@@ -1151,7 +1199,9 @@ function selectModule(id) {
   const nextId = id < modulesData.length ? id + 1 : null;
 
   // Dynamic SEO Title update
-  document.title = `Học phần ${mod.id}: ${mainTitle} — CCNA 200-301 (v1.1 & v2.0) Toàn Diện`;
+  document.title = isEn
+    ? `Module ${mod.id}: ${mainTitle} — CCNA 200-301 Complete Curriculum`
+    : `Học phần ${mod.id}: ${mainTitle} — CCNA 200-301 (v1.1 & v2.0) Toàn Diện`;
   closeMobileSidebar();
 
   // Estimate reading time & word count
@@ -1168,23 +1218,23 @@ function selectModule(id) {
   const readingTimeMinutes = Math.max(3, Math.ceil(wordCount / 180));
 
   const quickJumpItems = [];
-  if (beginnerSectionHtml) quickJumpItems.push({ id: "heading-beginner", label: "Nhập môn" });
-  if (visualSectionHtml) quickJumpItems.push({ id: "heading-visual", label: "Ảnh thiết bị & Cổng" });
-  quickJumpItems.push({ id: "heading-overview", label: "Lý thuyết cốt lõi" });
-  if (glossarySectionHtml) quickJumpItems.push({ id: "heading-glossary", label: "Thuật ngữ" });
-  if (advancedSectionHtml) quickJumpItems.push({ id: "heading-advanced", label: "Kiến thức mở rộng" });
-  if (tableSectionHtml) quickJumpItems.push({ id: "heading-table", label: "Bảng so sánh" });
-  if (jobSkillsHtml) quickJumpItems.push({ id: "heading-job", label: "Kinh nghiệm thực tế" });
-  if (exampleSectionHtml) quickJumpItems.push({ id: "heading-example", label: "Ví dụ giải mẫu" });
-  if (calcSectionHtml) quickJumpItems.push({ id: mod.id === 5 ? "heading-calc-bin" : "heading-calc-sub", label: "Công cụ tính" });
-  if (moduleLabsHtml) quickJumpItems.push({ id: "heading-pt-labs", label: "Bài Lab" });
-  if (commandsSectionHtml) quickJumpItems.push({ id: "heading-commands", label: "Lệnh CLI" });
-  if (quizSectionHtml) quickJumpItems.push({ id: "heading-quiz", label: "Trắc nghiệm ôn thi" });
+  if (beginnerSectionHtml) quickJumpItems.push({ id: "heading-beginner", label: isEn ? "Beginner Guide" : "Nhập môn" });
+  if (visualSectionHtml) quickJumpItems.push({ id: "heading-visual", label: isEn ? "Hardware & Ports" : "Ảnh thiết bị & Cổng" });
+  quickJumpItems.push({ id: "heading-overview", label: isEn ? "Core Theory" : "Lý thuyết cốt lõi" });
+  if (glossarySectionHtml) quickJumpItems.push({ id: "heading-glossary", label: isEn ? "Glossary" : "Thuật ngữ" });
+  if (advancedSectionHtml) quickJumpItems.push({ id: "heading-advanced", label: isEn ? "Advanced Dive" : "Kiến thức mở rộng" });
+  if (tableSectionHtml) quickJumpItems.push({ id: "heading-table", label: isEn ? "Comparison Table" : "Bảng so sánh" });
+  if (jobSkillsHtml) quickJumpItems.push({ id: "heading-job", label: isEn ? "Field Skills" : "Kinh nghiệm thực tế" });
+  if (exampleSectionHtml) quickJumpItems.push({ id: "heading-example", label: isEn ? "Worked Example" : "Ví dụ giải mẫu" });
+  if (calcSectionHtml) quickJumpItems.push({ id: mod.id === 5 ? "heading-calc-bin" : "heading-calc-sub", label: isEn ? "Calculator" : "Công cụ tính" });
+  if (moduleLabsHtml) quickJumpItems.push({ id: "heading-pt-labs", label: isEn ? "Packet Tracer Labs" : "Bài Lab" });
+  if (commandsSectionHtml) quickJumpItems.push({ id: "heading-commands", label: isEn ? "CLI Commands" : "Lệnh CLI" });
+  if (quizSectionHtml) quickJumpItems.push({ id: "heading-quiz", label: isEn ? "Exam Quiz" : "Trắc nghiệm ôn thi" });
 
   const quickJumpHtml = quickJumpItems.length > 0
     ? `
-      <nav class="quick-jump-bar" aria-label="Mục lục bài học">
-        <span class="quick-jump-label">Mục lục nhanh:</span>
+      <nav class="quick-jump-bar" aria-label="${isEn ? "Lesson table of contents" : "Mục lục bài học"}">
+        <span class="quick-jump-label">${isEn ? "Quick Navigation:" : "Mục lục nhanh:"}</span>
         <div class="quick-jump-links">
           ${quickJumpItems.map((item) => `<a href="#${item.id}" class="quick-jump-pill">${escapeHtml(item.label)}</a>`).join("")}
         </div>
@@ -1200,47 +1250,54 @@ function selectModule(id) {
             <circle cx="12" cy="12" r="10"/>
             <polyline points="12 6 12 12 16 14"/>
           </svg>
-          Thời gian đọc: ~<strong>${readingTimeMinutes} phút</strong> (${wordCount.toLocaleString()} từ)
+          ${isEn 
+            ? `Estimated Reading Time: ~<strong>${readingTimeMinutes} mins</strong> (${wordCount.toLocaleString()} words)`
+            : `Thời gian đọc: ~<strong>${readingTimeMinutes} phút</strong> (${wordCount.toLocaleString()} từ)`
+          }
         </span>
       </div>
       <div class="lesson-expand-controls">
-        <button type="button" class="lesson-expand-btn" id="collapse-all-sections-btn" title="Thu gọn tất cả để nhìn tổng quát">
+        <button type="button" class="lesson-expand-btn" id="collapse-all-sections-btn" title="${isEn ? "Collapse all sections for quick overview" : "Thu gọn tất cả để nhìn tổng quát"}">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="4 14 12 6 20 14"/>
             <polyline points="4 20 12 12 20 20"/>
           </svg>
-          Thu gọn tất cả
+          ${isEn ? "Collapse All" : "Thu gọn tất cả"}
         </button>
-        <button type="button" class="lesson-expand-btn" id="expand-all-sections-btn" title="Mở rộng tất cả nội dung">
+        <button type="button" class="lesson-expand-btn" id="expand-all-sections-btn" title="${isEn ? "Expand all section contents" : "Mở rộng tất cả nội dung"}">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="4 6 12 14 20 6"/>
             <polyline points="4 12 12 20 20 12"/>
           </svg>
-          Mở rộng tất cả
+          ${isEn ? "Expand All" : "Mở rộng tất cả"}
         </button>
       </div>
     </div>
   `;
 
   const isCompleted = !!completedItems["module-" + mod.id];
+  const completeBtnText = isCompleted
+    ? (isEn ? "✓ Completed this module" : "✓ Đã học xong học phần này")
+    : (isEn ? "○ Mark as completed" : "○ Đánh dấu đã học xong");
+
   const studyActionsHtml = `
     <div class="lesson-study-actions">
       <button type="button" class="lesson-complete-toggle-btn ${isCompleted ? "completed" : ""}" id="lesson-complete-btn" data-key="module-${mod.id}">
-        ${isCompleted ? "✓ Đã học xong học phần này" : "○ Đánh dấu đã học xong"}
+        ${completeBtnText}
       </button>
       <button type="button" class="lesson-note-trigger-btn" id="lesson-note-btn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 20h9"/>
           <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
         </svg>
-        Ghi chú học phần
+        ${isEn ? "Module Notes" : "Ghi chú học phần"}
       </button>
-      <button type="button" class="lesson-flashcards-trigger-btn" id="module-flashcards-btn" title="Luyện thẻ ghi nhớ nhanh cho học phần này">
+      <button type="button" class="lesson-flashcards-trigger-btn" id="module-flashcards-btn" title="${isEn ? "Study flashcards for this module" : "Luyện thẻ ghi nhớ nhanh cho học phần này"}">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
           <path d="M7 7h10M7 12h10M7 17h6"/>
         </svg>
-        Flashcards bài này
+        ${isEn ? "Module Flashcards" : "Flashcards bài này"}
       </button>
     </div>
   `;
@@ -1283,13 +1340,13 @@ function selectModule(id) {
 
     <div class="module-footer-nav">
       <button type="button" class="nav-btn" id="prev-module-btn" ${!prevId ? "disabled" : ""}>
-        &larr; ${currentLang === "en" ? "Previous Module" : "Học phần trước"}
+        &larr; ${isEn ? "Previous Module" : "Học phần trước"}
       </button>
       <button type="button" class="lesson-complete-toggle-btn ${isCompleted ? "completed" : ""}" id="footer-lesson-complete-btn" data-key="module-${mod.id}">
-        ${isCompleted ? "✓ Đã hoàn thành học phần này" : "○ Đánh dấu đã học xong"}
+        ${isCompleted ? (isEn ? "✓ Completed this module" : "✓ Đã hoàn thành học phần này") : (isEn ? "○ Mark as completed" : "○ Đánh dấu đã học xong")}
       </button>
       <button type="button" class="nav-btn" id="next-module-btn" ${!nextId ? "disabled" : ""}>
-        ${currentLang === "en" ? "Next Module" : "Học phần tiếp theo"} &rarr;
+        ${isEn ? "Next Module" : "Học phần tiếp theo"} &rarr;
       </button>
     </div>
   `;
@@ -1506,14 +1563,18 @@ function toggleItemCompleted(key) {
 function updateLessonCompletionButtons() {
   const currentKey = getCurrentLessonNoteKey();
   const isDone = isItemCompleted(currentKey);
+  const isEn = currentLang === "en";
   const btns = document.querySelectorAll(".lesson-complete-toggle-btn");
   btns.forEach((btn) => {
     btn.classList.toggle("completed", isDone);
-    btn.innerHTML = isDone ? "✓ Đã học xong bài này" : "○ Đánh dấu đã học xong";
+    btn.innerHTML = isDone
+      ? (isEn ? "✓ Completed this module" : "✓ Đã học xong học phần này")
+      : (isEn ? "○ Mark as completed" : "○ Đánh dấu đã học xong");
   });
 }
 
 function updateProgressSummary() {
+  const isEn = currentLang === "en";
   const totalModules = (modulesData && modulesData.length) || 17;
   let completedModulesCount = 0;
   for (let i = 1; i <= totalModules; i++) {
@@ -1521,7 +1582,9 @@ function updateProgressSummary() {
   }
   const pct = Math.round((completedModulesCount / totalModules) * 100);
   if (progressPillText) {
-    progressPillText.textContent = `${completedModulesCount}/${totalModules} bài (${pct}%)`;
+    progressPillText.textContent = isEn
+      ? `${completedModulesCount}/${totalModules} completed (${pct}%)`
+      : `${completedModulesCount}/${totalModules} bài (${pct}%)`;
   }
   if (progressMiniFill) {
     progressMiniFill.style.width = `${pct}%`;
@@ -1533,24 +1596,31 @@ function updateProgressSummary() {
 // ============================================================
 function updateTopbarBreadcrumb() {
   if (!topbarBreadcrumb) return;
+  const isEn = currentLang === "en";
   if (currentMode === "modules") {
     const mod = modulesData.find((m) => m.id === activeModuleId);
     if (mod) {
-      const title = currentLang === "en" ? mod.title : (mod.title_vi || mod.title);
-      topbarBreadcrumb.textContent = `Học phần ${String(mod.id).padStart(2, "0")}: ${title}`;
+      const title = isEn ? mod.title : (mod.title_vi || mod.title);
+      topbarBreadcrumb.textContent = isEn
+        ? `Module ${String(mod.id).padStart(2, "0")}: ${title}`
+        : `Học phần ${String(mod.id).padStart(2, "0")}: ${title}`;
     }
   } else if (currentMode === "labs") {
     const allLabs = typeof PACKET_TRACER_LABS !== "undefined" ? PACKET_TRACER_LABS : [];
     const lab = allLabs.find((l) => l.id === activeLabId);
     topbarBreadcrumb.textContent = lab
-      ? `Bài Lab ${String(lab.id).padStart(2, "0")}: ${lab.title_vi.replace(/^Lab \d+:\s*/, "")}`
-      : "35 Bài thực hành Lab Packet Tracer";
+      ? (isEn
+          ? `Lab ${String(lab.id).padStart(2, "0")}: ${lab.title_en || lab.title_vi.replace(/^Lab \d+:\s*/, "")}`
+          : `Bài Lab ${String(lab.id).padStart(2, "0")}: ${lab.title_vi.replace(/^Lab \d+:\s*/, "")}`)
+      : (isEn ? "35 Cisco Packet Tracer Hands-On Labs" : "35 Bài thực hành Lab Packet Tracer");
   } else if (currentMode === "mastery") {
     const allMastery = typeof CCNA_EXAM_MASTERY !== "undefined" ? CCNA_EXAM_MASTERY : [];
     const m = allMastery.find((item) => item.id === activeMasteryId);
     topbarBreadcrumb.textContent = m
-      ? `Chuyên đề ${String(m.id).padStart(2, "0")}: ${m.title_vi}`
-      : "10 Chuyên đề tổng hợp CCNA";
+      ? (isEn
+          ? `Mastery ${String(m.id).padStart(2, "0")}: ${m.title_en || m.title_vi}`
+          : `Chuyên đề ${String(m.id).padStart(2, "0")}: ${m.title_vi}`)
+      : (isEn ? "10 CCNA Exam Mastery Topics" : "10 Chuyên đề tổng hợp CCNA");
   }
 }
 
@@ -2495,62 +2565,145 @@ function initTextSelectionHighlighter() {
 }
 
 // --------------------------------------------------------------------------
-// Interactive Flashcards Study Deck System
+// Interactive Flashcards Study Deck System (Multi-Category, Multi-Module, Bilingual)
 // --------------------------------------------------------------------------
 let flashcardDeck = [];
 let currentFlashcardIndex = 0;
 let isFlashcardFlipped = false;
+let flashcardCurrentScope = "current";
+let flashcardCurrentCategory = "all";
 
-function buildFlashcardDeck(targetModId = null) {
+function buildFlashcardDeck(targetModId = null, targetCategory = "all") {
+  const isEn = currentLang === "en";
   const deck = [];
-  const modulesToScan = targetModId
-    ? modulesData.filter((m) => m.id === targetModId)
-    : (modulesData.length > 0 ? modulesData : []);
+  const useAllModules = targetModId === "all" || (targetModId === null && flashcardCurrentScope === "all");
+  const modulesToScan = useAllModules
+    ? (modulesData.length > 0 ? modulesData : [])
+    : (modulesData.filter((m) => m.id === (typeof targetModId === "number" ? targetModId : activeModuleId)));
 
   modulesToScan.forEach((m) => {
-    // 1. From Glossary
-    if (typeof MODULE_DEEP_GLOSSARY !== "undefined" && MODULE_DEEP_GLOSSARY[m.id]) {
-      MODULE_DEEP_GLOSSARY[m.id].forEach((g) => {
+    // 1. Cisco IOS CLI Commands
+    if ((targetCategory === "all" || targetCategory === "cli") && m.commands && Array.isArray(m.commands)) {
+      m.commands.forEach((cmdLine) => {
+        if (!cmdLine || typeof cmdLine !== "string") return;
+        const commentMatch = cmdLine.match(/^(.+?\s)(#\s.*)$/);
+        const cmdOnly = commentMatch ? commentMatch[1].trim() : cmdLine.trim();
+        const commentOnly = commentMatch ? commentMatch[2].replace(/^#\s*/, "").trim() : "";
+        if (!cmdOnly) return;
+
+        const frontHtml = isEn
+          ? `What is the syntax and purpose of this Cisco IOS command?<br/><div style="margin-top:0.8rem;"><code class="inline-code" style="font-size:1.05rem;">${escapeHtml(cmdOnly)}</code></div>`
+          : `Cú pháp &amp; Ý nghĩa của câu lệnh Cisco IOS này là gì?<br/><div style="margin-top:0.8rem;"><code class="inline-code" style="font-size:1.05rem;">${escapeHtml(cmdOnly)}</code></div>`;
+        
+        const backHtml = isEn
+          ? `<strong>Cisco Command:</strong> <code class="inline-code">${escapeHtml(cmdOnly)}</code><br/><br/>${commentOnly ? `<strong>Function / Usage:</strong> ${escapeHtml(commentOnly)}<br/><br/>` : ""}<strong>Module:</strong> Module ${m.id} (${escapeHtml(m.title || "")})`
+          : `<strong>Câu lệnh Cisco:</strong> <code class="inline-code">${escapeHtml(cmdOnly)}</code><br/><br/>${commentOnly ? `<strong>Mục đích &amp; Ý nghĩa:</strong> ${escapeHtml(commentOnly)}<br/><br/>` : ""}<strong>Thuộc bài học:</strong> Học phần ${m.id} (${escapeHtml(m.title_vi || m.title)})`;
+
         deck.push({
           modId: m.id,
-          type: "Thuật ngữ",
-          front: g.term,
-          back: `<strong>${escapeHtml(g.simple_vi)}</strong><br/><br/>${escapeHtml(g.detail_vi)}`
+          category: "cli",
+          type: isEn ? "Cisco IOS CLI" : "Lệnh Cisco IOS",
+          front: frontHtml,
+          back: backHtml
         });
       });
     }
 
-    // 2. From Key Concepts
-    const concepts = m.keyConcepts_vi || m.keyConcepts || [];
-    concepts.forEach((c, idx) => {
-      const parts = c.split(":");
-      if (parts.length > 1) {
-        deck.push({
-          modId: m.id,
-          type: "Khái niệm",
-          front: parts[0].trim(),
-          back: parts.slice(1).join(":").trim()
-        });
-      } else {
-        deck.push({
-          modId: m.id,
-          type: "Khái niệm",
-          front: `Học phần ${m.id} — Điểm mấu chốt ${idx + 1}`,
-          back: c
-        });
-      }
-    });
+    // 2. CCNA Exam Practice Quizzes
+    if ((targetCategory === "all" || targetCategory === "quiz") && m.quiz && Array.isArray(m.quiz)) {
+      m.quiz.forEach((q, qIdx) => {
+        const qText = isEn ? (q.question_en || q.question_vi) : q.question_vi;
+        const opts = isEn ? (q.options_en || q.options_vi) : q.options_vi;
+        const exp = isEn ? (q.explanation_en || q.explanation_vi) : q.explanation_vi;
+        const correctOpt = opts && opts[q.answerIndex] ? opts[q.answerIndex] : "";
 
-    // 3. From Quiz questions
-    if (m.quiz && Array.isArray(m.quiz)) {
-      m.quiz.forEach((q) => {
-        const correctOpt = q.options_vi && q.options_vi[q.answerIndex] ? q.options_vi[q.answerIndex] : "";
         deck.push({
           modId: m.id,
-          type: "Câu hỏi trắc nghiệm",
-          front: q.question_vi,
-          back: `<strong>Đáp án đúng:</strong> ${escapeHtml(correctOpt)}<br/><br/><strong>Giải thích:</strong> ${escapeHtml(q.explanation_vi)}`
+          category: "quiz",
+          type: isEn ? "Exam Quiz" : "Trắc nghiệm ôn thi",
+          front: `<strong>${isEn ? `Question ${qIdx + 1}:` : `Câu hỏi ${qIdx + 1}:`}</strong><br/><br/>${formatRichText(qText)}`,
+          back: `<strong>${isEn ? "Correct Answer:" : "Đáp án đúng:"}</strong> <span style="color:#22c55e;">${escapeHtml(correctOpt)}</span><br/><br/><strong>${isEn ? "Detailed Explanation:" : "Giải thích chi tiết:"}</strong><br/>${formatRichText(exp)}`
         });
+      });
+    }
+
+    // 3. Technical Glossary & Deep Terms
+    if ((targetCategory === "all" || targetCategory === "concepts") && typeof MODULE_DEEP_GLOSSARY !== "undefined" && MODULE_DEEP_GLOSSARY[m.id]) {
+      MODULE_DEEP_GLOSSARY[m.id].forEach((g) => {
+        deck.push({
+          modId: m.id,
+          category: "concepts",
+          type: isEn ? "Glossary Term" : "Thuật ngữ",
+          front: `<strong>${escapeHtml(g.term)}</strong><br/><br/><span style="font-size:0.85rem;color:var(--text-muted);">${isEn ? "What is the technical definition and core mechanism?" : "Khái niệm kỹ thuật và cơ chế hoạt động là gì?"}</span>`,
+          back: `<strong>${isEn ? "Core Definition:" : "Khái niệm căn bản:"}</strong> ${escapeHtml(g.simple_vi)}<br/><br/><strong>${isEn ? "Mechanism & Deep Dive:" : "Phân tích chuyên sâu:"}</strong> ${escapeHtml(g.detail_vi)}<br/><br/><strong>${isEn ? "Exam Note:" : "Lưu ý thi CCNA:"}</strong> ${escapeHtml(g.example_vi)}`
+        });
+      });
+    }
+
+    // 4. Core Concepts & Foundations
+    if (targetCategory === "all" || targetCategory === "concepts") {
+      const concepts = isEn
+        ? (m.keyConcepts && m.keyConcepts.length > 0 ? m.keyConcepts : m.keyConcepts_vi || [])
+        : (m.keyConcepts_vi || m.keyConcepts || []);
+
+      concepts.forEach((c, idx) => {
+        const parts = c.split(":");
+        if (parts.length > 1) {
+          deck.push({
+            modId: m.id,
+            category: "concepts",
+            type: isEn ? "Core Concept" : "Khái niệm cốt lõi",
+            front: `<strong>${escapeHtml(parts[0].trim())}</strong><br/><br/><span style="font-size:0.85rem;color:var(--text-muted);">${isEn ? "Explain the principle and mechanism:" : "Giải thích nguyên lý và cơ chế kỹ thuật:"}</span>`,
+            back: formatRichText(parts.slice(1).join(":").trim())
+          });
+        } else {
+          deck.push({
+            modId: m.id,
+            category: "concepts",
+            type: isEn ? "Key Takeaway" : "Điểm mấu chốt",
+            front: isEn ? `Module ${m.id} — Technical Principle ${idx + 1}` : `Học phần ${m.id} — Điểm mấu chốt ${idx + 1}`,
+            back: formatRichText(c)
+          });
+        }
+      });
+
+      // Also Beginner Guides
+      const bgList = isEn ? (m.beginnerGuide_en || m.beginnerGuide_vi || []) : (m.beginnerGuide_vi || []);
+      bgList.forEach((b) => {
+        const colonIdx = b.indexOf(":");
+        if (colonIdx > 0 && colonIdx < 80) {
+          deck.push({
+            modId: m.id,
+            category: "concepts",
+            type: isEn ? "Beginner Foundation" : "Nhập môn căn bản",
+            front: `<strong>${formatRichText(b.slice(0, colonIdx))}</strong>`,
+            back: formatRichText(b.slice(colonIdx + 1).trim())
+          });
+        }
+      });
+    }
+
+    // 5. Job Skills & Real-World Troubleshooting
+    if ((targetCategory === "all" || targetCategory === "skills") && m.jobSkills_vi && Array.isArray(m.jobSkills_vi)) {
+      m.jobSkills_vi.forEach((skill) => {
+        const colonIdx = skill.indexOf(":");
+        if (colonIdx > 0 && colonIdx < 100) {
+          deck.push({
+            modId: m.id,
+            category: "skills",
+            type: isEn ? "Field Skill" : "Kỹ năng thực chiến",
+            front: `<strong>${formatRichText(skill.slice(0, colonIdx))}</strong><br/><br/><span style="font-size:0.85rem;color:var(--text-muted);">${isEn ? "How does a network engineer solve this in production?" : "Kỹ sư mạng xử lý tình huống này trong thực tế như thế nào?"}</span>`,
+            back: formatRichText(skill.slice(colonIdx + 1).trim())
+          });
+        } else {
+          deck.push({
+            modId: m.id,
+            category: "skills",
+            type: isEn ? "Field Skill" : "Kỹ năng thực chiến",
+            front: isEn ? `Production Engineering Case (Module ${m.id})` : `Kinh nghiệm đi làm thực tế (Bài ${m.id})`,
+            back: formatRichText(skill)
+          });
+        }
       });
     }
   });
@@ -2565,6 +2718,7 @@ function buildFlashcardDeck(targetModId = null) {
 }
 
 function renderCurrentFlashcard() {
+  const isEn = currentLang === "en";
   const counterEl = document.getElementById("flashcard-counter");
   const cardTextEl = document.getElementById("flashcard-card-text");
   const hintPillEl = document.getElementById("flashcard-hint-pill");
@@ -2573,7 +2727,10 @@ function renderCurrentFlashcard() {
   const nextBtn = document.getElementById("flashcard-next-btn");
 
   if (!cardTextEl || flashcardDeck.length === 0) {
-    if (cardTextEl) cardTextEl.innerHTML = "Không có thẻ ghi nhớ nào trong học phần này.";
+    if (cardTextEl) cardTextEl.innerHTML = isEn ? "No flashcards match this filter criteria." : "Không có thẻ ghi nhớ nào phù hợp với bộ lọc đã chọn.";
+    if (counterEl) counterEl.textContent = "0 / 0";
+    if (prevBtn) prevBtn.disabled = true;
+    if (nextBtn) nextBtn.disabled = true;
     return;
   }
 
@@ -2585,23 +2742,50 @@ function renderCurrentFlashcard() {
 
   if (isFlashcardFlipped) {
     if (flipperEl) flipperEl.classList.add("is-flipped");
-    if (hintPillEl) hintPillEl.textContent = `Đáp án & Giải thích [${card.type} — Bài ${card.modId}]`;
+    if (hintPillEl) hintPillEl.textContent = isEn
+      ? `Answer & Explanation [${card.type} — Module ${card.modId}]`
+      : `Đáp án & Giải thích [${card.type} — Bài ${card.modId}]`;
     cardTextEl.innerHTML = formatRichText(card.back);
   } else {
     if (flipperEl) flipperEl.classList.remove("is-flipped");
-    if (hintPillEl) hintPillEl.textContent = `Câu hỏi / Khái niệm [${card.type} — Bài ${card.modId}] (Bấm để lật)`;
-    cardTextEl.innerHTML = `<strong>${formatRichText(card.front)}</strong>`;
+    if (hintPillEl) hintPillEl.textContent = isEn
+      ? `Question / Prompt [${card.type} — Module ${card.modId}] (Click or press Space to reveal)`
+      : `Câu hỏi / Khái niệm [${card.type} — Bài ${card.modId}] (Bấm để lật)`;
+    cardTextEl.innerHTML = card.front;
   }
+}
+
+function reloadFlashcardDeck() {
+  const scopeSelect = document.getElementById("flashcard-scope-select");
+  const catSelect = document.getElementById("flashcard-category-select");
+
+  if (scopeSelect) flashcardCurrentScope = scopeSelect.value;
+  if (catSelect) flashcardCurrentCategory = catSelect.value;
+
+  const targetId = flashcardCurrentScope === "all" ? "all" : activeModuleId;
+  flashcardDeck = buildFlashcardDeck(targetId, flashcardCurrentCategory);
+  currentFlashcardIndex = 0;
+  isFlashcardFlipped = false;
+  renderCurrentFlashcard();
 }
 
 function openFlashcardsModal(targetModId = null) {
   const modal = document.getElementById("flashcard-modal");
   if (!modal) return;
-  flashcardDeck = buildFlashcardDeck(targetModId || activeModuleId);
-  currentFlashcardIndex = 0;
-  isFlashcardFlipped = false;
+
+  const scopeSelect = document.getElementById("flashcard-scope-select");
+  if (scopeSelect) {
+    if (targetModId === "all") {
+      scopeSelect.value = "all";
+      flashcardCurrentScope = "all";
+    } else {
+      scopeSelect.value = "current";
+      flashcardCurrentScope = "current";
+    }
+  }
+
+  reloadFlashcardDeck();
   modal.hidden = false;
-  renderCurrentFlashcard();
 }
 
 function closeFlashcardsModal() {
@@ -2617,12 +2801,34 @@ function initFlashcardsSystem() {
   const flipBtn = document.getElementById("flashcard-flip-btn");
   const prevBtn = document.getElementById("flashcard-prev-btn");
   const nextBtn = document.getElementById("flashcard-next-btn");
+  const shuffleBtn = document.getElementById("flashcard-shuffle-btn");
+  const scopeSelect = document.getElementById("flashcard-scope-select");
+  const catSelect = document.getElementById("flashcard-category-select");
 
   if (openTopbarBtn) {
-    openTopbarBtn.addEventListener("click", () => openFlashcardsModal(activeModuleId));
+    openTopbarBtn.addEventListener("click", () => openFlashcardsModal("all"));
   }
   if (closeBtn) closeBtn.addEventListener("click", closeFlashcardsModal);
   if (backdrop) backdrop.addEventListener("click", closeFlashcardsModal);
+
+  if (scopeSelect) {
+    scopeSelect.addEventListener("change", reloadFlashcardDeck);
+  }
+  if (catSelect) {
+    catSelect.addEventListener("change", reloadFlashcardDeck);
+  }
+  if (shuffleBtn) {
+    shuffleBtn.addEventListener("click", () => {
+      // Re-shuffle deck
+      for (let i = flashcardDeck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [flashcardDeck[i], flashcardDeck[j]] = [flashcardDeck[j], flashcardDeck[i]];
+      }
+      currentFlashcardIndex = 0;
+      isFlashcardFlipped = false;
+      renderCurrentFlashcard();
+    });
+  }
 
   const toggleFlip = () => {
     isFlashcardFlipped = !isFlashcardFlipped;
@@ -2665,7 +2871,7 @@ function initFlashcardsSystem() {
 
     if (e.key === "Escape") {
       closeFlashcardsModal();
-    } else if (e.key === " " && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
+    } else if (e.key === " " && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA" && e.target.tagName !== "SELECT") {
       e.preventDefault();
       toggleFlip();
     } else if (e.key === "ArrowLeft") {

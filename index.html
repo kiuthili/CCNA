@@ -487,11 +487,29 @@
     <div class="flashcard-container">
       <header class="flashcard-header">
         <div class="flashcard-header-left">
-          <span class="flashcard-badge">FLASHCARDS ÔN TẬP</span>
+          <span class="flashcard-badge" id="flashcard-badge-label">FLASHCARDS ÔN TẬP</span>
           <span class="flashcard-progress-counter" id="flashcard-counter">1 / 10</span>
         </div>
         <button type="button" class="flashcard-close-btn" id="flashcard-close-btn" aria-label="Đóng flashcards">✕</button>
       </header>
+
+      <div class="flashcard-filter-bar">
+        <select id="flashcard-scope-select" class="flashcard-select" aria-label="Phạm vi bài học">
+          <option value="current">Bài học hiện tại</option>
+          <option value="all">Toàn bộ 17 Học phần CCNA</option>
+        </select>
+        <select id="flashcard-category-select" class="flashcard-select" aria-label="Loại thẻ ôn tập">
+          <option value="all">Tất cả dạng thẻ (Toàn diện)</option>
+          <option value="cli">Lệnh Cisco IOS CLI</option>
+          <option value="quiz">Trắc nghiệm ôn thi CCNA</option>
+          <option value="concepts">Khái niệm &amp; Thuật ngữ</option>
+          <option value="skills">Thực chiến &amp; Sự cố</option>
+        </select>
+        <button type="button" class="flashcard-tool-btn" id="flashcard-shuffle-btn" title="Trộn ngẫu nhiên thứ tự thẻ">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+          <span class="tool-text" id="flashcard-shuffle-label">Trộn thẻ</span>
+        </button>
+      </div>
 
       <div class="flashcard-card-wrap" id="flashcard-flip-trigger">
         <div class="flashcard-flipper" id="flashcard-flipper">
