@@ -1,0 +1,6 @@
+# Local credentials and keys - DO NOT COMMIT
+local_config.js
+ai_key_local.js
+*.local.js
+.env
+.env.*

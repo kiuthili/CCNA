@@ -12,8 +12,8 @@
   const STORAGE_KEY_MODEL = "ccna_gemini_model";
   const STORAGE_KEY_CHAT_HISTORY = "ccna_ai_chat_history";
 
-  // Default Model
-  const DEFAULT_MODEL = "gemini-2.0-flash";
+  // Default Model (Low token consumption & ultra-fast)
+  const DEFAULT_MODEL = "gemini-2.5-flash-lite";
 
   // State
   let chatHistory = [];
@@ -34,15 +34,11 @@
   // System Prompt for Cisco CCNA Certified Instructor & Senior Network Architect
   function buildSystemInstruction() {
     return (
-      "Bạn là một Giảng viên Chuyên gia Mạng Cisco CCNA (CCNA 200-301 Master Instructor) và Kỹ sư Trưởng Thiết kế & Xử lý Sự cố Mạng (Senior Network Architect & CCIE).\n" +
-      "Nhiệm vụ chính của bạn:\n" +
-      "1. Hỗ trợ học viên giải đáp mọi thắc mắc lý thuyết & thực hành trong giáo trình CCNA 200-301 (Network Fundamentals, IP Connectivity, IP Services, Security Fundamentals, Network Access, Automation & Programmability).\n" +
-      "2. CHẨN ĐOÁN HÌNH ẢNH CISCO PACKET TRACER: Khi học viên gửi ảnh chụp màn hình Packet Tracer (Topology sơ đồ mạng, bảng CLI lệnh, thông báo lỗi ping, bảng định tuyến, trạng thái cổng):\n" +
-      "   - Soi kỹ đèn báo trạng thái liên kết (Link Lights): Đèn Xanh (Forwarding/Up), Đèn Cam/Vàng (STP Listening/Learning/Blocked), Đèn Đỏ (Cổng shutdown hoặc cắm nhầm loại cáp Straight-through vs Cross-over).\n" +
-      "   - Kiểm tra cổng cắm (FastEthernet, GigabitEthernet, Serial, Console) và đối chiếu với bảng địa chỉ IP / Default Gateway.\n" +
-      "   - Chỉ rõ chính xác nguyên nhân lỗi (Root Cause) và hậu quả.\n" +
-      "   - Cung cấp chính xác từng dòng lệnh Cisco IOS CLI để khắc phục, kèm chế độ cấu hình rõ ràng (ví dụ: `Router#`, `Router(config)#`, `Router(config-if)#`, `Router(config-subif)#`, `Switch(config-vlan)#`).\n" +
-      "3. Trả lời bằng tiếng Việt chuyên nghiệp, ngắn gọn, sư phạm, có định dạng Markdown rõ ràng, làm nổi bật các khối lệnh CLI để học viên dễ copy và thực hành ngay trong Packet Tracer."
+      "Bạn là Giảng viên Chuyên gia Mạng Cisco CCNA (CCNA 200-301 Master Instructor) và Kỹ sư Trưởng Xử lý Sự cố Mạng (Senior Network Architect).\n" +
+      "Nhiệm vụ chính:\n" +
+      "1. Hỗ trợ giải đáp kiến thức CCNA 200-301 và chẩn đoán sự cố Cisco Packet Tracer.\n" +
+      "2. Khi nhận ảnh chụp Packet Tracer (Topology, CLI, Ping timeout): Soi kỹ đèn báo cổng (Xanh/Cam/Đỏ), loại cáp (Straight-through/Cross-over), IP/Subnet/Default Gateway, và trạng thái cổng.\n" +
+      "3. Nguyên tắc trả lời: CÔ ĐỌNG, SÚC TÍCH, ĐI THẲNG VÀO NGUYÊN NHÂN LỖI và cung cấp ngay khối lệnh Cisco IOS CLI khắc phục chuẩn xác (kèm chế độ cấu hình Router(config)#). Tránh viết dài dòng để tối ưu token cho người học."
     );
   }
 
@@ -242,8 +238,8 @@
         }
       ],
       generationConfig: {
-        temperature: 0.3,
-        maxOutputTokens: 2048
+        temperature: 0.2,
+        maxOutputTokens: 1024
       }
     };
 
@@ -485,9 +481,9 @@
             <div class="ai-field-group">
               <label for="ai-model-select"><strong>Mô hình AI (Model)</strong></label>
               <select id="ai-model-select" class="ai-select-field">
-                <option value="gemini-2.0-flash" selected>Gemini 2.0 Flash (Mới nhất, Siêu tốc, Xử lý ảnh Lab cực chuẩn - Khuyên dùng)</option>
-                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Nhanh, ổn định)</option>
-                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Suy luận sâu, giải thích chi tiết)</option>
+                <option value="gemini-2.5-flash-lite" selected>Gemini 2.5 Flash-Lite (Tiết kiệm token tối đa, Siêu tốc - Khuyên dùng)</option>
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Cân bằng, Phân tích ảnh sắc nét)</option>
+                <option value="gemini-2.5-pro">Gemini 2.5 Pro (Suy luận sâu)</option>
               </select>
             </div>
 
@@ -703,38 +699,59 @@
       return;
     }
 
-    // Limit to ~8MB to ensure smooth base64 conversion
-    if (file.size > 8 * 1024 * 1024) {
-      alert("Kích thước ảnh quá lớn (>8MB). Vui lòng chọn ảnh chụp màn hình nhẹ hơn.");
-      return;
-    }
-
     const reader = new FileReader();
     reader.onload = (e) => {
-      const dataUrl = e.target.result;
-      const base64 = dataUrl.split(",")[1];
-      attachedImage = {
-        base64: base64,
-        mimeType: file.type || "image/png",
-        previewUrl: dataUrl,
-        name: file.name || "screenshot.png"
-      };
+      const img = new Image();
+      img.onload = () => {
+        // Token Saver: Downscale image to max dimension 1024px to drastically reduce token usage
+        const maxDim = 1024;
+        let width = img.width;
+        let height = img.height;
 
-      const bar = document.getElementById("ai-attachment-preview-bar");
-      const thumb = document.getElementById("ai-attachment-thumb");
-      const nameEl = document.getElementById("ai-attachment-name");
-
-      if (thumb) thumb.src = dataUrl;
-      if (nameEl) nameEl.textContent = attachedImage.name;
-      if (bar) bar.style.display = "flex";
-
-      const input = document.getElementById("ai-user-prompt-input");
-      if (input) {
-        input.focus();
-        if (!input.value.trim()) {
-          input.value = "Nhờ AI soi lỗi trên sơ đồ Packet Tracer này và chỉ cách sửa giúp tôi:";
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
         }
-      }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Compress to efficient JPEG 0.82 quality (preserves CLI text & link lights while saving ~80% tokens)
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.82);
+        const base64 = compressedDataUrl.split(",")[1];
+
+        attachedImage = {
+          base64: base64,
+          mimeType: "image/jpeg",
+          previewUrl: compressedDataUrl,
+          name: file.name || "packet_tracer_screenshot.jpg"
+        };
+
+        const bar = document.getElementById("ai-attachment-preview-bar");
+        const thumb = document.getElementById("ai-attachment-thumb");
+        const nameEl = document.getElementById("ai-attachment-name");
+
+        if (thumb) thumb.src = compressedDataUrl;
+        if (nameEl) nameEl.textContent = `${attachedImage.name} (${width}x${height} - Tối ưu token)`;
+        if (bar) bar.style.display = "flex";
+
+        const input = document.getElementById("ai-user-prompt-input");
+        if (input) {
+          input.focus();
+          if (!input.value.trim()) {
+            input.value = "Nhờ AI soi lỗi trên sơ đồ Packet Tracer này và chỉ cách sửa giúp tôi:";
+          }
+        }
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
