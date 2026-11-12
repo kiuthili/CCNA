@@ -447,92 +447,68 @@
       <div class="notes-panel" id="panel-sync">
         <div class="sync-card hero">
           <div class="sync-hero-content">
-            <h3 class="sync-hero-title">Đồng Bộ Đám Mây Đa Thiết Bị</h3>
+            <h3 class="sync-hero-title">Đồng Bộ Đám Mây Tự Động Theo Tài Khoản</h3>
             <p class="sync-hero-desc">
-              Ghi chú của bạn được tự động lưu an toàn trên đám mây. Bạn có thể mở web trên <strong>Điện thoại</strong>, <strong>Máy tính bảng</strong>, hay <strong>Laptop làm việc</strong> và tiếp tục học tập mà không bao giờ mất dữ liệu!
+              Toàn bộ <strong>Ghi chú</strong>, <strong>Highlight bài học</strong> và <strong>Tiến độ học tập</strong> được tự động lưu trữ và đồng bộ đám mây liên kết trực tiếp với tài khoản của bạn.
             </p>
           </div>
         </div>
 
-        <!-- Sync Key Section -->
+        <!-- Account Sync Status Section -->
         <div class="sync-section">
-          <label class="sync-label" for="cloud-sync-key-display">
-            <strong>Mã Đồng Bộ Cá Nhân (Cloud Sync Key)</strong>
-          </label>
-          <p class="sync-hint">
-            Dùng mã này để kết nối và xem toàn bộ ghi chú trên các thiết bị khác.
-          </p>
-
-          <div class="sync-key-row">
-            <input type="text" id="cloud-sync-key-display" class="sync-key-input" readonly value="Đang tạo mã..." />
-            <button type="button" class="sync-btn-copy" id="sync-copy-key-btn" title="Sao chép mã đồng bộ">
-              Sao chép
-            </button>
-          </div>
-
-          <div class="sync-action-buttons">
-            <button type="button" class="sync-btn-action" id="sync-now-btn">
-              Đồng bộ đám mây ngay
-            </button>
-            <button type="button" class="sync-btn-action secondary" id="sync-copy-link-btn" title="Sao chép link chia sẻ để mở trực tiếp trên điện thoại">
-              Sao chép link mở trên điện thoại
-            </button>
-          </div>
-        </div>
-
-        <!-- Connect to an existing Sync Key from another device -->
-        <div class="sync-section">
-          <label class="sync-label" for="cloud-sync-key-input">
-            <strong>Kết Nối Với Mã Từ Thiết Bị Khác</strong>
-          </label>
-          <p class="sync-hint">
-            Nếu bạn đã ghi chú trên máy khác, nhập mã đồng bộ của máy đó vào đây để tải về toàn bộ ghi chú:
-          </p>
-
-          <div class="sync-connect-row">
-            <input
-              type="text"
-              id="cloud-sync-key-input"
-              class="sync-input-field"
-              placeholder="Nhập mã đồng bộ từ thiết bị khác..."
-            />
-            <button type="button" class="sync-btn-connect" id="sync-connect-key-btn">
-              Tải ghi chú về
-            </button>
-          </div>
-        </div>
-
-        <!-- QR Code for fast mobile access -->
-        <div class="sync-section qr-section">
-          <label class="sync-label">
-            <strong>Mở Nhanh Trên Điện Thoại (Quét Mã QR)</strong>
-          </label>
-          <p class="sync-hint">
-            Dùng camera điện thoại quét mã QR bên dưới để mở ngay khóa học với toàn bộ ghi chú của bạn đã được kết nối:
-          </p>
-          <div class="qr-code-wrapper">
-            <img id="sync-qr-code-img" class="sync-qr-code-img" src="" alt="Mã QR mở trên điện thoại" />
-            <div class="qr-helper-text">
-              <span>Quét để mở trực tiếp trên di động</span>
-              <small>Tự động nạp mã đồng bộ và hiển thị đầy đủ ghi chú</small>
+          <div class="sync-account-header">
+            <div class="sync-status-indicator active" id="account-sync-status-indicator">
+              <span class="sync-status-pulse"></span>
+              <span class="sync-status-label" id="account-sync-status-label">Tài khoản: <strong>Đã đăng nhập</strong> &bull; Tự động đồng bộ hoạt động</span>
             </div>
+            <span class="sync-badge-live">AUTO SYNC</span>
+          </div>
+
+          <p class="sync-hint" style="margin-top: 0.85rem; font-size: 0.88rem; line-height: 1.6;">
+            💡 <strong>Hoàn toàn tự động — Không cần mã, link hay mã QR:</strong> Bạn chỉ cần đăng nhập tài khoản này trên bất kỳ máy tính, laptop, máy tính bảng hay điện thoại nào, dữ liệu học tập sẽ <strong>tự động xuất hiện và đồng bộ 2 chiều thời gian thực</strong>!
+          </p>
+
+          <div class="sync-feature-box">
+            <div class="sync-feature-item">
+              <span class="sync-feature-icon">✨</span>
+              <div>
+                <strong>Tự động lưu &amp; đẩy lên đám mây:</strong>
+                <span>Mỗi khi bạn ghi chú, đánh dấu highlight đoạn văn hay hoàn thành bài học, hệ thống tự động lưu vào tài khoản trên đám mây.</span>
+              </div>
+            </div>
+            <div class="sync-feature-item">
+              <span class="sync-feature-icon">⚡</span>
+              <div>
+                <strong>Đồng bộ đa thiết bị tức thì:</strong>
+                <span>Mở đồng thời trên máy tính và điện thoại, mọi ghi chú và highlight được cập nhật qua lại theo thời gian thực (Real-time SSE).</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sync-action-buttons" style="margin-top: 1rem; align-items: center;">
+            <button type="button" class="sync-btn-action" id="sync-now-btn">
+              🔄 Đồng bộ đám mây ngay bây giờ
+            </button>
+            <span id="account-sync-timestamp" style="font-size: 0.82rem; color: var(--text-muted); align-self: center;">
+              Trạng thái: Đã kết nối đám mây
+            </span>
           </div>
         </div>
 
         <!-- Backup & Restore section -->
         <div class="sync-section backup-section">
           <label class="sync-label">
-            <strong>Sao Lưu &amp; Khôi Phục (File JSON)</strong>
+            <strong>Sao Lưu &amp; Khôi Phục Dự Phòng (File JSON Ngoại Tuyến)</strong>
           </label>
           <p class="sync-hint">
-            Bạn cũng có thể tải file sao lưu dự phòng về máy tính hoặc chuyển file sang máy khác:
+            Tùy chọn tải file sao lưu dự phòng về lưu trữ ngoại tuyến trên máy tính hoặc chuyển file thủ công nếu muốn:
           </p>
           <div class="backup-btn-row">
             <button type="button" class="backup-btn" id="backup-export-btn">
-              Tải file sao lưu (.json)
+              💾 Tải file sao lưu (.json)
             </button>
             <label class="backup-btn secondary" for="backup-import-file">
-              Nhập từ file sao lưu
+              📂 Nhập từ file sao lưu
               <input type="file" id="backup-import-file" accept=".json" style="display:none;" />
             </label>
           </div>

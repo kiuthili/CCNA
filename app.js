@@ -6,6 +6,11 @@ let activeMasteryId = 0; // 0 = show all 10 mastery domains, 1..10 = show specif
 let currentLang = "vi"; // "vi" | "en" | "both"
 let currentMode = "modules"; // "modules" | "labs" | "mastery"
 
+// Secure Access Gateway (SHA-256 Auth & Anti-Scraping Shield)
+const AUTH_HASH_TARGET = "04e7ca8de21d616b80eaa340a06f7ffceb6a3ca22425cbf813b0fb09a4a7f783";
+const AUTH_SALT = "ccna_auth_v1_2026";
+const ACCOUNT_SYNC_VAULT_KEY = "ccna_acc_" + AUTH_HASH_TARGET.substring(0, 24);
+
 // State Management for Study Tools, Themes, Sidebar, Progress & Notes
 let completedItems = {};
 try {
@@ -28,11 +33,9 @@ try {
   studyHighlights = {};
 }
 
-let cloudSyncKey = localStorage.getItem("ccna_cloud_sync_key") || "";
-if (!cloudSyncKey) {
-  cloudSyncKey = "ccna-" + Math.random().toString(36).substring(2, 8) + Date.now().toString(36).slice(-4);
-  localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
-}
+// Account-bound deterministic Cloud Sync Key
+let cloudSyncKey = ACCOUNT_SYNC_VAULT_KEY;
+localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
 let currentTheme = localStorage.getItem("ccna_theme") || "light";
 let currentFontSize = parseFloat(localStorage.getItem("ccna_font_size") || "16.5");
 let isSidebarCollapsed = localStorage.getItem("ccna_sidebar_collapsed") === "true";
@@ -126,9 +129,6 @@ let cloudSyncDebounceTimer = null;
 // ============================================================
 // Secure Access Gateway (SHA-256 Auth & Anti-Scraping Shield)
 // ============================================================
-const AUTH_HASH_TARGET = "04e7ca8de21d616b80eaa340a06f7ffceb6a3ca22425cbf813b0fb09a4a7f783";
-const AUTH_SALT = "ccna_auth_v1_2026";
-
 async function hashCredentials(username, password) {
   const raw = `${username.trim().toLowerCase()}:${password}::${AUTH_SALT}`;
   const enc = new TextEncoder();
@@ -157,6 +157,11 @@ function initSecurityAndAuth() {
   if (checkCurrentAuth()) {
     document.body.classList.remove("not-authenticated");
     if (loginOverlay) loginOverlay.style.display = "none";
+    cloudSyncKey = ACCOUNT_SYNC_VAULT_KEY;
+    localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
+    pullNotesFromCloud(cloudSyncKey, true);
+    initRealtimeSyncListener();
+    updateAccountSyncStatusUI();
   } else {
     document.body.classList.add("not-authenticated");
     if (loginOverlay) loginOverlay.style.display = "flex";
@@ -197,6 +202,11 @@ function initSecurityAndAuth() {
           }
           if (loginErrorMsg) loginErrorMsg.hidden = true;
           document.body.classList.remove("not-authenticated");
+          cloudSyncKey = ACCOUNT_SYNC_VAULT_KEY;
+          localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
+          pullNotesFromCloud(cloudSyncKey, true);
+          initRealtimeSyncListener();
+          updateAccountSyncStatusUI();
           if (loginOverlay) {
             loginOverlay.style.opacity = "0";
             setTimeout(() => {
@@ -229,6 +239,10 @@ function initSecurityAndAuth() {
     topbarLogoutBtn.addEventListener("click", () => {
       sessionStorage.removeItem("ccna_auth_session");
       localStorage.removeItem("ccna_auth_session");
+      if (realtimeSyncSource) {
+        try { realtimeSyncSource.close(); } catch {}
+        realtimeSyncSource = null;
+      }
       document.body.classList.add("not-authenticated");
       document.title = "CCNA Learning";
       if (loginOverlay) {
@@ -238,6 +252,7 @@ function initSecurityAndAuth() {
       if (loginPass) loginPass.value = "";
       if (loginErrorMsg) loginErrorMsg.hidden = true;
       if (loginUser) loginUser.focus();
+      updateAccountSyncStatusUI();
     });
   }
 
@@ -2290,22 +2305,57 @@ function renderAllNotesList() {
   });
 }
 
+function updateAccountSyncStatusUI(customMsg) {
+  const label = document.getElementById("account-sync-status-label");
+  const indicator = document.getElementById("account-sync-status-indicator");
+  const timeEl = document.getElementById("account-sync-timestamp");
+  const isEn = typeof currentLang !== "undefined" && currentLang === "en";
+
+  const isAuth = checkCurrentAuth();
+  if (label) {
+    if (isAuth) {
+      label.innerHTML = isEn
+        ? "Account: <strong>Signed In</strong> &bull; Auto-sync active"
+        : "Tài khoản: <strong>Đã đăng nhập</strong> &bull; Tự động đồng bộ hoạt động";
+    } else {
+      label.innerHTML = isEn
+        ? "Account: <strong>Not Signed In</strong> &bull; Local only"
+        : "Tài khoản: <strong>Chưa đăng nhập</strong> &bull; Lưu cục bộ";
+    }
+  }
+
+  if (indicator) {
+    indicator.classList.toggle("active", isAuth);
+  }
+
+  if (timeEl) {
+    if (customMsg) {
+      timeEl.textContent = customMsg;
+    } else {
+      const d = new Date();
+      const timeStr = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      timeEl.textContent = isEn
+        ? `Last Synced: ${timeStr}`
+        : `Lần đồng bộ gần nhất: ${timeStr}`;
+    }
+  }
+}
+
 function updateCloudSyncTabUI() {
   if (cloudSyncKeyDisplay) {
     cloudSyncKeyDisplay.value = cloudSyncKey;
   }
+  updateAccountSyncStatusUI();
   updateQrCode();
 }
 
 function initSyncKey() {
-  if (!cloudSyncKey) {
-    cloudSyncKey = "ccna-" + Math.random().toString(36).substring(2, 8) + Date.now().toString(36).slice(-4);
-    localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
-  }
+  cloudSyncKey = ACCOUNT_SYNC_VAULT_KEY;
+  localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
   if (cloudSyncKeyDisplay) {
     cloudSyncKeyDisplay.value = cloudSyncKey;
   }
-  updateQrCode();
+  updateAccountSyncStatusUI();
 }
 
 let realtimeSyncSource = null;
@@ -2564,6 +2614,7 @@ function setCloudSyncStatus(status, text) {
   if (cloudSyncStatusText) {
     cloudSyncStatusText.textContent = text;
   }
+  updateAccountSyncStatusUI(text);
 }
 
 function exportNotesJson() {
@@ -2611,18 +2662,9 @@ function importNotesJson(file) {
       updateProgressSummary();
       filterAndRenderSidebar();
       triggerAutoSync();
+      alert("Đã nhập dữ liệu sao lưu thành công!");
     } catch {
       alert("Tệp sao lưu không hợp lệ.");
-    }
-  };
-  reader.readAsText(file);
-}
-      updateProgressSummary();
-      filterAndRenderSidebar();
-      triggerAutoSync();
-      alert("Đã nhập dữ liệu ghi chú thành công!");
-    } catch {
-      alert("File sao lưu không hợp lệ.");
     }
   };
   reader.readAsText(file);
@@ -2689,7 +2731,23 @@ function initNotesSystem() {
   }
 
   if (syncNowBtn) {
-    syncNowBtn.addEventListener("click", () => pushNotesToCloud());
+    syncNowBtn.addEventListener("click", async () => {
+      try {
+        syncNowBtn.disabled = true;
+        const origHtml = syncNowBtn.innerHTML;
+        syncNowBtn.innerHTML = "⏳ Đang kết nối &amp; đồng bộ...";
+        await pullNotesFromCloud(cloudSyncKey, true);
+        await pushNotesToCloud();
+        syncNowBtn.innerHTML = "✓ Đã đồng bộ thành công!";
+        setTimeout(() => {
+          syncNowBtn.disabled = false;
+          syncNowBtn.innerHTML = origHtml;
+        }, 1600);
+      } catch (err) {
+        syncNowBtn.disabled = false;
+        syncNowBtn.innerHTML = "🔄 Đồng bộ đám mây ngay bây giờ";
+      }
+    });
   }
 
   if (syncCopyLinkBtn) {
