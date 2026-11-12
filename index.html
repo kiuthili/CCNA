@@ -154,6 +154,7 @@
       <div class="topbar-select-wrap tools-dropdown-wrap" id="tools-select-wrap" title="Chọn công cụ học tập CCNA">
         <select class="topbar-dropdown" id="study-tools-select" aria-label="Chọn công cụ học tập CCNA">
           <option value="" disabled selected id="opt-tools-default">Công cụ học tập</option>
+          <option value="ai-tutor" id="opt-tool-ai-tutor">🤖 Trợ lý AI Cisco (Hỏi đáp &amp; Soi lỗi Lab)</option>
           <option value="notes" id="opt-tool-notes">Sổ tay ghi chú (Alt+N)</option>
           <option value="flashcards" id="opt-tool-flashcard">Thẻ nhớ Flashcard</option>
           <option value="exam" id="opt-tool-exam">Phòng thi thử CCNA</option>
@@ -293,6 +294,13 @@
       <path d="m11 9 3 3-3 3"/>
     </svg>
     <span>Mục lục</span>
+  </button>
+
+  <!-- Floating Action Button for AI Lab & Study Assistant -->
+  <button type="button" class="floating-ai-fab" id="floating-ai-fab" title="Trợ lý AI Cisco: Giải đáp kiến thức &amp; Soi lỗi ảnh Packet Tracer (Alt+A)" aria-label="Mở Trợ lý AI Cisco">
+    <span class="fab-ai-icon">🤖</span>
+    <span class="fab-ai-text">Hỏi AI Lab</span>
+    <span class="fab-ai-badge">Vision 2.0</span>
   </button>
 
   <!-- Floating Action Button for Quick Notes -->
@@ -694,6 +702,7 @@
   <script src="exam_mastery.js?v=20261112_v1"></script>
   <script src="en_translations.js?v=20261112_v2"></script>
   <script src="exam_sim.js?v=20261112_v1"></script>
+  <script src="ai_tutor.js?v=20261112_v1"></script>
   <script src="app.js?v=20261112_v1"></script>
 </body>
 </html>

@@ -339,7 +339,11 @@ function initStudyToolsSelect() {
     const action = e.target.value;
     if (!action) return;
 
-    if (action === "notes") {
+    if (action === "ai-tutor") {
+      if (typeof window.openAiTutorModal === "function") {
+        window.openAiTutorModal();
+      }
+    } else if (action === "notes") {
       if (typeof openNotesModal === "function") {
         openNotesModal("current");
       }
@@ -777,6 +781,9 @@ function renderLabsView(labId) {
         </svg>
         ${labId > 0 ? "Ghi chú bài Lab này" : "Mở sổ tay ghi chú"}
       </button>
+      <button type="button" class="lesson-ai-trigger-btn" id="lab-quick-ai-btn" title="Hỏi AI hoặc gửi ảnh chụp màn hình Packet Tracer">
+        <span>🤖 Hỏi AI / Soi lỗi Lab</span>
+      </button>
     </div>
   `;
 
@@ -810,6 +817,14 @@ function renderLabsView(labId) {
   const labQuickNoteBtn = document.getElementById("lab-quick-note-btn");
   if (labQuickNoteBtn) {
     labQuickNoteBtn.addEventListener("click", () => openNotesModal("current"));
+  }
+  const labQuickAiBtn = document.getElementById("lab-quick-ai-btn");
+  if (labQuickAiBtn) {
+    labQuickAiBtn.addEventListener("click", () => {
+      if (typeof window.openAiTutorModal === "function") {
+        window.openAiTutorModal(labId > 0 ? `Tôi đang làm bài Lab #${labId}, nhờ AI hướng dẫn / kiểm tra sơ đồ Packet Tracer:` : "");
+      }
+    });
   }
 
   // Restore saved highlights for this lab
@@ -922,6 +937,9 @@ function renderMasteryView(masteryId) {
         </svg>
         ${masteryId > 0 ? (isEn ? "Notes on this Topic" : "Ghi chú chuyên đề này") : (isEn ? "Open Study Notebook" : "Mở sổ tay ghi chú")}
       </button>
+      <button type="button" class="lesson-ai-trigger-btn" id="mastery-ai-btn" title="Hỏi Trợ lý AI về chuyên đề này">
+        <span>🤖 Hỏi AI</span>
+      </button>
     </div>
   `;
 
@@ -954,6 +972,14 @@ function renderMasteryView(masteryId) {
   const masteryQuickNoteBtn = document.getElementById("mastery-quick-note-btn");
   if (masteryQuickNoteBtn) {
     masteryQuickNoteBtn.addEventListener("click", () => openNotesModal("current"));
+  }
+  const masteryAiBtn = document.getElementById("mastery-ai-btn");
+  if (masteryAiBtn) {
+    masteryAiBtn.addEventListener("click", () => {
+      if (typeof window.openAiTutorModal === "function") {
+        window.openAiTutorModal(masteryId > 0 ? `Tôi đang ôn luyện Chuyên đề #${masteryId}: ${itemsToShow[0]?.title_vi || ""}, nhờ AI giải thích thêm:` : "");
+      }
+    });
   }
 
   // Restore saved highlights for this mastery domain
@@ -1592,6 +1618,9 @@ function selectModule(id) {
         </svg>
         ${isEn ? "Module Flashcards" : "Flashcards bài này"}
       </button>
+      <button type="button" class="lesson-ai-trigger-btn" id="lesson-ai-btn" title="Hỏi Trợ lý AI Cisco về bài học này">
+        <span>🤖 Hỏi AI</span>
+      </button>
     </div>
   `;
 
@@ -1662,6 +1691,14 @@ function selectModule(id) {
   const moduleFlashcardsBtn = document.getElementById("module-flashcards-btn");
   if (moduleFlashcardsBtn) {
     moduleFlashcardsBtn.addEventListener("click", () => openFlashcardsModal(mod.id));
+  }
+  const lessonAiBtn = document.getElementById("lesson-ai-btn");
+  if (lessonAiBtn) {
+    lessonAiBtn.addEventListener("click", () => {
+      if (typeof window.openAiTutorModal === "function") {
+        window.openAiTutorModal(`Tôi đang học Học phần ${mod.id}: ${mod.title_vi || mod.title}, cần AI giải thích thêm:`);
+      }
+    });
   }
 
   attachCalculatorEvents(mod.id);
@@ -3589,7 +3626,27 @@ document.addEventListener("keydown", (e) => {
     }
     return;
   }
+  if (e.altKey && (e.key === "a" || e.key === "A")) {
+    e.preventDefault();
+    const aiModal = document.getElementById("ai-tutor-modal");
+    if (aiModal && !aiModal.hidden) {
+      if (typeof window.closeAiTutorModal === "function") window.closeAiTutorModal();
+    } else {
+      if (typeof window.openAiTutorModal === "function") window.openAiTutorModal();
+    }
+    return;
+  }
   if (e.key === "Escape") {
+    const aiModal = document.getElementById("ai-tutor-modal");
+    if (aiModal && !aiModal.hidden) {
+      if (typeof window.closeAiTutorModal === "function") window.closeAiTutorModal();
+      return;
+    }
+    const aiSettingsModal = document.getElementById("ai-settings-modal");
+    if (aiSettingsModal && !aiSettingsModal.hidden) {
+      aiSettingsModal.hidden = true;
+      return;
+    }
     if (notesModal && !notesModal.hidden) {
       closeNotesModal();
       return;
