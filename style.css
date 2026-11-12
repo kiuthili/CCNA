@@ -252,28 +252,83 @@ body {
   transition: width 0.3s ease;
 }
 
-/* Action button for Notes Drawer */
-.topbar-action-btn.notes-btn {
+/* Unified Topbar Action Buttons */
+.topbar-action-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
+  height: 34px;
+  padding: 0 0.85rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.topbar-action-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  transform: translateY(-1px);
+}
+
+.topbar-action-btn.notes-btn {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: #ffffff;
   border: none;
-  padding: 0.42rem 0.85rem;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
-  position: relative;
 }
 
 .topbar-action-btn.notes-btn:hover {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  transform: translateY(-1px);
+  color: #ffffff;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.topbar-action-btn.flashcards-btn {
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(2, 132, 199, 0.3);
+  color: var(--accent-color);
+}
+
+.topbar-action-btn.flashcards-btn:hover {
+  background: var(--accent-color);
+  color: #ffffff;
+  border-color: var(--accent-color);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+}
+
+.topbar-action-btn.zen-btn {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #6366f1;
+}
+
+.topbar-action-btn.zen-btn:hover,
+.topbar-action-btn.zen-btn.active {
+  background: #6366f1;
+  color: #ffffff;
+  border-color: #6366f1;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+}
+
+.topbar-action-btn.logout-btn {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+}
+
+.topbar-action-btn.logout-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
 }
 
 .notes-count-badge {
@@ -928,19 +983,32 @@ body {
   flex-wrap: wrap;
 }
 
-.lesson-complete-toggle-btn {
+.lesson-complete-toggle-btn,
+.lesson-note-trigger-btn,
+.lesson-flashcards-trigger-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  background: var(--bg-card);
-  border: 1.5px solid var(--border-color);
-  color: var(--text-secondary);
-  padding: 0.4rem 0.9rem;
+  height: 34px;
+  padding: 0 0.95rem;
   border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.16s ease;
+  box-sizing: border-box;
+}
+
+.lesson-complete-toggle-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.lesson-complete-toggle-btn:hover {
+  border-color: #16a34a;
+  color: #16a34a;
+  transform: translateY(-1px);
 }
 
 .lesson-complete-toggle-btn.completed {
@@ -949,24 +1017,16 @@ body {
   color: #15803d;
 }
 
-.lesson-complete-toggle-btn:hover {
-  border-color: #16a34a;
-  transform: translateY(-1px);
+[data-theme="dark"] .lesson-complete-toggle-btn.completed {
+  background: rgba(34, 197, 94, 0.18);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #86efac;
 }
 
 .lesson-note-trigger-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
   background: var(--accent-light);
-  border: 1.5px solid #bae6fd;
+  border: 1px solid #bae6fd;
   color: var(--accent-dark);
-  padding: 0.4rem 0.85rem;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.18s ease;
 }
 
 .lesson-note-trigger-btn:hover {
@@ -974,6 +1034,33 @@ body {
   color: #ffffff;
   border-color: var(--accent-color);
   transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+}
+
+[data-theme="dark"] .lesson-note-trigger-btn {
+  background: rgba(2, 132, 199, 0.15);
+  border-color: rgba(2, 132, 199, 0.35);
+  color: #38bdf8;
+}
+
+.lesson-flashcards-trigger-btn {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #6366f1;
+}
+
+.lesson-flashcards-trigger-btn:hover {
+  background: #6366f1;
+  color: #ffffff;
+  border-color: #6366f1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+}
+
+[data-theme="dark"] .lesson-flashcards-trigger-btn {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #a5b4fc;
 }
 
 .content-container {
@@ -2545,6 +2632,7 @@ mark.ccna-hl-blue {
   font-size: 0.78rem;
 }
 
+.lesson-stats,
 .lesson-meta-left {
   display: flex;
   align-items: center;
@@ -2553,34 +2641,262 @@ mark.ccna-hl-blue {
   font-size: 0.78rem;
 }
 
+.lesson-stat-item,
 .lesson-meta-item {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
 }
 
+.lesson-expand-controls,
 .lesson-meta-actions {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.45rem;
 }
 
+.lesson-expand-btn,
 .lesson-control-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 28px;
+  padding: 0 0.65rem;
   background: var(--bg-page);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 600;
-  padding: 0.22rem 0.55rem;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
 }
 
+.lesson-expand-btn:hover,
 .lesson-control-btn:hover {
-  background: var(--accent-light);
-  color: var(--accent-dark);
+  background: var(--bg-card-hover);
   border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Secure Authentication Gateway Overlay & Anti-Scraping Rules                */
+/* -------------------------------------------------------------------------- */
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 30%, #0f172a 0%, #020617 100%);
+  padding: 1.5rem;
+  backdrop-filter: blur(8px);
+}
+
+.login-overlay[hidden] {
+  display: none !important;
+}
+
+body.not-authenticated #app-topbar,
+body.not-authenticated #app-layout,
+body.not-authenticated .floating-expand-btn,
+body.not-authenticated .floating-note-fab,
+body.not-authenticated .selection-tooltip,
+body.not-authenticated .flashcard-modal {
+  display: none !important;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(2, 132, 199, 0.15);
+  border-radius: 16px;
+  padding: 2.2rem 2rem;
+  color: #f8fafc;
+  animation: modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.login-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.login-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.login-sec-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.12);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.login-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0 0 0.45rem;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.login-subtitle {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0 0 1.6rem;
+  line-height: 1.45;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.login-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.login-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-icon {
+  position: absolute;
+  left: 0.85rem;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.login-input {
+  width: 100%;
+  padding: 0.65rem 0.85rem 0.65rem 2.4rem;
+  background: #090d16;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #f8fafc;
+  font-size: 0.86rem;
+  outline: none;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.login-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+.login-pwd-toggle {
+  position: absolute;
+  right: 0.65rem;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.9rem;
+}
+
+.login-extra-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.login-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+}
+
+.login-checkbox-label input {
+  accent-color: var(--accent-color);
+  cursor: pointer;
+}
+
+.login-error-msg {
+  padding: 0.55rem 0.85rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.login-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.2rem;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+  margin-top: 0.3rem;
+}
+
+.login-submit-btn:hover {
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
+}
+
+.login-footer {
+  margin-top: 1.6rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  font-size: 0.7rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Anti-scraping protection */
+.sidebar, .module-kicker, .quick-jump-bar, .lesson-control-bar {
+  user-select: none;
 }
 
 /* Panel 1: Current Note */

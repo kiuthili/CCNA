@@ -116,7 +116,150 @@ const backupImportFile = document.getElementById("backup-import-file");
 let noteSaveDebounceTimer = null;
 let cloudSyncDebounceTimer = null;
 
+// ============================================================
+// Secure Access Gateway (SHA-256 Auth & Anti-Scraping Shield)
+// ============================================================
+const AUTH_HASH_TARGET = "04e7ca8de21d616b80eaa340a06f7ffceb6a3ca22425cbf813b0fb09a4a7f783";
+const AUTH_SALT = "ccna_auth_v1_2026";
+
+async function hashCredentials(username, password) {
+  const raw = `${username.trim().toLowerCase()}:${password}::${AUTH_SALT}`;
+  const enc = new TextEncoder();
+  const buffer = await crypto.subtle.digest("SHA-256", enc.encode(raw));
+  return Array.from(new Uint8Array(buffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function checkCurrentAuth() {
+  const s = sessionStorage.getItem("ccna_auth_session");
+  const l = localStorage.getItem("ccna_auth_session");
+  return (s === AUTH_HASH_TARGET || l === AUTH_HASH_TARGET);
+}
+
+function initSecurityAndAuth() {
+  const loginOverlay = document.getElementById("login-overlay");
+  const loginForm = document.getElementById("login-form");
+  const loginUser = document.getElementById("login-username");
+  const loginPass = document.getElementById("login-password");
+  const loginPwdToggle = document.getElementById("login-pwd-toggle");
+  const loginRemember = document.getElementById("login-remember");
+  const loginErrorMsg = document.getElementById("login-error-msg");
+  const topbarLogoutBtn = document.getElementById("topbar-logout-btn");
+
+  if (checkCurrentAuth()) {
+    document.body.classList.remove("not-authenticated");
+    if (loginOverlay) loginOverlay.style.display = "none";
+  } else {
+    document.body.classList.add("not-authenticated");
+    if (loginOverlay) loginOverlay.style.display = "flex";
+  }
+
+  if (loginPwdToggle && loginPass) {
+    loginPwdToggle.addEventListener("click", () => {
+      const isPwd = loginPass.type === "password";
+      loginPass.type = isPwd ? "text" : "password";
+      loginPwdToggle.textContent = isPwd ? "🙈" : "👁️";
+    });
+  }
+
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const u = loginUser ? loginUser.value : "";
+      const p = loginPass ? loginPass.value : "";
+
+      if (!u || !p) {
+        if (loginErrorMsg) {
+          loginErrorMsg.textContent = currentLang === "en"
+            ? "Please enter both username and password."
+            : "Vui lòng nhập đầy đủ tài khoản và mật khẩu.";
+          loginErrorMsg.hidden = false;
+        }
+        return;
+      }
+
+      try {
+        const computed = await hashCredentials(u, p);
+        if (computed === AUTH_HASH_TARGET) {
+          sessionStorage.setItem("ccna_auth_session", AUTH_HASH_TARGET);
+          if (loginRemember && loginRemember.checked) {
+            localStorage.setItem("ccna_auth_session", AUTH_HASH_TARGET);
+          } else {
+            localStorage.removeItem("ccna_auth_session");
+          }
+          if (loginErrorMsg) loginErrorMsg.hidden = true;
+          document.body.classList.remove("not-authenticated");
+          if (loginOverlay) {
+            loginOverlay.style.opacity = "0";
+            setTimeout(() => {
+              loginOverlay.style.display = "none";
+              loginOverlay.style.opacity = "1";
+            }, 250);
+          }
+        } else {
+          if (loginErrorMsg) {
+            loginErrorMsg.textContent = currentLang === "en"
+              ? "Invalid username or password. Please verify credentials."
+              : "Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.";
+            loginErrorMsg.hidden = false;
+          }
+          if (loginPass) {
+            loginPass.value = "";
+            loginPass.focus();
+          }
+        }
+      } catch (err) {
+        if (loginErrorMsg) {
+          loginErrorMsg.textContent = "Lỗi xác thực hệ thống: " + err.message;
+          loginErrorMsg.hidden = false;
+        }
+      }
+    });
+  }
+
+  if (topbarLogoutBtn) {
+    topbarLogoutBtn.addEventListener("click", () => {
+      sessionStorage.removeItem("ccna_auth_session");
+      localStorage.removeItem("ccna_auth_session");
+      document.body.classList.add("not-authenticated");
+      if (loginOverlay) {
+        loginOverlay.style.display = "flex";
+        loginOverlay.style.opacity = "1";
+      }
+      if (loginPass) loginPass.value = "";
+      if (loginErrorMsg) loginErrorMsg.hidden = true;
+      if (loginUser) loginUser.focus();
+    });
+  }
+
+  // Anti-scraping safeguards
+  try {
+    if (window.top !== window.self) {
+      window.top.location = window.self.location;
+    }
+  } catch (e) {}
+
+  document.addEventListener("contextmenu", (e) => {
+    const tag = e.target.tagName;
+    if (tag !== "INPUT" && tag !== "TEXTAREA") {
+      e.preventDefault();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    const isCtrlOrMeta = e.ctrlKey || e.metaKey;
+    if (isCtrlOrMeta) {
+      const k = e.key.toLowerCase();
+      if (k === "s" || k === "u" || k === "p") {
+        e.preventDefault();
+      }
+    }
+  });
+}
+
 async function initApp() {
+  initSecurityAndAuth();
   applyTheme(currentTheme);
   applyFontSize(currentFontSize);
   applySidebarCollapsedState(isSidebarCollapsed);
@@ -264,6 +407,7 @@ function formatCliCommands(commands) {
 
 // Build a single Cisco Packet Tracer Lab HTML Card
 function renderSinglePacketTracerLabCard(lab) {
+  const isEn = currentLang === "en";
   const svgDiagram =
     typeof renderPacketTracerTopologySvg === "function"
       ? `<div class="svg-diagram-wrapper">${renderPacketTracerTopologySvg(lab)}</div>`
@@ -279,11 +423,11 @@ function renderSinglePacketTracerLabCard(lab) {
         <table class="tech-table">
           <thead>
             <tr>
-              <th>Thiết bị (Device)</th>
-              <th>Cổng nối (Interface)</th>
-              <th>Địa chỉ IP (IP Address)</th>
-              <th>Subnet Mask / Prefix</th>
-              <th>Gateway / Ghi chú</th>
+              <th>${isEn ? "Device" : "Thiết bị (Device)"}</th>
+              <th>${isEn ? "Interface" : "Cổng nối (Interface)"}</th>
+              <th>${isEn ? "IP Address" : "Địa chỉ IP (IP Address)"}</th>
+              <th>${isEn ? "Subnet Mask / Prefix" : "Subnet Mask / Prefix"}</th>
+              <th>${isEn ? "Default Gateway / Notes" : "Gateway / Ghi chú"}</th>
             </tr>
           </thead>
           <tbody>${rowsHtml}</tbody>
@@ -292,7 +436,8 @@ function renderSinglePacketTracerLabCard(lab) {
     `;
   }
 
-  const stepsHtml = (lab.steps_vi || [])
+  const stepsList = isEn && lab.steps_en && lab.steps_en.length > 0 ? lab.steps_en : (lab.steps_vi || []);
+  const stepsHtml = stepsList
     .map((s) => `<li class="pt-step-item">${formatRichText(s)}</li>`)
     .join("");
 
@@ -301,38 +446,42 @@ function renderSinglePacketTracerLabCard(lab) {
       ? `
       <div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.45rem;">
-          <strong style="font-size:0.88rem;color:#0f172a;">Tập lệnh cấu hình &amp; Kiểm tra (CLI):</strong>
+          <strong style="font-size:0.88rem;color:#0f172a;">${isEn ? "Configuration &amp; Verification Commands (CLI):" : "Tập lệnh cấu hình &amp; Kiểm tra (CLI):"}</strong>
         </div>
         <pre class="cli-block"><code>${formatCliCommands(lab.cli_commands)}</code></pre>
       </div>
     `
       : "";
 
+  const title = isEn ? (lab.title_en || lab.title_vi.replace(/^Lab \d+:\s*/, "")) : lab.title_vi;
+  const objective = isEn ? (lab.objective_en || lab.objective_vi) : lab.objective_vi;
+  const verify = isEn ? (lab.verify_en || lab.verify_vi) : lab.verify_vi;
+
   return `
     <article class="pt-lab-card" id="pt-lab-${lab.id}">
       <div class="pt-lab-header">
         <div class="pt-lab-badges">
-          <span class="pt-badge">BÀI LAB ${String(lab.id).padStart(2, "0")} / 35</span>
-          <span class="pt-badge">HỌC PHẦN ${lab.moduleId}</span>
+          <span class="pt-badge">${isEn ? `LAB ${String(lab.id).padStart(2, "0")} / 35` : `BÀI LAB ${String(lab.id).padStart(2, "0")} / 35`}</span>
+          <span class="pt-badge">${isEn ? `MODULE ${lab.moduleId}` : `HỌC PHẦN ${lab.moduleId}`}</span>
           <span class="pt-badge pt-badge-level">${escapeHtml(lab.level)}</span>
         </div>
-        <h4 class="pt-lab-title">${escapeHtml(lab.title_vi)}</h4>
+        <h4 class="pt-lab-title">${escapeHtml(title)}</h4>
       </div>
       <div class="pt-lab-body">
         <div class="pt-lab-objective">
-          <strong>Mục tiêu bài thực hành:</strong> ${formatRichText(lab.objective_vi)}
+          <strong>${isEn ? "Hands-On Objective:" : "Mục tiêu bài thực hành:"}</strong> ${formatRichText(objective)}
         </div>
         ${svgDiagram}
         ${ipTableHtml}
         <div>
           <strong style="display:block;margin-bottom:0.55rem;font-size:0.92rem;color:#0369a1;">
-            Hướng dẫn thực hành trên Cisco Packet Tracer:
+            ${isEn ? "Step-by-Step Hands-On Instructions:" : "Hướng dẫn thực hành trên Cisco Packet Tracer:"}
           </strong>
           <ul class="pt-steps-list">${stepsHtml}</ul>
         </div>
         ${cliHtml}
         <div class="pt-verify-box">
-          <strong>Tiêu chí nghiệm thu hoàn thành:</strong> ${formatRichText(lab.verify_vi)}
+          <strong>${isEn ? "Acceptance &amp; Verification Criteria:" : "Tiêu chí nghiệm thu hoàn thành:"}</strong> ${formatRichText(verify)}
         </div>
       </div>
     </article>
@@ -1045,15 +1194,19 @@ function selectModule(id) {
 
   // 6. Technical Comparison Table
   let tableSectionHtml = "";
-  if (mod.comparisonTable && mod.comparisonTable.rows) {
+  const compData = (isEn && typeof CCNA_COMPARISON_TABLES_EN !== "undefined" && CCNA_COMPARISON_TABLES_EN[mod.id])
+    ? CCNA_COMPARISON_TABLES_EN[mod.id]
+    : mod.comparisonTable;
+
+  if (compData && compData.rows) {
     const defaultEnHeaders = ["Technology / Standard", "Technical Specification", "Actual Bandwidth / Speed", "Enterprise & Exam Use-Case"];
     const headers = isEn
-      ? (mod.comparisonTable.headers_en || defaultEnHeaders)
-      : (mod.comparisonTable.headers_vi || defaultEnHeaders);
+      ? (compData.headers_en || compData.headers_vi || defaultEnHeaders)
+      : (compData.headers_vi || defaultEnHeaders);
     const headersHtml = headers
       .map((h) => `<th>${formatRichText(h)}</th>`)
       .join("");
-    const rowsHtml = mod.comparisonTable.rows
+    const rowsHtml = compData.rows
       .map(
         (row) =>
           `<tr>${row.map((cell) => `<td>${formatRichText(cell)}</td>`).join("")}</tr>`
@@ -1061,8 +1214,8 @@ function selectModule(id) {
       .join("");
 
     const tblTitle = isEn
-      ? (mod.comparisonTable.title_en || "Technical Comparison & Reference Table")
-      : (mod.comparisonTable.title_vi || "Bảng So Sánh Kỹ Thuật");
+      ? (compData.title_en || compData.title_vi || "Technical Comparison & Reference Table")
+      : (compData.title_vi || "Bảng So Sánh Kỹ Thuật");
 
     tableSectionHtml = wrapSectionBlock(
       "heading-table",
@@ -1079,7 +1232,7 @@ function selectModule(id) {
   // 7. Real-World Network Engineer Job Skills
   let jobSkillsHtml = "";
   const jobList = isEn
-    ? (mod.jobSkills_en && mod.jobSkills_en.length > 0 ? mod.jobSkills_en : mod.jobSkills_vi || [])
+    ? ((typeof CCNA_JOB_SKILLS_EN !== "undefined" && CCNA_JOB_SKILLS_EN[mod.id]) || (mod.jobSkills_en && mod.jobSkills_en.length > 0 ? mod.jobSkills_en : mod.jobSkills_vi || []))
     : (mod.jobSkills_vi || []);
   if (jobList.length > 0) {
     const itemsHtml = jobList
@@ -1144,8 +1297,12 @@ function selectModule(id) {
 
   // 10. Interactive CCNA 200-301 Exam Quiz
   let quizSectionHtml = "";
-  if (mod.quiz && mod.quiz.length > 0) {
-    const quizCardsHtml = mod.quiz
+  const activeQuizList = (isEn && typeof CCNA_QUIZ_EN !== "undefined" && CCNA_QUIZ_EN[mod.id])
+    ? CCNA_QUIZ_EN[mod.id]
+    : (mod.quiz && mod.quiz.length > 0 ? mod.quiz : []);
+
+  if (activeQuizList && activeQuizList.length > 0) {
+    const quizCardsHtml = activeQuizList
       .map((q, qIdx) => {
         const qText = isEn ? (q.question_en || q.question_vi) : q.question_vi;
         const opts = isEn ? (q.options_en || q.options_vi) : q.options_vi;
@@ -1173,7 +1330,7 @@ function selectModule(id) {
 
     quizSectionHtml = wrapSectionBlock(
       "heading-quiz",
-      `<span>${isEn ? `Part 11: CCNA Practice Exam Quiz (${mod.quiz.length} Questions)` : `Phần 11: Câu hỏi trắc nghiệm ôn thi CCNA (${mod.quiz.length} câu)`}</span>`,
+      `<span>${isEn ? `Part 11: CCNA Practice Exam Quiz (${activeQuizList.length} Questions)` : `Phần 11: Câu hỏi trắc nghiệm ôn thi CCNA (${activeQuizList.length} câu)`}</span>`,
       `<div class="quiz-container">${quizCardsHtml}</div>`
     );
   }
@@ -2610,8 +2767,12 @@ function buildFlashcardDeck(targetModId = null, targetCategory = "all") {
     }
 
     // 2. CCNA Exam Practice Quizzes
-    if ((targetCategory === "all" || targetCategory === "quiz") && m.quiz && Array.isArray(m.quiz)) {
-      m.quiz.forEach((q, qIdx) => {
+    const modQuizList = (isEn && typeof CCNA_QUIZ_EN !== "undefined" && CCNA_QUIZ_EN[m.id])
+      ? CCNA_QUIZ_EN[m.id]
+      : (m.quiz && Array.isArray(m.quiz) ? m.quiz : []);
+
+    if ((targetCategory === "all" || targetCategory === "quiz") && modQuizList.length > 0) {
+      modQuizList.forEach((q, qIdx) => {
         const qText = isEn ? (q.question_en || q.question_vi) : q.question_vi;
         const opts = isEn ? (q.options_en || q.options_vi) : q.options_vi;
         const exp = isEn ? (q.explanation_en || q.explanation_vi) : q.explanation_vi;
@@ -2684,8 +2845,12 @@ function buildFlashcardDeck(targetModId = null, targetCategory = "all") {
     }
 
     // 5. Job Skills & Real-World Troubleshooting
-    if ((targetCategory === "all" || targetCategory === "skills") && m.jobSkills_vi && Array.isArray(m.jobSkills_vi)) {
-      m.jobSkills_vi.forEach((skill) => {
+    const modSkillsList = isEn
+      ? ((typeof CCNA_JOB_SKILLS_EN !== "undefined" && CCNA_JOB_SKILLS_EN[m.id]) || (m.jobSkills_en && m.jobSkills_en.length > 0 ? m.jobSkills_en : m.jobSkills_vi || []))
+      : (m.jobSkills_vi || []);
+
+    if ((targetCategory === "all" || targetCategory === "skills") && Array.isArray(modSkillsList)) {
+      modSkillsList.forEach((skill) => {
         const colonIdx = skill.indexOf(":");
         if (colonIdx > 0 && colonIdx < 100) {
           deck.push({
@@ -2745,7 +2910,7 @@ function renderCurrentFlashcard() {
     if (hintPillEl) hintPillEl.textContent = isEn
       ? `Answer & Explanation [${card.type} — Module ${card.modId}]`
       : `Đáp án & Giải thích [${card.type} — Bài ${card.modId}]`;
-    cardTextEl.innerHTML = formatRichText(card.back);
+    cardTextEl.innerHTML = card.back;
   } else {
     if (flipperEl) flipperEl.classList.remove("is-flipped");
     if (hintPillEl) hintPillEl.textContent = isEn
