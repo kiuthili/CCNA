@@ -223,6 +223,7 @@ function initSecurityAndAuth() {
       sessionStorage.removeItem("ccna_auth_session");
       localStorage.removeItem("ccna_auth_session");
       document.body.classList.add("not-authenticated");
+      document.title = "CCNA Learning";
       if (loginOverlay) {
         loginOverlay.style.display = "flex";
         loginOverlay.style.opacity = "1";
@@ -697,11 +698,7 @@ function renderLabsView(labId) {
     </div>
   `;
 
-  const isEn = currentLang === "en";
-  document.title = labId > 0 && labsToShow[0]
-    ? (isEn ? `Lab ${labId}: ${labsToShow[0].title_en || labsToShow[0].title_vi.replace(/^Lab \d+:\s*/, "")} — CCNA Learning` : `${labsToShow[0].title_vi} — CCNA Learning`)
-    : (isEn ? "35 Packet Tracer Labs — CCNA Learning" : "35 Bài thực hành Lab — CCNA Learning");
-
+  document.title = "CCNA Learning";
   updateTopbarBreadcrumb();
 
   const labCompleteBtn = document.getElementById("lab-complete-btn");
@@ -797,10 +794,7 @@ function renderMasteryView(masteryId) {
     })
     .join("");
 
-  const isEn = currentLang === "en";
-  document.title = masteryId > 0 && itemsToShow[0]
-    ? (isEn ? `Mastery ${masteryId}: ${itemsToShow[0].title_en || itemsToShow[0].title_vi} — CCNA Learning` : `Chuyên đề ${masteryId}: ${itemsToShow[0].title_vi} — CCNA Learning`)
-    : (isEn ? "10 CCNA Exam Mastery Topics — CCNA Learning" : "10 Chuyên đề CCNA — CCNA Learning");
+  document.title = "CCNA Learning";
 
   const isMasteryCompleted = masteryId > 0 && !!completedItems["mastery-" + masteryId];
   const masteryActionsHtml = `
@@ -1363,10 +1357,8 @@ function selectModule(id) {
   const prevId = id > 1 ? id - 1 : null;
   const nextId = id < modulesData.length ? id + 1 : null;
 
-  // Dynamic SEO Title update
-  document.title = isEn
-    ? `Module ${mod.id}: ${mainTitle} — CCNA Learning`
-    : `Học phần ${mod.id}: ${mainTitle} — CCNA Learning`;
+  // Document Title
+  document.title = "CCNA Learning";
   closeMobileSidebar();
 
   // Estimate reading time & word count
