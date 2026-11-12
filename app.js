@@ -1,21 +1,125 @@
-// CCNA 200-301 Toàn Diện — 17 Học Phần Chi Tiết, 6 Chuyên Đề Thi & Đi Làm, 35 Bài Lab Cisco Packet Tracer
+// CCNA 200-301 Toàn Diện — 17 Học Phần Chi Tiết, 10 Chuyên Đề Thi & Đi Làm, 35 Bài Lab Cisco Packet Tracer
 let modulesData = [];
 let activeModuleId = 1;
 let activeLabId = 0; // 0 = show all 35 labs, 1..35 = show specific lab
-let activeMasteryId = 0; // 0 = show all 6 mastery domains, 1..6 = show specific domain
+let activeMasteryId = 0; // 0 = show all 10 mastery domains, 1..10 = show specific domain
 let currentLang = "vi"; // "vi" | "en" | "both"
 let currentMode = "modules"; // "modules" | "labs" | "mastery"
 
+// State Management for Study Tools, Themes, Sidebar, Progress & Notes
+let completedItems = {};
+try {
+  completedItems = JSON.parse(localStorage.getItem("ccna_completed_items") || "{}");
+} catch {
+  completedItems = {};
+}
+
+let studyNotes = {};
+try {
+  studyNotes = JSON.parse(localStorage.getItem("ccna_study_notes") || "{}");
+} catch {
+  studyNotes = {};
+}
+
+let cloudSyncKey = localStorage.getItem("ccna_cloud_sync_key") || "";
+let currentTheme = localStorage.getItem("ccna_theme") || "light";
+let currentFontSize = parseFloat(localStorage.getItem("ccna_font_size") || "16.5");
+let isSidebarCollapsed = localStorage.getItem("ccna_sidebar_collapsed") === "true";
+
+// DOM Elements
 const moduleListEl = document.getElementById("module-list");
 const moduleDetailEl = document.getElementById("module-detail");
 const searchInputEl = document.getElementById("module-search");
+const searchClearBtn = document.getElementById("search-clear-btn");
 const appTitleEl = document.getElementById("app-title");
 const langButtons = document.querySelectorAll(".lang-btn");
 const tabModulesBtn = document.getElementById("tab-modules-btn");
 const tabLabsBtn = document.getElementById("tab-labs-btn");
 const tabMasteryBtn = document.getElementById("tab-mastery-btn");
 
+// Topbar & Layout DOM Elements
+const appTopbar = document.getElementById("app-topbar");
+const topbarBreadcrumb = document.getElementById("topbar-breadcrumb");
+const sidebarToggleBtn = document.getElementById("sidebar-toggle-btn");
+const sidebarCollapseBtn = document.getElementById("sidebar-collapse-btn");
+const floatingExpandBtn = document.getElementById("floating-expand-btn");
+const studyProgressPill = document.getElementById("study-progress-pill");
+const progressPillText = document.getElementById("progress-pill-text");
+const progressMiniFill = document.getElementById("progress-mini-fill");
+const readingProgressBar = document.getElementById("reading-progress-bar");
+const themeSwitchBtn = document.getElementById("theme-switch-btn");
+const themeIcon = document.getElementById("theme-icon");
+const fontDecreaseBtn = document.getElementById("font-decrease-btn");
+const fontResetBtn = document.getElementById("font-reset-btn");
+const fontIncreaseBtn = document.getElementById("font-increase-btn");
+const brandHomeLink = document.getElementById("brand-home-link");
+
+// Notes Modal & FAB Elements
+const openNotesBtn = document.getElementById("open-notes-btn");
+const floatingNoteFab = document.getElementById("floating-note-fab");
+const notesCountBadge = document.getElementById("notes-count-badge");
+const fabNoteBadge = document.getElementById("fab-note-badge");
+const notesModal = document.getElementById("notes-modal");
+const notesBackdrop = document.getElementById("notes-backdrop");
+const notesCloseBtn = document.getElementById("notes-close-btn");
+const cloudSyncStatusBadge = document.getElementById("cloud-sync-status-badge");
+const cloudSyncStatusText = document.getElementById("cloud-sync-status-text");
+
+// Note Tabs & Panels
+const noteTabCurrentBtn = document.getElementById("note-tab-current-btn");
+const noteTabAllBtn = document.getElementById("note-tab-all-btn");
+const noteTabSyncBtn = document.getElementById("note-tab-sync-btn");
+const notesTabCounter = document.getElementById("notes-tab-counter");
+const panelCurrent = document.getElementById("panel-current");
+const panelAll = document.getElementById("panel-all");
+const panelSync = document.getElementById("panel-sync");
+
+// Note Editor Elements
+const noteLessonTitle = document.getElementById("note-lesson-title");
+const noteTitleInput = document.getElementById("note-title-input");
+const noteContentInput = document.getElementById("note-content-input");
+const noteSaveStatusText = document.getElementById("note-save-status-text");
+const noteSaveTimestamp = document.getElementById("note-save-timestamp");
+const noteDeleteCurrentBtn = document.getElementById("note-delete-current-btn");
+const noteSaveManualBtn = document.getElementById("note-save-manual-btn");
+const noteTagPills = document.querySelectorAll(".note-tag-pill");
+let activeNoteTag = "exam";
+
+// Formatting Toolbar Elements
+const toolBoldBtn = document.getElementById("tool-bold-btn");
+const toolItalicBtn = document.getElementById("tool-italic-btn");
+const toolCodeBtn = document.getElementById("tool-code-btn");
+const toolListBtn = document.getElementById("tool-list-btn");
+const toolInsertCliBtn = document.getElementById("tool-insert-cli-btn");
+
+// All Notes List Elements
+const allNotesSearchInput = document.getElementById("all-notes-search-input");
+const allNotesList = document.getElementById("all-notes-list");
+const allNotesTotalLabel = document.getElementById("all-notes-total-label");
+
+// Cloud Sync Elements
+const cloudSyncKeyDisplay = document.getElementById("cloud-sync-key-display");
+const syncCopyKeyBtn = document.getElementById("sync-copy-key-btn");
+const syncNowBtn = document.getElementById("sync-now-btn");
+const syncCopyLinkBtn = document.getElementById("sync-copy-link-btn");
+const cloudSyncKeyInput = document.getElementById("cloud-sync-key-input");
+const syncConnectKeyBtn = document.getElementById("sync-connect-key-btn");
+const syncQrCodeImg = document.getElementById("sync-qr-code-img");
+const backupExportBtn = document.getElementById("backup-export-btn");
+const backupImportFile = document.getElementById("backup-import-file");
+
+// Debounce timer for auto-save and auto-sync
+let noteSaveDebounceTimer = null;
+let cloudSyncDebounceTimer = null;
+
 async function initApp() {
+  applyTheme(currentTheme);
+  applyFontSize(currentFontSize);
+  applySidebarCollapsedState(isSidebarCollapsed);
+
+  initSyncKey();
+  checkUrlForSyncParam();
+
   try {
     const response = await fetch("ccna_data.json?v=20261111_v8");
     if (!response.ok) {
@@ -36,12 +140,24 @@ async function initApp() {
       </div>
     `;
   }
+
+  // Initial cloud sync pull in background if key is present
+  if (cloudSyncKey) {
+    pullNotesFromCloud(cloudSyncKey, true);
+  }
+
+  initNotesSystem();
+  updateProgressSummary();
+  updateNotesCountBadges();
 }
 
 function renderAll() {
   document.documentElement.lang = currentLang === "en" ? "en" : "vi";
   updateHeaderLabels();
   filterAndRenderSidebar();
+  updateProgressSummary();
+  updateTopbarBreadcrumb();
+
   if (currentMode === "labs") {
     renderLabsView(activeLabId);
   } else if (currentMode === "mastery") {
@@ -176,7 +292,7 @@ function renderSinglePacketTracerLabCard(lab) {
   `;
 }
 
-// Render Sidebar for 17 Modules, 6 Exam/Job Mastery Domains, or 35 Packet Tracer Labs
+// Render Sidebar for 17 Modules, 10 Exam/Job Mastery Domains, or 35 Packet Tracer Labs
 function renderSidebar(items) {
   moduleListEl.innerHTML = "";
 
@@ -203,7 +319,8 @@ function renderSidebar(items) {
       const li = document.createElement("li");
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = `module-item${m.id === activeMasteryId ? " active" : ""}`;
+      const isCompleted = !!completedItems["mastery-" + m.id];
+      btn.className = `module-item${m.id === activeMasteryId ? " active" : ""}${isCompleted ? " completed" : ""}`;
       btn.innerHTML = `
         <span class="module-num">CĐ${m.id}</span>
         <span class="module-name">
@@ -248,7 +365,8 @@ function renderSidebar(items) {
       const li = document.createElement("li");
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = `module-item${lab.id === activeLabId ? " active" : ""}`;
+      const isCompleted = !!completedItems["lab-" + lab.id];
+      btn.className = `module-item${lab.id === activeLabId ? " active" : ""}${isCompleted ? " completed" : ""}`;
       btn.innerHTML = `
         <span class="module-num">L${String(lab.id).padStart(2, "0")}</span>
         <span class="module-name">
@@ -282,7 +400,8 @@ function renderSidebar(items) {
     const li = document.createElement("li");
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = `module-item${mod.id === activeModuleId ? " active" : ""}`;
+    const isCompleted = !!completedItems["module-" + mod.id];
+    btn.className = `module-item${mod.id === activeModuleId ? " active" : ""}${isCompleted ? " completed" : ""}`;
     btn.dataset.id = mod.id;
 
     const numSpan = document.createElement("span");
@@ -305,6 +424,7 @@ function renderSidebar(items) {
 
     btn.addEventListener("click", () => {
       selectModule(mod.id);
+      closeMobileSidebar();
     });
 
     li.appendChild(btn);
@@ -319,6 +439,22 @@ function renderLabsView(labId) {
 
   const cardsHtml = labsToShow.map((lab) => renderSinglePacketTracerLabCard(lab)).join("");
 
+  const isLabCompleted = labId > 0 && !!completedItems["lab-" + labId];
+  const studyActionsHtml = `
+    <div class="lesson-study-actions">
+      ${
+        labId > 0
+          ? `<button type="button" class="lesson-complete-toggle-btn ${isLabCompleted ? "completed" : ""}" id="lab-complete-btn" data-key="lab-${labId}">
+              ${isLabCompleted ? "✓ Đã làm xong bài Lab này" : "○ Đánh dấu đã làm xong bài Lab"}
+            </button>`
+          : ""
+      }
+      <button type="button" class="lesson-note-trigger-btn" id="lab-quick-note-btn">
+        📝 ${labId > 0 ? "Ghi chú bài Lab này" : "Mở sổ tay ghi chú"}
+      </button>
+    </div>
+  `;
+
   moduleDetailEl.innerHTML = `
     <header class="module-header">
       <div class="module-kicker">THỰC HÀNH MẠNG CISCO PACKET TRACER • TRỌN BỘ 35 BÀI LAB TỪ CƠ BẢN ĐẾN NÂNG CAO</div>
@@ -332,11 +468,23 @@ function renderLabsView(labId) {
       <div class="module-heading-sub">
         Mỗi bài Lab đều có Sơ đồ đấu nối trực quan chuẩn Packet Tracer, Bảng quy hoạch địa chỉ IP, Hướng dẫn từng bước thao tác chuột và Giải thích từng dòng lệnh CLI.
       </div>
+      ${studyActionsHtml}
     </header>
     <div class="pt-labs-wrapper">
       ${cardsHtml}
     </div>
   `;
+
+  updateTopbarBreadcrumb();
+
+  const labCompleteBtn = document.getElementById("lab-complete-btn");
+  if (labCompleteBtn && labId > 0) {
+    labCompleteBtn.addEventListener("click", () => toggleItemCompleted(`lab-${labId}`));
+  }
+  const labQuickNoteBtn = document.getElementById("lab-quick-note-btn");
+  if (labQuickNoteBtn) {
+    labQuickNoteBtn.addEventListener("click", () => openNotesModal("current"));
+  }
 }
 
 // Render 6 CCNA 200-301 Exam Mastery & Real-World Job Readiness Domains
@@ -423,6 +571,23 @@ function renderMasteryView(masteryId) {
     .join("");
 
   document.title = "10 Chuyên Đề Thi CCNA 200-301 (v1.1 & v2.0), Thiết Bị Đa Hãng, Ngoại Vi & Phỏng Vấn Đi Làm";
+
+  const isMasteryCompleted = masteryId > 0 && !!completedItems["mastery-" + masteryId];
+  const masteryActionsHtml = `
+    <div class="lesson-study-actions">
+      ${
+        masteryId > 0
+          ? `<button type="button" class="lesson-complete-toggle-btn ${isMasteryCompleted ? "completed" : ""}" id="mastery-complete-btn" data-key="mastery-${masteryId}">
+              ${isMasteryCompleted ? "✓ Đã học xong chuyên đề này" : "○ Đánh dấu đã học xong chuyên đề"}
+            </button>`
+          : ""
+      }
+      <button type="button" class="lesson-note-trigger-btn" id="mastery-quick-note-btn">
+        📝 ${masteryId > 0 ? "Ghi chú chuyên đề này" : "Mở sổ tay ghi chú"}
+      </button>
+    </div>
+  `;
+
   moduleDetailEl.innerHTML = `
     <header class="module-header">
       <div class="module-kicker">HOÀN THIỆN 100% KHUNG ĐỀ THI QUỐC TẾ CISCO CCNA 200-301 • THIẾT BỊ ĐA HÃNG ARUBA / MIKROTIK • NGOẠI VI VĂN PHÒNG &amp; ĐI LÀM THỰC CHIẾN</div>
@@ -436,12 +601,23 @@ function renderMasteryView(masteryId) {
       <div class="module-heading-sub">
         Bao trọn toàn bộ kiến thức CCNA 2 (SRWE), CCNA 3 (ENSA) và các công nghệ thực chiến mới nhất: AI Tạo Sinh / Agentic AI, Terraform IaC, Root Guard / Loop Guard, Giải phẫu đa góc độ cổng vật lý, Switch HPE Aruba quản trị Web GUI / Cloud, Router cân bằng tải Multi-WAN DrayTek/MikroTik, cùng toàn bộ hệ sinh thái thiết bị ngoại vi văn phòng (Máy in cảm ứng LCD &amp; EWS, Máy scan mạng SMB, Máy in bill nhiệt POS 9100, IP Phone PoE passthrough, Quản trị từ xa máy tính nhân viên RMM/RDP/RustDesk/Wake-on-LAN).
       </div>
+      ${masteryActionsHtml}
     </header>
     <div>
       ${cardsHtml}
     </div>
   `;
+  updateTopbarBreadcrumb();
   attachPhotoLightboxEvents();
+
+  const masteryCompleteBtn = document.getElementById("mastery-complete-btn");
+  if (masteryCompleteBtn && masteryId > 0) {
+    masteryCompleteBtn.addEventListener("click", () => toggleItemCompleted(`mastery-${masteryId}`));
+  }
+  const masteryQuickNoteBtn = document.getElementById("mastery-quick-note-btn");
+  if (masteryQuickNoteBtn) {
+    masteryQuickNoteBtn.addEventListener("click", () => openNotesModal("current"));
+  }
 }
 
 // Build interactive Subnet / Binary Calculator for Modules 5 & 11
@@ -964,11 +1140,24 @@ function selectModule(id) {
     </nav>
   `;
 
+  const isCompleted = !!completedItems["module-" + mod.id];
+  const studyActionsHtml = `
+    <div class="lesson-study-actions">
+      <button type="button" class="lesson-complete-toggle-btn ${isCompleted ? "completed" : ""}" id="lesson-complete-btn" data-key="module-${mod.id}">
+        ${isCompleted ? "✓ Đã học xong học phần này" : "○ Đánh dấu đã học xong"}
+      </button>
+      <button type="button" class="lesson-note-trigger-btn" id="lesson-note-btn">
+        📝 Thêm ghi chú cho học phần này
+      </button>
+    </div>
+  `;
+
   moduleDetailEl.innerHTML = `
     <header class="module-header">
       <div class="module-kicker">${escapeHtml(kickerText)}</div>
       <h2 class="module-heading">${escapeHtml(mainTitle)}</h2>
       ${subTitle ? `<div class="module-heading-sub">${escapeHtml(subTitle)}</div>` : ""}
+      ${studyActionsHtml}
     </header>
 
     ${quickJumpHtml}
@@ -1025,11 +1214,29 @@ function selectModule(id) {
       <button type="button" class="nav-btn" id="prev-module-btn" ${!prevId ? "disabled" : ""}>
         &larr; ${currentLang === "en" ? "Previous Module" : "Học phần trước"}
       </button>
+      <button type="button" class="lesson-complete-toggle-btn ${isCompleted ? "completed" : ""}" id="footer-lesson-complete-btn" data-key="module-${mod.id}">
+        ${isCompleted ? "✓ Đã hoàn thành học phần này" : "○ Đánh dấu đã học xong"}
+      </button>
       <button type="button" class="nav-btn" id="next-module-btn" ${!nextId ? "disabled" : ""}>
         ${currentLang === "en" ? "Next Module" : "Học phần tiếp theo"} &rarr;
       </button>
     </div>
   `;
+
+  updateTopbarBreadcrumb();
+
+  const lessonCompleteBtn = document.getElementById("lesson-complete-btn");
+  if (lessonCompleteBtn) {
+    lessonCompleteBtn.addEventListener("click", () => toggleItemCompleted(`module-${mod.id}`));
+  }
+  const footerLessonCompleteBtn = document.getElementById("footer-lesson-complete-btn");
+  if (footerLessonCompleteBtn) {
+    footerLessonCompleteBtn.addEventListener("click", () => toggleItemCompleted(`module-${mod.id}`));
+  }
+  const lessonNoteBtn = document.getElementById("lesson-note-btn");
+  if (lessonNoteBtn) {
+    lessonNoteBtn.addEventListener("click", () => openNotesModal("current"));
+  }
 
   attachCalculatorEvents(mod.id);
   attachPhotoLightboxEvents();
@@ -1179,12 +1386,762 @@ if (tabMasteryBtn) {
 langButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     currentLang = btn.dataset.lang;
-    langButtons.forEach((b) => b.classList.toggle("active", b === btn));
+    langButtons.forEach((b) => b.classList.toggle("active", b.dataset.lang === currentLang));
     renderAll();
   });
 });
 
-searchInputEl.addEventListener("input", filterAndRenderSidebar);
+searchInputEl.addEventListener("input", () => {
+  if (searchClearBtn) {
+    searchClearBtn.style.display = searchInputEl.value ? "block" : "none";
+  }
+  filterAndRenderSidebar();
+});
+
+if (searchClearBtn) {
+  searchClearBtn.addEventListener("click", () => {
+    searchInputEl.value = "";
+    searchClearBtn.style.display = "none";
+    filterAndRenderSidebar();
+    searchInputEl.focus();
+  });
+}
+
+// ============================================================
+// Study Completion Tracking System
+// ============================================================
+function isItemCompleted(key) {
+  return !!completedItems[key];
+}
+
+function toggleItemCompleted(key) {
+  if (completedItems[key]) {
+    delete completedItems[key];
+  } else {
+    completedItems[key] = true;
+  }
+  localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
+  updateProgressSummary();
+  filterAndRenderSidebar();
+  updateLessonCompletionButtons();
+  triggerAutoSync();
+}
+
+function updateLessonCompletionButtons() {
+  const currentKey = getCurrentLessonNoteKey();
+  const isDone = isItemCompleted(currentKey);
+  const btns = document.querySelectorAll(".lesson-complete-toggle-btn");
+  btns.forEach((btn) => {
+    btn.classList.toggle("completed", isDone);
+    btn.innerHTML = isDone ? "✓ Đã học xong bài này" : "○ Đánh dấu đã học xong";
+  });
+}
+
+function updateProgressSummary() {
+  const totalModules = (modulesData && modulesData.length) || 17;
+  let completedModulesCount = 0;
+  for (let i = 1; i <= totalModules; i++) {
+    if (completedItems["module-" + i]) completedModulesCount++;
+  }
+  const pct = Math.round((completedModulesCount / totalModules) * 100);
+  if (progressPillText) {
+    progressPillText.textContent = `${completedModulesCount}/${totalModules} bài (${pct}%)`;
+  }
+  if (progressMiniFill) {
+    progressMiniFill.style.width = `${pct}%`;
+  }
+}
+
+// ============================================================
+// Topbar Breadcrumb & Reading Progress Indicator
+// ============================================================
+function updateTopbarBreadcrumb() {
+  if (!topbarBreadcrumb) return;
+  if (currentMode === "modules") {
+    const mod = modulesData.find((m) => m.id === activeModuleId);
+    if (mod) {
+      const title = currentLang === "en" ? mod.title : (mod.title_vi || mod.title);
+      topbarBreadcrumb.textContent = `📘 Học phần ${mod.id}: ${title}`;
+    }
+  } else if (currentMode === "labs") {
+    const allLabs = typeof PACKET_TRACER_LABS !== "undefined" ? PACKET_TRACER_LABS : [];
+    const lab = allLabs.find((l) => l.id === activeLabId);
+    topbarBreadcrumb.textContent = lab
+      ? `🟦 Lab ${lab.id}: ${lab.title_vi.replace(/^Lab \d+:\s*/, "")}`
+      : "🟦 Tất cả 35 Lab Packet Tracer";
+  } else if (currentMode === "mastery") {
+    const allMastery = typeof CCNA_EXAM_MASTERY !== "undefined" ? CCNA_EXAM_MASTERY : [];
+    const m = allMastery.find((item) => item.id === activeMasteryId);
+    topbarBreadcrumb.textContent = m
+      ? `🏆 CĐ${m.id}: ${m.title_vi}`
+      : "🏆 10 Chuyên Đề Thi & Đi Làm";
+  }
+}
+
+function updateReadingProgressBar() {
+  if (!readingProgressBar) return;
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  readingProgressBar.style.width = `${Math.min(100, Math.max(0, scrollPercent))}%`;
+}
+
+window.addEventListener("scroll", updateReadingProgressBar, { passive: true });
+
+// ============================================================
+// Collapsible Sidebar Functions
+// ============================================================
+function applySidebarCollapsedState(collapsed) {
+  isSidebarCollapsed = collapsed;
+  document.body.classList.toggle("sidebar-collapsed", collapsed);
+  localStorage.setItem("ccna_sidebar_collapsed", collapsed ? "true" : "false");
+}
+
+function toggleSidebar() {
+  if (window.innerWidth <= 980) {
+    if (appSidebarEl && appSidebarEl.classList.contains("open")) {
+      closeMobileSidebar();
+    } else {
+      openMobileSidebar();
+    }
+  } else {
+    applySidebarCollapsedState(!isSidebarCollapsed);
+  }
+}
+
+if (sidebarToggleBtn) sidebarToggleBtn.addEventListener("click", toggleSidebar);
+if (sidebarCollapseBtn) sidebarCollapseBtn.addEventListener("click", () => applySidebarCollapsedState(true));
+if (floatingExpandBtn) floatingExpandBtn.addEventListener("click", () => applySidebarCollapsedState(false));
+
+// ============================================================
+// Theme & Font Size Controls
+// ============================================================
+function applyTheme(theme) {
+  currentTheme = theme;
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("ccna_theme", theme);
+  if (themeIcon) {
+    if (theme === "dark") themeIcon.textContent = "🌙";
+    else if (theme === "sepia") themeIcon.textContent = "📜";
+    else themeIcon.textContent = "☀️";
+  }
+}
+
+function cycleTheme() {
+  if (currentTheme === "light") applyTheme("sepia");
+  else if (currentTheme === "sepia") applyTheme("dark");
+  else applyTheme("light");
+}
+
+if (themeSwitchBtn) themeSwitchBtn.addEventListener("click", cycleTheme);
+
+function applyFontSize(size) {
+  currentFontSize = Math.min(20, Math.max(14, size));
+  document.documentElement.style.setProperty("--app-font-size", `${currentFontSize}px`);
+  localStorage.setItem("ccna_font_size", String(currentFontSize));
+}
+
+if (fontDecreaseBtn) fontDecreaseBtn.addEventListener("click", () => applyFontSize(currentFontSize - 1));
+if (fontResetBtn) fontResetBtn.addEventListener("click", () => applyFontSize(16.5));
+if (fontIncreaseBtn) fontIncreaseBtn.addEventListener("click", () => applyFontSize(currentFontSize + 1));
+
+if (brandHomeLink) {
+  brandHomeLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    currentMode = "modules";
+    activeModuleId = 1;
+    setActiveModeTab("modules");
+    selectModule(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
+// ============================================================
+// Smart Notes System (Local Cache + Multi-Device Cloud Sync)
+// ============================================================
+function getCurrentLessonNoteKey() {
+  if (currentMode === "labs") {
+    return activeLabId > 0 ? `lab-${activeLabId}` : "labs-general";
+  }
+  if (currentMode === "mastery") {
+    return activeMasteryId > 0 ? `mastery-${activeMasteryId}` : "mastery-general";
+  }
+  return `module-${activeModuleId}`;
+}
+
+function getCurrentLessonTitle() {
+  if (currentMode === "labs") {
+    const allLabs = typeof PACKET_TRACER_LABS !== "undefined" ? PACKET_TRACER_LABS : [];
+    const lab = allLabs.find((l) => l.id === activeLabId);
+    return lab ? `Bài Lab ${lab.id}: ${lab.title_vi}` : "35 Bài Lab Packet Tracer";
+  }
+  if (currentMode === "mastery") {
+    const allMastery = typeof CCNA_EXAM_MASTERY !== "undefined" ? CCNA_EXAM_MASTERY : [];
+    const m = allMastery.find((item) => item.id === activeMasteryId);
+    return m ? `Chuyên Đề ${m.id}: ${m.title_vi}` : "10 Chuyên Đề Thi CCNA v2.0";
+  }
+  const mod = modulesData.find((m) => m.id === activeModuleId);
+  return mod ? `Học phần ${mod.id}: ${mod.title_vi || mod.title}` : "Học phần CCNA";
+}
+
+function updateNotesCountBadges() {
+  const count = Object.keys(studyNotes).length;
+  if (notesCountBadge) {
+    notesCountBadge.textContent = count;
+    notesCountBadge.style.display = count > 0 ? "inline-block" : "none";
+  }
+  if (fabNoteBadge) {
+    fabNoteBadge.textContent = count;
+    fabNoteBadge.style.display = count > 0 ? "inline-block" : "none";
+  }
+  if (notesTabCounter) {
+    notesTabCounter.textContent = `(${count})`;
+  }
+}
+
+function openNotesModal(targetPanel = "current") {
+  if (!notesModal) return;
+  notesModal.hidden = false;
+  switchNotesPanel(targetPanel);
+  loadCurrentNoteIntoEditor();
+  renderAllNotesList();
+  updateCloudSyncTabUI();
+}
+
+function closeNotesModal() {
+  if (!notesModal) return;
+  notesModal.hidden = true;
+}
+
+function switchNotesPanel(panelName) {
+  const panels = { current: panelCurrent, all: panelAll, sync: panelSync };
+  const buttons = { current: noteTabCurrentBtn, all: noteTabAllBtn, sync: noteTabSyncBtn };
+
+  Object.keys(panels).forEach((k) => {
+    if (panels[k]) panels[k].classList.toggle("active", k === panelName);
+    if (buttons[k]) buttons[k].classList.toggle("active", k === panelName);
+  });
+}
+
+function loadCurrentNoteIntoEditor() {
+  const key = getCurrentLessonNoteKey();
+  const title = getCurrentLessonTitle();
+  if (noteLessonTitle) noteLessonTitle.textContent = title;
+
+  const existing = studyNotes[key];
+  if (existing) {
+    if (noteTitleInput) noteTitleInput.value = existing.title || "";
+    if (noteContentInput) noteContentInput.value = existing.content || "";
+    activeNoteTag = existing.tag || "exam";
+    if (noteSaveTimestamp && existing.updatedAt) {
+      const date = new Date(existing.updatedAt);
+      noteSaveTimestamp.textContent = `(Lần lưu cuối: ${date.toLocaleTimeString("vi-VN")} ${date.toLocaleDateString("vi-VN")})`;
+    }
+  } else {
+    if (noteTitleInput) noteTitleInput.value = "";
+    if (noteContentInput) noteContentInput.value = "";
+    activeNoteTag = "exam";
+    if (noteSaveTimestamp) noteSaveTimestamp.textContent = "";
+  }
+
+  noteTagPills.forEach((p) => {
+    p.classList.toggle("active", p.dataset.tag === activeNoteTag);
+  });
+
+  if (noteSaveStatusText) {
+    noteSaveStatusText.textContent = "⚡ Tự động lưu tức thì";
+  }
+}
+
+function saveCurrentNote(isManual = false) {
+  const key = getCurrentLessonNoteKey();
+  const title = noteTitleInput ? noteTitleInput.value.trim() : "";
+  const content = noteContentInput ? noteContentInput.value.trim() : "";
+
+  if (!title && !content) {
+    if (studyNotes[key]) {
+      delete studyNotes[key];
+      localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+      updateNotesCountBadges();
+      renderAllNotesList();
+      triggerAutoSync();
+    }
+    return;
+  }
+
+  studyNotes[key] = {
+    key: key,
+    title: title || getCurrentLessonTitle(),
+    content: content,
+    tag: activeNoteTag,
+    lessonTitle: getCurrentLessonTitle(),
+    lessonMode: currentMode,
+    moduleId: activeModuleId,
+    labId: activeLabId,
+    masteryId: activeMasteryId,
+    updatedAt: Date.now()
+  };
+
+  localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+  updateNotesCountBadges();
+
+  if (noteSaveStatusText) {
+    noteSaveStatusText.textContent = isManual ? "✅ Đã lưu thủ công!" : "⚡ Đã tự động lưu";
+  }
+  if (noteSaveTimestamp) {
+    const d = new Date();
+    noteSaveTimestamp.textContent = `(${d.toLocaleTimeString("vi-VN")})`;
+  }
+
+  renderAllNotesList();
+  triggerAutoSync();
+}
+
+function deleteCurrentNote() {
+  const key = getCurrentLessonNoteKey();
+  if (studyNotes[key]) {
+    if (confirm("Bạn có chắc chắn muốn xóa ghi chú của bài học này không?")) {
+      delete studyNotes[key];
+      localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+      loadCurrentNoteIntoEditor();
+      renderAllNotesList();
+      updateNotesCountBadges();
+      triggerAutoSync();
+    }
+  } else {
+    if (noteTitleInput) noteTitleInput.value = "";
+    if (noteContentInput) noteContentInput.value = "";
+  }
+}
+
+function insertTextIntoNote(before, after = "") {
+  if (!noteContentInput) return;
+  const start = noteContentInput.selectionStart;
+  const end = noteContentInput.selectionEnd;
+  const text = noteContentInput.value;
+  const selected = text.substring(start, end);
+  const replacement = before + selected + after;
+  noteContentInput.value = text.substring(0, start) + replacement + text.substring(end);
+  noteContentInput.focus();
+  noteContentInput.setSelectionRange(start + before.length, end + before.length);
+  saveCurrentNote();
+}
+
+function renderAllNotesList() {
+  if (!allNotesList) return;
+  const query = allNotesSearchInput ? allNotesSearchInput.value.trim().toLowerCase() : "";
+  const allKeys = Object.keys(studyNotes);
+
+  if (allNotesTotalLabel) {
+    allNotesTotalLabel.textContent = `Tổng cộng: ${allKeys.length} ghi chú`;
+  }
+
+  if (allKeys.length === 0) {
+    allNotesList.innerHTML = `
+      <div class="notes-empty-state">
+        <span class="empty-icon">📝</span>
+        <p>Bạn chưa có ghi chú nào. Hãy mở một học phần, chuyên đề hoặc bài Lab và ghi lại các mẹo, câu lệnh trọng tâm nhé!</p>
+      </div>
+    `;
+    return;
+  }
+
+  const tagLabels = {
+    exam: "⭐ Trọng tâm thi",
+    tip: "💡 Mẹo ghi nhớ",
+    cli: "💻 Lệnh CLI",
+    trap: "⚠️ Bẫy đề thi",
+    job: "💼 Đi làm thực tế"
+  };
+
+  const filtered = allKeys
+    .map((k) => studyNotes[k])
+    .filter((note) => {
+      if (!query) return true;
+      return (
+        (note.title && note.title.toLowerCase().includes(query)) ||
+        (note.content && note.content.toLowerCase().includes(query)) ||
+        (note.lessonTitle && note.lessonTitle.toLowerCase().includes(query))
+      );
+    })
+    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+  if (filtered.length === 0) {
+    allNotesList.innerHTML = `<p class="no-results">Không tìm thấy ghi chú nào khớp với từ khóa tìm kiếm.</p>`;
+    return;
+  }
+
+  allNotesList.innerHTML = filtered
+    .map((note) => {
+      const d = note.updatedAt ? new Date(note.updatedAt) : new Date();
+      const dateStr = `${d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })} ${d.toLocaleDateString("vi-VN")}`;
+      const tagText = tagLabels[note.tag] || "⭐ Trọng tâm";
+      return `
+        <div class="note-card-item" data-key="${escapeHtml(note.key)}">
+          <div class="note-card-top">
+            <div class="note-card-badges">
+              <span class="note-badge-lesson">${escapeHtml(note.lessonTitle || "Bài học")}</span>
+              <span class="note-badge-tag">${escapeHtml(tagText)}</span>
+            </div>
+            <span class="note-card-time">${escapeHtml(dateStr)}</span>
+          </div>
+          <h4 class="note-card-title">${escapeHtml(note.title || "Ghi chú")}</h4>
+          <p class="note-card-snippet">${escapeHtml(note.content || "")}</p>
+          <div class="note-card-actions">
+            <button type="button" class="note-card-btn jump-btn" data-key="${escapeHtml(note.key)}" data-mode="${escapeHtml(note.lessonMode || "modules")}" data-mod="${note.moduleId || 1}" data-lab="${note.labId || 0}" data-mastery="${note.masteryId || 0}">
+              🚀 Mở bài học
+            </button>
+            <button type="button" class="note-card-btn edit-btn" data-key="${escapeHtml(note.key)}" data-mode="${escapeHtml(note.lessonMode || "modules")}" data-mod="${note.moduleId || 1}" data-lab="${note.labId || 0}" data-mastery="${note.masteryId || 0}">
+              ✏️ Sửa
+            </button>
+            <button type="button" class="note-card-btn danger delete-btn" data-key="${escapeHtml(note.key)}">
+              🗑️ Xóa
+            </button>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  allNotesList.querySelectorAll(".jump-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.mode || "modules";
+      setActiveModeTab(mode);
+      if (mode === "modules") selectModule(Number(btn.dataset.mod));
+      else if (mode === "labs") renderLabsView(Number(btn.dataset.lab));
+      else if (mode === "mastery") renderMasteryView(Number(btn.dataset.mastery));
+      closeNotesModal();
+    });
+  });
+
+  allNotesList.querySelectorAll(".edit-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.mode || "modules";
+      setActiveModeTab(mode);
+      if (mode === "modules") selectModule(Number(btn.dataset.mod));
+      else if (mode === "labs") renderLabsView(Number(btn.dataset.lab));
+      else if (mode === "mastery") renderMasteryView(Number(btn.dataset.mastery));
+      switchNotesPanel("current");
+      loadCurrentNoteIntoEditor();
+    });
+  });
+
+  allNotesList.querySelectorAll(".delete-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const k = btn.dataset.key;
+      if (confirm("Bạn có chắc chắn muốn xóa ghi chú này?")) {
+        delete studyNotes[k];
+        localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+        updateNotesCountBadges();
+        renderAllNotesList();
+        loadCurrentNoteIntoEditor();
+        triggerAutoSync();
+      }
+    });
+  });
+}
+
+function updateCloudSyncTabUI() {
+  if (cloudSyncKeyDisplay) {
+    cloudSyncKeyDisplay.value = cloudSyncKey;
+  }
+  updateQrCode();
+}
+
+function initSyncKey() {
+  if (!cloudSyncKey) {
+    cloudSyncKey = "ccna-" + Math.random().toString(36).substring(2, 8) + Date.now().toString(36).slice(-4);
+    localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
+  }
+  if (cloudSyncKeyDisplay) {
+    cloudSyncKeyDisplay.value = cloudSyncKey;
+  }
+  updateQrCode();
+}
+
+function checkUrlForSyncParam() {
+  try {
+    const hash = window.location.hash;
+    const urlParams = new URLSearchParams(window.location.search);
+    let keyFromUrl = urlParams.get("sync");
+    if (!keyFromUrl && hash.includes("sync=")) {
+      const match = hash.match(/sync=([^&]+)/);
+      if (match) keyFromUrl = decodeURIComponent(match[1]);
+    }
+    if (keyFromUrl && keyFromUrl !== cloudSyncKey) {
+      cloudSyncKey = keyFromUrl;
+      localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
+      if (cloudSyncKeyDisplay) cloudSyncKeyDisplay.value = cloudSyncKey;
+      pullNotesFromCloud(cloudSyncKey);
+    }
+  } catch {}
+}
+
+function updateQrCode() {
+  if (!syncQrCodeImg || !cloudSyncKey) return;
+  const shareUrl = `${window.location.origin}${window.location.pathname}#sync=${encodeURIComponent(cloudSyncKey)}`;
+  syncQrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(shareUrl)}`;
+}
+
+function triggerAutoSync() {
+  if (cloudSyncDebounceTimer) clearTimeout(cloudSyncDebounceTimer);
+  cloudSyncDebounceTimer = setTimeout(() => {
+    pushNotesToCloud();
+  }, 1200);
+}
+
+async function pushNotesToCloud() {
+  if (!cloudSyncKey) return;
+  setCloudSyncStatus("syncing", "Đang lưu đám mây...");
+
+  const payload = {
+    name: "ccna-study-notes",
+    data: {
+      syncKey: cloudSyncKey,
+      notes: studyNotes,
+      completedItems: completedItems,
+      updatedAt: Date.now()
+    }
+  };
+
+  try {
+    let success = false;
+    try {
+      const apiRes = await fetch(`/api/sync?key=${encodeURIComponent(cloudSyncKey)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (apiRes.ok) success = true;
+    } catch {}
+
+    if (!success) {
+      const directUrl = `https://api.restful-api.dev/objects/${encodeURIComponent(cloudSyncKey)}`;
+      let res = await fetch(directUrl, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        await fetch("https://api.restful-api.dev/objects", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      }
+    }
+
+    setCloudSyncStatus("synced", "Đã lưu đám mây");
+  } catch {
+    setCloudSyncStatus("synced", "Đã lưu (Cục bộ)");
+  }
+}
+
+async function pullNotesFromCloud(key, silent = false) {
+  if (!key) return;
+  if (!silent) setCloudSyncStatus("syncing", "Đang tải về...");
+
+  try {
+    let cloudData = null;
+    try {
+      const apiRes = await fetch(`/api/sync?key=${encodeURIComponent(key)}`);
+      if (apiRes.ok) {
+        const json = await apiRes.json();
+        cloudData = json.data || json;
+      }
+    } catch {}
+
+    if (!cloudData) {
+      const directRes = await fetch(`https://api.restful-api.dev/objects/${encodeURIComponent(key)}`);
+      if (directRes.ok) {
+        const json = await directRes.json();
+        cloudData = json.data || json;
+      }
+    }
+
+    if (cloudData && cloudData.notes) {
+      Object.keys(cloudData.notes).forEach((k) => {
+        if (!studyNotes[k] || (cloudData.notes[k].updatedAt || 0) > (studyNotes[k].updatedAt || 0)) {
+          studyNotes[k] = cloudData.notes[k];
+        }
+      });
+      if (cloudData.completedItems) {
+        completedItems = { ...completedItems, ...cloudData.completedItems };
+        localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
+      }
+      localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+      updateNotesCountBadges();
+      loadCurrentNoteIntoEditor();
+      renderAllNotesList();
+      updateProgressSummary();
+      filterAndRenderSidebar();
+      setCloudSyncStatus("synced", "Đã đồng bộ đám mây");
+      if (!silent) {
+        alert("Đã kết nối và đồng bộ toàn bộ ghi chú từ đám mây thành công!");
+      }
+    } else {
+      if (!silent) alert("Không tìm thấy dữ liệu ghi chú trên đám mây với mã này.");
+      setCloudSyncStatus("synced", "Chưa có dữ liệu mây");
+    }
+  } catch {
+    if (!silent) alert("Không thể kết nối đến máy chủ đồng bộ. Vui lòng kiểm tra lại kết nối mạng.");
+    setCloudSyncStatus("synced", "Đã lưu (Cục bộ)");
+  }
+}
+
+function setCloudSyncStatus(status, text) {
+  if (cloudSyncStatusBadge) {
+    cloudSyncStatusBadge.className = `cloud-sync-status-badge ${status}`;
+  }
+  if (cloudSyncStatusText) {
+    cloudSyncStatusText.textContent = text;
+  }
+}
+
+function exportNotesJson() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+    syncKey: cloudSyncKey,
+    notes: studyNotes,
+    completedItems: completedItems,
+    exportedAt: new Date().toISOString()
+  }, null, 2));
+  const dlAnchor = document.createElement("a");
+  dlAnchor.setAttribute("href", dataStr);
+  dlAnchor.setAttribute("download", `ccna_study_notes_${new Date().toISOString().slice(0, 10)}.json`);
+  document.body.appendChild(dlAnchor);
+  dlAnchor.click();
+  dlAnchor.remove();
+}
+
+function importNotesJson(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (parsed.notes) {
+        studyNotes = { ...studyNotes, ...parsed.notes };
+        localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+      }
+      if (parsed.completedItems) {
+        completedItems = { ...completedItems, ...parsed.completedItems };
+        localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
+      }
+      if (parsed.syncKey) {
+        cloudSyncKey = parsed.syncKey;
+        localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
+        if (cloudSyncKeyDisplay) cloudSyncKeyDisplay.value = cloudSyncKey;
+      }
+      updateNotesCountBadges();
+      loadCurrentNoteIntoEditor();
+      renderAllNotesList();
+      updateProgressSummary();
+      filterAndRenderSidebar();
+      triggerAutoSync();
+      alert("Đã nhập dữ liệu ghi chú thành công!");
+    } catch {
+      alert("File sao lưu không hợp lệ.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function initNotesSystem() {
+  if (noteTabCurrentBtn) noteTabCurrentBtn.addEventListener("click", () => switchNotesPanel("current"));
+  if (noteTabAllBtn) noteTabAllBtn.addEventListener("click", () => switchNotesPanel("all"));
+  if (noteTabSyncBtn) noteTabSyncBtn.addEventListener("click", () => switchNotesPanel("sync"));
+
+  if (openNotesBtn) openNotesBtn.addEventListener("click", () => openNotesModal("current"));
+  if (floatingNoteFab) floatingNoteFab.addEventListener("click", () => openNotesModal("current"));
+  if (notesCloseBtn) notesCloseBtn.addEventListener("click", closeNotesModal);
+  if (notesBackdrop) notesBackdrop.addEventListener("click", closeNotesModal);
+
+  const onNoteInputChange = () => {
+    if (noteSaveStatusText) noteSaveStatusText.textContent = "✍️ Đang nhập...";
+    if (noteSaveDebounceTimer) clearTimeout(noteSaveDebounceTimer);
+    noteSaveDebounceTimer = setTimeout(() => {
+      saveCurrentNote();
+    }, 450);
+  };
+
+  if (noteTitleInput) noteTitleInput.addEventListener("input", onNoteInputChange);
+  if (noteContentInput) noteContentInput.addEventListener("input", onNoteInputChange);
+
+  if (noteSaveManualBtn) noteSaveManualBtn.addEventListener("click", () => saveCurrentNote(true));
+  if (noteDeleteCurrentBtn) noteDeleteCurrentBtn.addEventListener("click", deleteCurrentNote);
+
+  noteTagPills.forEach((pill) => {
+    pill.addEventListener("click", () => {
+      noteTagPills.forEach((p) => p.classList.remove("active"));
+      pill.classList.add("active");
+      activeNoteTag = pill.dataset.tag;
+      saveCurrentNote();
+    });
+  });
+
+  if (toolBoldBtn) toolBoldBtn.addEventListener("click", () => insertTextIntoNote("**", "**"));
+  if (toolItalicBtn) toolItalicBtn.addEventListener("click", () => insertTextIntoNote("*", "*"));
+  if (toolCodeBtn) toolCodeBtn.addEventListener("click", () => insertTextIntoNote("`", "`"));
+  if (toolListBtn) toolListBtn.addEventListener("click", () => insertTextIntoNote("\n• "));
+  if (toolInsertCliBtn) {
+    toolInsertCliBtn.addEventListener("click", () => {
+      const mod = modulesData.find((m) => m.id === activeModuleId);
+      if (mod && mod.commands && mod.commands.length > 0) {
+        const cmdBlock = `\n\`\`\`cisco\n${mod.commands.slice(0, 5).join("\n")}\n\`\`\`\n`;
+        insertTextIntoNote(cmdBlock);
+      }
+    });
+  }
+
+  if (allNotesSearchInput) {
+    allNotesSearchInput.addEventListener("input", renderAllNotesList);
+  }
+
+  if (syncCopyKeyBtn) {
+    syncCopyKeyBtn.addEventListener("click", async () => {
+      if (!cloudSyncKey) return;
+      await navigator.clipboard.writeText(cloudSyncKey);
+      syncCopyKeyBtn.textContent = "✓ Đã sao chép";
+      setTimeout(() => (syncCopyKeyBtn.textContent = "📋 Sao chép"), 1800);
+    });
+  }
+
+  if (syncNowBtn) {
+    syncNowBtn.addEventListener("click", () => pushNotesToCloud());
+  }
+
+  if (syncCopyLinkBtn) {
+    syncCopyLinkBtn.addEventListener("click", async () => {
+      const shareUrl = `${window.location.origin}${window.location.pathname}#sync=${encodeURIComponent(cloudSyncKey)}`;
+      await navigator.clipboard.writeText(shareUrl);
+      syncCopyLinkBtn.textContent = "✓ Đã sao chép link!";
+      setTimeout(() => (syncCopyLinkBtn.textContent = "🔗 Sao chép link mở trên điện thoại"), 1800);
+    });
+  }
+
+  if (syncConnectKeyBtn) {
+    syncConnectKeyBtn.addEventListener("click", () => {
+      const key = cloudSyncKeyInput ? cloudSyncKeyInput.value.trim() : "";
+      if (!key) {
+        alert("Vui lòng nhập mã đồng bộ.");
+        return;
+      }
+      cloudSyncKey = key;
+      localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
+      if (cloudSyncKeyDisplay) cloudSyncKeyDisplay.value = cloudSyncKey;
+      pullNotesFromCloud(key);
+      updateQrCode();
+    });
+  }
+
+  if (backupExportBtn) backupExportBtn.addEventListener("click", exportNotesJson);
+  if (backupImportFile) {
+    backupImportFile.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files[0]) {
+        importNotesJson(e.target.files[0]);
+      }
+    });
+  }
+}
 
 // Responsive Mobile Sidebar Drawer & Photo Lightbox & Back-to-Top Logic
 const appSidebarEl = document.getElementById("app-sidebar");
@@ -1243,12 +2200,35 @@ if (lightboxCloseBtn && lightboxModal) {
   lightboxModal.addEventListener("click", (e) => {
     if (e.target === lightboxModal) lightboxModal.hidden = true;
   });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !lightboxModal.hidden) {
-      lightboxModal.hidden = true;
-    }
-  });
 }
+
+// Global Keyboard Shortcuts (Ctrl+B: Sidebar, Alt+N: Notes, Esc: Modals)
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && (e.key === "b" || e.key === "B")) {
+    e.preventDefault();
+    toggleSidebar();
+    return;
+  }
+  if (e.altKey && (e.key === "n" || e.key === "N")) {
+    e.preventDefault();
+    if (notesModal && !notesModal.hidden) {
+      closeNotesModal();
+    } else {
+      openNotesModal("current");
+    }
+    return;
+  }
+  if (e.key === "Escape") {
+    if (notesModal && !notesModal.hidden) {
+      closeNotesModal();
+      return;
+    }
+    if (lightboxModal && !lightboxModal.hidden) {
+      lightboxModal.hidden = true;
+      return;
+    }
+  }
+});
 
 document.addEventListener("DOMContentLoaded", initApp);
 

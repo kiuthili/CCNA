@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" translate="no">
+<html lang="vi" translate="no" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="google" content="notranslate" />
@@ -7,8 +7,8 @@
   <title>CCNA 200-301 Toàn Diện (v1.1 &amp; v2.0) — 17 Học Phần, 10 Chuyên Đề Thi &amp; Đi Làm Thực Tế &amp; 35 Lab Packet Tracer</title>
 
   <!-- SEO Meta Tags -->
-  <meta name="description" content="Hệ thống học tập và thực hành chứng chỉ quốc tế Cisco CCNA 200-301 (cập nhật v1.1 &amp; v2.0 mới nhất): 17 học phần từ cơ bản đến nâng cao, hình ảnh cận cảnh cổng port đa góc độ, bách khoa thuật ngữ, 10 chuyên đề thi &amp; đi làm thực tế (Switch Aruba Web GUI, máy in LCD, máy scan SMB, máy in bill POS, VoIP, quản lý máy tính từ xa RMM), cùng 35 bài Lab Cisco Packet Tracer." />
-  <meta name="keywords" content="CCNA 200-301, CCNA v2.0, CCNA v1.1, giáo trình CCNA tiếng Việt, tự học mạng máy tính, Cisco Packet Tracer Labs, VLAN, OSPF, STP, Root Guard, Loop Guard, Terraform, AI in Networking, phỏng vấn kỹ sư mạng" />
+  <meta name="description" content="Hệ thống học tập và thực hành chứng chỉ quốc tế Cisco CCNA 200-301 (cập nhật v1.1 &amp; v2.0 mới nhất): 17 học phần từ cơ bản đến nâng cao, hình ảnh cận cảnh cổng port đa góc độ, bách khoa thuật ngữ, 10 chuyên đề thi &amp; đi làm thực tế, cùng 35 bài Lab Cisco Packet Tracer và Sổ tay ghi chú đồng bộ đa thiết bị." />
+  <meta name="keywords" content="CCNA 200-301, CCNA v2.0, CCNA v1.1, giáo trình CCNA tiếng Việt, tự học mạng máy tính, Cisco Packet Tracer Labs, VLAN, OSPF, STP, Root Guard, Loop Guard, Terraform, AI in Networking, phỏng vấn kỹ sư mạng, note ccna" />
   <meta name="author" content="CCNA 200-301 Complete Learning Platform" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="theme-color" content="#0284c7" />
@@ -33,7 +33,7 @@
     "@context": "https://schema.org",
     "@type": "Course",
     "name": "Giáo Trình Quốc Tế Cisco CCNA 200-301 Toàn Diện (Phiên bản v1.1 & v2.0)",
-    "description": "Khóa học toàn diện gồm 17 Học phần nền tảng mạng, 10 Chuyên đề nâng cao phủ kín 100% đề thi CCNA 200-301 v1.1 & v2.0 (AI, Terraform, STP Guards, OSPF, WLC, NAT, SDN, Switch Aruba Web GUI, Thiết bị ngoại vi văn phòng, Máy in cảm ứng LCD, Máy scan SMB, Máy in bill nhiệt POS, VoIP, Quản lý máy tính từ xa RMM), thư viện ảnh phần cứng đa góc độ và 35 bài Lab Cisco Packet Tracer.",
+    "description": "Khóa học toàn diện gồm 17 Học phần nền tảng mạng, 10 Chuyên đề nâng cao phủ kín 100% đề thi CCNA 200-301 v1.1 & v2.0, thư viện ảnh phần cứng đa góc độ và 35 bài Lab Cisco Packet Tracer kèm Sổ tay ghi chú đồng bộ đa thiết bị.",
     "provider": {
       "@type": "Organization",
       "name": "Cisco Networking Academy Study Portal"
@@ -48,37 +48,87 @@
   }
   </script>
 
-  <link rel="stylesheet" href="style.css?v=20261111_v8" />
+  <link rel="stylesheet" href="style.css?v=20261112_v1" />
 </head>
 <body>
-  <!-- Mobile / Tablet Sticky Header Bar (Responsive) -->
-  <header class="mobile-topbar" aria-label="Thanh điều hướng di động">
-    <button type="button" class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Mở danh mục học phần" aria-expanded="false">
-      <span class="hamburger-icon">☰</span>
-      <span>Danh mục &amp; Tìm kiếm</span>
-    </button>
-    <div class="mobile-topbar-title">CCNA 200-301 (v1.1 &amp; v2.0)</div>
+  <!-- Scroll Reading Progress Bar at the top of the browser -->
+  <div class="reading-progress-bar" id="reading-progress-bar" aria-hidden="true"></div>
+
+  <!-- Universal Sticky Topbar (Modern Learning Experience like Coursera / GitBook / Udemy) -->
+  <header class="app-topbar" id="app-topbar" aria-label="Thanh công cụ học tập">
+    <div class="topbar-left">
+      <button type="button" class="topbar-btn sidebar-toggle-btn" id="sidebar-toggle-btn" aria-label="Thu gọn hoặc mở rộng thanh bài học (Ctrl+B)" title="Thu gọn / Mở rộng danh mục bài học (Ctrl+B)">
+        <span class="hamburger-icon">☰</span>
+        <span class="btn-text">Mục lục</span>
+      </button>
+
+      <div class="topbar-brand">
+        <a href="#" class="brand-link" id="brand-home-link" title="Về trang đầu CCNA">
+          <span class="brand-badge">CCNA 200-301</span>
+        </a>
+        <span class="brand-divider">/</span>
+        <span class="topbar-breadcrumb" id="topbar-breadcrumb">📘 Học phần 01</span>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <!-- Course Completion Progress Pill -->
+      <div class="study-progress-pill" id="study-progress-pill" title="Tiến độ học phần đã hoàn thành của bạn">
+        <span class="progress-pill-icon">🎯</span>
+        <span class="progress-pill-text" id="progress-pill-text">0/17 bài (0%)</span>
+        <div class="progress-mini-bar" aria-hidden="true">
+          <div class="progress-mini-fill" id="progress-mini-fill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Quick Notes Drawer Button -->
+      <button type="button" class="topbar-action-btn notes-btn" id="open-notes-btn" title="Mở Sổ tay ghi chú (Alt+N)">
+        <span class="action-icon">📝</span>
+        <span class="btn-text">Ghi chú</span>
+        <span class="notes-count-badge" id="notes-count-badge" style="display:none;">0</span>
+      </button>
+
+      <!-- Font Zoom Adjuster -->
+      <div class="font-zoom-group" role="group" aria-label="Điều chỉnh kích cỡ chữ">
+        <button type="button" class="font-zoom-btn" id="font-decrease-btn" title="Giảm cỡ chữ (A-)">A-</button>
+        <button type="button" class="font-zoom-btn" id="font-reset-btn" title="Cỡ chữ mặc định">A</button>
+        <button type="button" class="font-zoom-btn" id="font-increase-btn" title="Tăng cỡ chữ (A+)">A+</button>
+      </div>
+
+      <!-- Eye-Care Theme Switcher (Light / Eye-care Sepia / Dark) -->
+      <button type="button" class="theme-switch-btn" id="theme-switch-btn" title="Đổi giao diện học tập: Sáng / Dịu mắt Sepia / Tối">
+        <span id="theme-icon">☀️</span>
+      </button>
+
+      <!-- Language Switcher in Topbar -->
+      <div class="lang-switch topbar-lang" role="group" aria-label="Chuyển đổi ngôn ngữ">
+        <button type="button" class="lang-btn active" data-lang="vi" title="Tiếng Việt">🇻🇳 VI</button>
+        <button type="button" class="lang-btn" data-lang="en" title="English">🇬🇧 EN</button>
+        <button type="button" class="lang-btn" data-lang="both" title="Song ngữ Việt - Anh">VI+EN</button>
+      </div>
+    </div>
   </header>
 
   <!-- Backdrop for Mobile Drawer -->
   <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
 
-  <div class="app-layout">
-    <!-- Left Sidebar -->
+  <div class="app-layout" id="app-layout">
+    <!-- Left Collapsible Sidebar -->
     <aside class="sidebar" id="app-sidebar" aria-label="Điều hướng Học phần, Chuyên đề thi và Bài Lab">
       <div class="sidebar-header">
         <div class="header-top-row">
           <span class="course-badge">CCNA 200-301 • v1.1 &amp; v2.0 MỚI</span>
-          <div class="lang-switch" role="group" aria-label="Chuyển đổi ngôn ngữ">
-            <button type="button" class="lang-btn active" data-lang="vi" title="Tiếng Việt">🇻🇳 VI</button>
-            <button type="button" class="lang-btn" data-lang="en" title="English">🇬🇧 EN</button>
-            <button type="button" class="lang-btn" data-lang="both" title="Song ngữ Việt - Anh">VI+EN</button>
-            <button type="button" class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Đóng menu">✕</button>
+          <div class="sidebar-actions-group">
+            <button type="button" class="sidebar-collapse-icon-btn" id="sidebar-collapse-btn" title="Thu gọn thanh bên để mở rộng không gian học (Ctrl+B)" aria-label="Thu gọn thanh bên">
+              <span class="collapse-icon">◀</span>
+              <span class="collapse-text">Thu gọn</span>
+            </button>
+            <button type="button" class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Đóng menu trên di động">✕</button>
           </div>
         </div>
         <h1 class="sidebar-title" id="app-title">CCNA 200-301 (v2.0) &amp; 35 Lab</h1>
 
-        <!-- Mode Switcher: 17 Modules vs. 35 Packet Tracer Labs vs. 8 Exam v2.0/Job Mastery Domains -->
+        <!-- Mode Switcher: 17 Modules vs. 35 Packet Tracer Labs vs. 10 Exam v2.0/Job Mastery Domains -->
         <div class="mode-tabs" role="tablist">
           <button type="button" class="mode-tab-btn active" id="tab-modules-btn" data-mode="modules">
             📘 17 Học Phần Nền Tảng
@@ -96,10 +146,11 @@
             type="search"
             id="module-search"
             class="search-input"
-            placeholder="🔍 Tìm học phần, Switch Aruba Web GUI, máy in LCD, scan SMB, bill POS, VoIP, Router..."
+            placeholder="🔍 Tìm học phần, Switch Aruba, máy in LCD, SMB, VoIP, Router..."
             aria-label="Tìm kiếm học phần, chuyên đề hoặc bài Lab"
             autocomplete="off"
           />
+          <button type="button" class="search-clear-btn" id="search-clear-btn" title="Xóa tìm kiếm" aria-label="Xóa tìm kiếm" style="display:none;">✕</button>
         </div>
       </div>
 
@@ -116,6 +167,19 @@
     </main>
   </div>
 
+  <!-- Floating Expand Sidebar Button (Shown when sidebar is collapsed on desktop) -->
+  <button type="button" class="floating-expand-btn" id="floating-expand-btn" title="Mở lại danh mục bài học (Ctrl+B)" aria-label="Mở danh mục bài học">
+    <span class="btn-icon">📖</span>
+    <span>Danh mục bài</span>
+  </button>
+
+  <!-- Floating Action Button for Quick Notes -->
+  <button type="button" class="floating-note-fab" id="floating-note-fab" title="Ghi chú nhanh cho bài học này (Alt+N)" aria-label="Mở Sổ tay ghi chú">
+    <span class="fab-icon">📝</span>
+    <span class="fab-text">Ghi chú</span>
+    <span class="fab-badge" id="fab-note-badge" style="display:none;">0</span>
+  </button>
+
   <!-- Floating Back-to-Top Button -->
   <button type="button" class="back-to-top-btn" id="back-to-top-btn" title="Cuộn lên đầu trang" aria-label="Cuộn lên đầu trang">
     ⬆️ Đầu trang
@@ -130,10 +194,225 @@
     </div>
   </div>
 
-  <script src="diagrams.js?v=20261111_v8"></script>
-  <script src="glossary.js?v=20261111_v8"></script>
-  <script src="labs.js?v=20261111_v8"></script>
-  <script src="exam_mastery.js?v=20261111_v8"></script>
-  <script src="app.js?v=20261111_v8"></script>
+  <!-- Smart Note Modal / Drawer with Multi-Device Cloud Sync -->
+  <div class="notes-modal" id="notes-modal" role="dialog" aria-modal="true" aria-label="Sổ tay ghi chú học tập CCNA" hidden>
+    <div class="notes-backdrop" id="notes-backdrop"></div>
+    <div class="notes-container">
+      <!-- Modal Header -->
+      <header class="notes-header">
+        <div class="notes-title-wrap">
+          <span class="notes-icon">📝</span>
+          <h2 class="notes-title">Sổ Tay Ghi Chú Học Tập CCNA</h2>
+          <span class="cloud-sync-status-badge synced" id="cloud-sync-status-badge" title="Trạng thái lưu trữ &amp; đồng bộ đám mây">
+            <span class="status-dot"></span>
+            <span class="status-text" id="cloud-sync-status-text">Đã lưu</span>
+          </span>
+        </div>
+        <button type="button" class="notes-close-btn" id="notes-close-btn" aria-label="Đóng sổ tay ghi chú" title="Đóng (ESC)">✕</button>
+      </header>
+
+      <!-- Modal Tabs -->
+      <nav class="notes-tabs" role="tablist">
+        <button type="button" class="notes-tab-btn active" id="note-tab-current-btn" data-panel="panel-current">
+          📌 Bài học này
+        </button>
+        <button type="button" class="notes-tab-btn" id="note-tab-all-btn" data-panel="panel-all">
+          📚 Tất cả ghi chú <span class="notes-tab-counter" id="notes-tab-counter">(0)</span>
+        </button>
+        <button type="button" class="notes-tab-btn" id="note-tab-sync-btn" data-panel="panel-sync">
+          ☁️ Đồng bộ đám mây &amp; Đa thiết bị
+        </button>
+      </nav>
+
+      <!-- Panel 1: Current Lesson Note Editor -->
+      <div class="notes-panel active" id="panel-current">
+        <div class="note-current-banner">
+          <span class="banner-badge">Đang học:</span>
+          <span class="banner-lesson-title" id="note-lesson-title">Học phần 1: Networking Today</span>
+        </div>
+
+        <div class="note-editor-wrapper">
+          <div class="note-input-row">
+            <input
+              type="text"
+              id="note-title-input"
+              class="note-title-input"
+              placeholder="Tiêu đề ghi chú (VD: Phân biệt TCP vs UDP, bẫy subnet mask, mẹo nhớ 8 mức Syslog)..."
+              autocomplete="off"
+            />
+          </div>
+
+          <!-- Category Tags Picker -->
+          <div class="note-tags-picker" role="group" aria-label="Phân loại ghi chú">
+            <span class="tags-label">Nhãn:</span>
+            <button type="button" class="note-tag-pill active" data-tag="exam">⭐ Trọng tâm thi CCNA</button>
+            <button type="button" class="note-tag-pill" data-tag="tip">💡 Mẹo ghi nhớ</button>
+            <button type="button" class="note-tag-pill" data-tag="cli">💻 Lệnh CLI quan trọng</button>
+            <button type="button" class="note-tag-pill" data-tag="trap">⚠️ Bẫy đề thi hay gặp</button>
+            <button type="button" class="note-tag-pill" data-tag="job">💼 Đi làm thực tế</button>
+          </div>
+
+          <!-- Quick Formatting Toolbar -->
+          <div class="note-toolbar">
+            <button type="button" class="tool-btn" id="tool-bold-btn" title="In đậm (Ctrl+B)"><strong>B</strong></button>
+            <button type="button" class="tool-btn" id="tool-italic-btn" title="In nghiêng (Ctrl+I)"><em>I</em></button>
+            <button type="button" class="tool-btn" id="tool-code-btn" title="Chèn mã lệnh (`lệnh`)"><code>&lt;/&gt;</code></button>
+            <button type="button" class="tool-btn" id="tool-list-btn" title="Chèn danh sách gạch đầu dòng">• Danh sách</button>
+            <button type="button" class="tool-btn highlight" id="tool-insert-cli-btn" title="Chèn nhanh các lệnh CLI của bài này vào ghi chú">📋 Chèn lệnh bài này</button>
+          </div>
+
+          <!-- Content Textarea -->
+          <textarea
+            id="note-content-input"
+            class="note-content-textarea"
+            placeholder="Nhập nội dung ghi chú của bạn ở đây... Ghi chú sẽ tự động được lưu và đồng bộ lên đám mây để xem trên điện thoại hoặc máy tính khác bất cứ lúc nào."
+          ></textarea>
+
+          <!-- Editor Footer with Save Status and Actions -->
+          <div class="note-editor-footer">
+            <div class="note-save-info">
+              <span class="save-status-text" id="note-save-status-text">⚡ Tự động lưu tức thì</span>
+              <span class="save-timestamp" id="note-save-timestamp"></span>
+            </div>
+
+            <div class="note-editor-actions">
+              <button type="button" class="note-btn-danger" id="note-delete-current-btn" title="Xóa ghi chú của bài này">
+                🗑️ Xóa ghi chú
+              </button>
+              <button type="button" class="note-btn-primary" id="note-save-manual-btn" title="Lưu và đồng bộ lên đám mây ngay">
+                💾 Lưu ngay
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2: All Notes Browser -->
+      <div class="notes-panel" id="panel-all">
+        <div class="all-notes-header">
+          <input
+            type="search"
+            id="all-notes-search-input"
+            class="all-notes-search-input"
+            placeholder="🔍 Tìm kiếm trong tất cả ghi chú của bạn..."
+            autocomplete="off"
+          />
+          <div class="all-notes-stats">
+            <span id="all-notes-total-label">Tổng cộng: 0 ghi chú</span>
+          </div>
+        </div>
+
+        <div class="all-notes-list" id="all-notes-list">
+          <div class="notes-empty-state">
+            <span class="empty-icon">📝</span>
+            <p>Bạn chưa có ghi chú nào. Hãy mở một học phần hoặc bài Lab và ghi lại các kiến thức trọng tâm nhé!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Cloud Sync & Multi-Device Settings -->
+      <div class="notes-panel" id="panel-sync">
+        <div class="sync-card hero">
+          <div class="sync-hero-icon">☁️</div>
+          <div class="sync-hero-content">
+            <h3 class="sync-hero-title">Đồng Bộ Đám Mây Đa Thiết Bị</h3>
+            <p class="sync-hero-desc">
+              Ghi chú của bạn được lưu an toàn trên đám mây. Bạn có thể mở web trên <strong>Điện thoại</strong>, <strong>Máy tính bảng</strong>, hay <strong>Laptop làm việc ở công ty</strong> và tiếp tục học tập mà không bao giờ bị mất dữ liệu!
+            </p>
+          </div>
+        </div>
+
+        <!-- Sync Key Section -->
+        <div class="sync-section">
+          <label class="sync-label" for="cloud-sync-key-display">
+            🔑 <strong>Mã Đồng Bộ Cá Nhân (Cloud Sync Key)</strong>
+          </label>
+          <p class="sync-hint">
+            Dùng mã này để kết nối và xem toàn bộ ghi chú trên các thiết bị khác.
+          </p>
+
+          <div class="sync-key-row">
+            <input type="text" id="cloud-sync-key-display" class="sync-key-input" readonly value="Đang tạo mã..." />
+            <button type="button" class="sync-btn-copy" id="sync-copy-key-btn" title="Sao chép mã đồng bộ">
+              📋 Sao chép
+            </button>
+          </div>
+
+          <div class="sync-action-buttons">
+            <button type="button" class="sync-btn-action" id="sync-now-btn">
+              🔄 Đồng bộ đám mây ngay
+            </button>
+            <button type="button" class="sync-btn-action secondary" id="sync-copy-link-btn" title="Sao chép link chia sẻ để mở trực tiếp trên điện thoại">
+              🔗 Sao chép link mở trên điện thoại
+            </button>
+          </div>
+        </div>
+
+        <!-- Connect to an existing Sync Key from another device -->
+        <div class="sync-section">
+          <label class="sync-label" for="cloud-sync-key-input">
+            📲 <strong>Kết Nối Với Mã Từ Thiết Bị Khác</strong>
+          </label>
+          <p class="sync-hint">
+            Nếu bạn đã ghi chú trên máy khác, nhập mã đồng bộ của máy đó vào đây để tải về toàn bộ ghi chú:
+          </p>
+
+          <div class="sync-connect-row">
+            <input
+              type="text"
+              id="cloud-sync-key-input"
+              class="sync-input-field"
+              placeholder="Nhập mã đồng bộ từ thiết bị khác (VD: ff808181...)..."
+            />
+            <button type="button" class="sync-btn-connect" id="sync-connect-key-btn">
+              ⚡ Tải ghi chú về
+            </button>
+          </div>
+        </div>
+
+        <!-- QR Code for fast mobile access -->
+        <div class="sync-section qr-section">
+          <label class="sync-label">
+            📸 <strong>Mở Nhanh Trên Điện Thoại (Quét Mã QR)</strong>
+          </label>
+          <p class="sync-hint">
+            Dùng camera điện thoại quét mã QR bên dưới để mở ngay khóa học với toàn bộ ghi chú của bạn đã được kết nối:
+          </p>
+          <div class="qr-code-wrapper">
+            <img id="sync-qr-code-img" class="sync-qr-code-img" src="" alt="Mã QR mở trên điện thoại" />
+            <div class="qr-helper-text">
+              <span>📱 Quét để mở trực tiếp trên di động</span>
+              <small>Tự động nạp mã đồng bộ và hiển thị đầy đủ ghi chú</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Backup & Restore section -->
+        <div class="sync-section backup-section">
+          <label class="sync-label">
+            💾 <strong>Sao Lưu &amp; Khôi Phục (File JSON)</strong>
+          </label>
+          <p class="sync-hint">
+            Bạn cũng có thể tải về file sao lưu dự phòng về máy tính hoặc chuyển file sang máy khác:
+          </p>
+          <div class="backup-btn-row">
+            <button type="button" class="backup-btn" id="backup-export-btn">
+              📥 Tải file sao lưu (.json)
+            </button>
+            <label class="backup-btn secondary" for="backup-import-file">
+              📤 Nhập từ file sao lưu
+              <input type="file" id="backup-import-file" accept=".json" style="display:none;" />
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="diagrams.js?v=20261112_v1"></script>
+  <script src="glossary.js?v=20261112_v1"></script>
+  <script src="labs.js?v=20261112_v1"></script>
+  <script src="exam_mastery.js?v=20261112_v1"></script>
+  <script src="app.js?v=20261112_v1"></script>
 </body>
 </html>
