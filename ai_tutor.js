@@ -16,8 +16,9 @@
   const DEFAULT_MODEL = "gemini-2.5-flash-lite";
 
   // State
+  const MAX_ATTACHED_IMAGES = 6;
   let chatHistory = [];
-  let attachedImage = null; // { base64: string, mimeType: string, previewUrl: string, name: string }
+  let attachedImages = []; // Array of { id: string, base64: string, mimeType: string, previewUrl: string, name: string, width: number, height: number }
   let isGenerating = false;
 
   // Load chat history from localStorage
@@ -37,7 +38,7 @@
       "Bạn là Giảng viên Chuyên gia Mạng Cisco CCNA (CCNA 200-301 Master Instructor) và Kỹ sư Trưởng Xử lý Sự cố Mạng (Senior Network Architect).\n" +
       "Nhiệm vụ chính:\n" +
       "1. Hỗ trợ giải đáp kiến thức CCNA 200-301 và chẩn đoán sự cố Cisco Packet Tracer.\n" +
-      "2. Khi nhận ảnh chụp Packet Tracer (Topology, CLI, Ping timeout): Soi kỹ đèn báo cổng (Xanh/Cam/Đỏ), loại cáp (Straight-through/Cross-over), IP/Subnet/Default Gateway, và trạng thái cổng.\n" +
+      "2. Khi nhận một hoặc nhiều ảnh chụp Packet Tracer (Topology, CLI, Ping timeout): Soi kỹ đèn báo cổng (Xanh/Cam/Đỏ), loại cáp (Straight-through/Cross-over), IP/Subnet/Default Gateway, và trạng thái cổng. Đối chiếu liên thông giữa các ảnh (ví dụ Router CLI vs Switch CLI vs PC IP) để tìm điểm bất đồng bộ hoặc sai sót.\n" +
       "3. Nguyên tắc trả lời: CÔ ĐỌNG, SÚC TÍCH, ĐI THẲNG VÀO NGUYÊN NHÂN LỖI và cung cấp ngay khối lệnh Cisco IOS CLI khắc phục chuẩn xác (kèm chế độ cấu hình Router(config)#). Tránh viết dài dòng để tối ưu token cho người học."
     );
   }
@@ -114,15 +115,16 @@
   }
 
   // Smart Offline Fallback Heuristics Engine
-  function generateSmartOfflineResponse(userPrompt, imageAttached, context) {
+  function generateSmartOfflineResponse(userPrompt, imagesList, context) {
     const p = (userPrompt || "").toLowerCase();
     const isLab = context.type === "lab";
+    const numImages = Array.isArray(imagesList) ? imagesList.length : (imagesList ? 1 : 0);
 
     let reply = `### 💡 Phản hồi từ Trợ lý Kỹ thuật Cisco CCNA (Chế độ Phân tích Sẵn sàng)\n\n`;
 
-    if (imageAttached) {
-      reply += `> 📸 **Đã nhận ảnh chụp màn hình Packet Tracer của bạn!**\n>\n`;
-      reply += `> Để kích hoạt trí tuệ nhân tạo **Gemini Vision 2.0** soi chiếu từng pixel, kiểm tra màu sắc đèn cổng (Xanh/Cam/Đỏ) và đọc từng dòng bảng cấu hình trên ảnh, bạn chỉ cần bấm nút **⚙️ Cài đặt** ở góc trên và dán **API Key Gemini miễn phí** (lấy trong 10 giây tại Google AI Studio).\n\n`;
+    if (numImages > 0) {
+      reply += `> 📸 **Đã nhận ${numImages} ảnh chụp màn hình Packet Tracer của bạn!**\n>\n`;
+      reply += `> Để kích hoạt trí tuệ nhân tạo **Gemini Vision** soi chiếu chi tiết từng pixel và đối chiếu liên thông cả ${numImages} ảnh (Topology, CLI, Ping), bạn chỉ cần mở Cài đặt (⚙️) kiểm tra API Key miễn phí.\n\n`;
     }
 
     reply += `Dưới đây là chẩn đoán nhanh và hướng dẫn khắc phục dựa trên ngữ cảnh **${escapeHtml(context.title)}**:\n\n`;
@@ -192,15 +194,15 @@
     return reply;
   }
 
-  // Call Google Gemini API (Supports Vision & Multi-turn chat)
-  async function callGeminiApi(userPrompt, imageObj, context) {
+  // Call Google Gemini API (Supports Vision & Multi-turn chat with multiple images)
+  async function callGeminiApi(userPrompt, imagesList, context) {
     const apiKey = localStorage.getItem(STORAGE_KEY_API_KEY) || "";
     const model = localStorage.getItem(STORAGE_KEY_MODEL) || DEFAULT_MODEL;
 
     // If no API Key is provided, use the Smart Offline Engine
     if (!apiKey.trim()) {
       await new Promise((res) => setTimeout(res, 600)); // slight natural feel
-      return generateSmartOfflineResponse(userPrompt, imageObj, context);
+      return generateSmartOfflineResponse(userPrompt, imagesList, context);
     }
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
@@ -212,17 +214,24 @@
     if (context && context.contextText) {
       promptWithContext += `${context.contextText}\n\n`;
     }
-    promptWithContext += `Câu hỏi của học viên: ${userPrompt || "Hãy phân tích hình ảnh đính kèm và hướng dẫn giải quyết sự cố trong Cisco Packet Tracer."}`;
+    const hasImages = Array.isArray(imagesList) && imagesList.length > 0;
+    promptWithContext += `Câu hỏi của học viên: ${
+      userPrompt || (hasImages ? `Hãy phân tích chi tiết ${imagesList.length} ảnh đính kèm và hướng dẫn giải quyết sự cố trong Cisco Packet Tracer.` : "Hãy hướng dẫn tôi.")
+    }`;
 
     // Parts array
     const parts = [{ text: promptWithContext }];
 
-    // If image attached, add inlineData
-    if (imageObj && imageObj.base64 && imageObj.mimeType) {
-      parts.push({
-        inlineData: {
-          mimeType: imageObj.mimeType,
-          data: imageObj.base64
+    // If multiple images attached, add all inlineData
+    if (hasImages) {
+      imagesList.forEach((imgObj) => {
+        if (imgObj && imgObj.base64 && imgObj.mimeType) {
+          parts.push({
+            inlineData: {
+              mimeType: imgObj.mimeType,
+              data: imgObj.base64
+            }
+          });
         }
       });
     }
@@ -393,23 +402,22 @@
             <!-- Messages will be rendered here -->
           </div>
 
-          <!-- Attachment Preview Bar (shown when an image is pasted or selected) -->
+          <!-- Attachment Preview Bar (shown when 1 or more images are pasted or selected) -->
           <div class="ai-attachment-preview-bar" id="ai-attachment-preview-bar" style="display: none;">
-            <div class="ai-attachment-thumb-wrap">
-              <img id="ai-attachment-thumb" class="ai-attachment-thumb" src="" alt="Ảnh đính kèm" />
-              <button type="button" class="ai-remove-attachment-btn" id="ai-remove-attachment-btn" title="Hủy ảnh này">
-                ✕
+            <div class="ai-attachments-top-row">
+              <span class="ai-attachment-count" id="ai-attachment-count">Đã đính kèm 0 ảnh</span>
+              <button type="button" class="ai-clear-all-attachments-btn" id="ai-clear-all-attachments-btn" title="Hủy tất cả ảnh đã đính kèm">
+                ✕ Xóa tất cả ảnh
               </button>
             </div>
-            <div class="ai-attachment-info">
-              <span class="ai-attachment-name" id="ai-attachment-name">screenshot.png</span>
-              <span class="ai-attachment-desc">Sẵn sàng để AI phân tích khi bạn bấm Gửi</span>
+            <div class="ai-attachments-scroll" id="ai-attachments-scroll">
+              <!-- Dynamically populated thumbnails -->
             </div>
           </div>
 
           <!-- Suggested Quick Prompts -->
           <div class="ai-quick-prompts" id="ai-quick-prompts">
-            <button type="button" class="ai-prompt-chip" data-prompt="Soi lỗi ảnh Packet Tracer này giúp tôi: tại sao link bị đỏ hoặc ping không thông?">
+            <button type="button" class="ai-prompt-chip" data-prompt="Soi lỗi các ảnh Packet Tracer này giúp tôi: tại sao link bị đỏ hoặc ping không thông?">
               🔍 Soi lỗi ảnh Packet Tracer
             </button>
             <button type="button" class="ai-prompt-chip" data-prompt="Hướng dẫn từng bước cấu hình CLI để hoàn thành bài Lab hiện tại">
@@ -426,9 +434,9 @@
           <!-- Input Footer -->
           <footer class="ai-tutor-footer">
             <div class="ai-input-wrapper">
-              <label for="ai-image-upload-input" class="ai-image-btn" title="Đính kèm ảnh chụp màn hình Packet Tracer (hoặc bấm Ctrl+V để dán trực tiếp)">
+              <label for="ai-image-upload-input" class="ai-image-btn" title="Đính kèm một hoặc nhiều ảnh Packet Tracer (hoặc bấm Ctrl+V nhiều lần để dán)">
                 📷
-                <input type="file" id="ai-image-upload-input" accept="image/*" style="display:none;" />
+                <input type="file" id="ai-image-upload-input" accept="image/*" multiple style="display:none;" />
               </label>
 
               <textarea
@@ -549,7 +557,16 @@
           <div class="ai-msg-content-wrap">
             <div class="ai-msg-sender">${isUser ? "Bạn" : "Cisco AI Tutor"}</div>
             ${
-              msg.image
+              Array.isArray(msg.images) && msg.images.length > 0
+                ? `<div class="ai-msg-images-grid count-${Math.min(msg.images.length, 4)}">
+                     ${msg.images.map((src, i) => `
+                       <div class="ai-grid-img-wrap">
+                         <img src="${src}" alt="Ảnh ${i + 1}" class="ai-msg-img" onclick="window.openImageLightbox && window.openImageLightbox('${src}', 'Ảnh Packet Tracer ${i + 1}')" />
+                         <span class="ai-img-num-badge">#${i + 1}</span>
+                       </div>
+                     `).join("")}
+                   </div>`
+                : msg.image
                 ? `<div class="ai-msg-image-wrap">
                      <img src="${msg.image}" alt="Ảnh gửi từ người dùng" class="ai-msg-img" onclick="window.openImageLightbox && window.openImageLightbox('${msg.image}', 'Ảnh Packet Tracer')" />
                    </div>`
@@ -617,7 +634,7 @@
     const input = document.getElementById("ai-user-prompt-input");
     const promptText = (customPrompt || (input ? input.value : "")).trim();
 
-    if (!promptText && !attachedImage) {
+    if (!promptText && attachedImages.length === 0) {
       if (input) input.focus();
       return;
     }
@@ -629,15 +646,15 @@
     const userMsg = {
       role: "user",
       text: promptText,
-      image: attachedImage ? attachedImage.previewUrl : null,
+      images: attachedImages.map((img) => img.previewUrl),
       time: timeStr
     };
 
     chatHistory.push(userMsg);
     saveChatHistory();
 
-    const imageToSend = attachedImage;
-    clearAttachment();
+    const imagesToSend = [...attachedImages];
+    clearAttachments();
 
     if (input) {
       input.value = "";
@@ -650,7 +667,7 @@
     const context = getCurrentStudyContext();
 
     try {
-      const responseText = await callGeminiApi(promptText, imageToSend, context);
+      const responseText = await callGeminiApi(promptText, imagesToSend, context);
       chatHistory.push({
         role: "assistant",
         text: responseText,
@@ -680,22 +697,62 @@
     }
   }
 
-  function clearAttachment() {
-    attachedImage = null;
+  function renderAttachmentsPreviewBar() {
     const bar = document.getElementById("ai-attachment-preview-bar");
-    const thumb = document.getElementById("ai-attachment-thumb");
-    const nameEl = document.getElementById("ai-attachment-name");
-    const fileInput = document.getElementById("ai-image-upload-input");
+    const countEl = document.getElementById("ai-attachment-count");
+    const scrollEl = document.getElementById("ai-attachments-scroll");
 
-    if (bar) bar.style.display = "none";
-    if (thumb) thumb.src = "";
-    if (nameEl) nameEl.textContent = "";
+    if (!bar || !scrollEl) return;
+
+    if (attachedImages.length === 0) {
+      bar.style.display = "none";
+      scrollEl.innerHTML = "";
+      return;
+    }
+
+    bar.style.display = "block";
+    if (countEl) {
+      countEl.textContent = `Đã đính kèm ${attachedImages.length} ảnh (${attachedImages.length}/${MAX_ATTACHED_IMAGES})`;
+    }
+
+    scrollEl.innerHTML = attachedImages
+      .map(
+        (img, idx) => `
+      <div class="ai-thumb-chip" data-id="${img.id}">
+        <div class="ai-chip-preview-wrap">
+          <img src="${img.previewUrl}" alt="${escapeHtml(img.name)}" class="ai-chip-thumb" />
+          <button type="button" class="ai-chip-del-btn" data-id="${img.id}" title="Hủy ảnh này">✕</button>
+        </div>
+        <span class="ai-chip-label" title="${escapeHtml(img.name)}">#${idx + 1} (${img.width}x${img.height})</span>
+      </div>
+    `
+      )
+      .join("");
+
+    scrollEl.querySelectorAll(".ai-chip-del-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.id;
+        attachedImages = attachedImages.filter((it) => it.id !== id);
+        renderAttachmentsPreviewBar();
+      });
+    });
+  }
+
+  function clearAttachments() {
+    attachedImages = [];
+    renderAttachmentsPreviewBar();
+    const fileInput = document.getElementById("ai-image-upload-input");
     if (fileInput) fileInput.value = "";
   }
 
-  function setAttachmentFromFile(file) {
+  function addImageAttachment(file) {
     if (!file || !file.type.startsWith("image/")) {
       alert("Vui lòng chọn một tệp hình ảnh (PNG, JPG, JPEG, WEBP).");
+      return;
+    }
+
+    if (attachedImages.length >= MAX_ATTACHED_IMAGES) {
+      alert(`Bạn chỉ có thể gửi tối đa ${MAX_ATTACHED_IMAGES} ảnh cùng lúc để đảm bảo tốc độ phản hồi và tiết kiệm token.`);
       return;
     }
 
@@ -728,26 +785,24 @@
         const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.82);
         const base64 = compressedDataUrl.split(",")[1];
 
-        attachedImage = {
+        const item = {
+          id: "img_" + Math.random().toString(36).substring(2, 9),
           base64: base64,
           mimeType: "image/jpeg",
           previewUrl: compressedDataUrl,
-          name: file.name || "packet_tracer_screenshot.jpg"
+          name: file.name || `Ảnh Packet Tracer ${attachedImages.length + 1}`,
+          width: width,
+          height: height
         };
 
-        const bar = document.getElementById("ai-attachment-preview-bar");
-        const thumb = document.getElementById("ai-attachment-thumb");
-        const nameEl = document.getElementById("ai-attachment-name");
-
-        if (thumb) thumb.src = compressedDataUrl;
-        if (nameEl) nameEl.textContent = `${attachedImage.name} (${width}x${height} - Tối ưu token)`;
-        if (bar) bar.style.display = "flex";
+        attachedImages.push(item);
+        renderAttachmentsPreviewBar();
 
         const input = document.getElementById("ai-user-prompt-input");
         if (input) {
           input.focus();
           if (!input.value.trim()) {
-            input.value = "Nhờ AI soi lỗi trên sơ đồ Packet Tracer này và chỉ cách sửa giúp tôi:";
+            input.value = "Nhờ AI soi lỗi trên các sơ đồ / cấu hình Packet Tracer này và chỉ cách sửa giúp tôi:";
           }
         }
       };
@@ -904,19 +959,21 @@
       });
     }
 
-    // File input attachment
+    // File input attachment (supports multiple files)
     const fileInput = document.getElementById("ai-image-upload-input");
     if (fileInput) {
       fileInput.addEventListener("change", (e) => {
-        if (e.target.files && e.target.files[0]) {
-          setAttachmentFromFile(e.target.files[0]);
+        if (e.target.files && e.target.files.length > 0) {
+          for (let i = 0; i < e.target.files.length; i++) {
+            addImageAttachment(e.target.files[i]);
+          }
         }
       });
     }
 
-    // Remove attachment button
-    const removeAttBtn = document.getElementById("ai-remove-attachment-btn");
-    if (removeAttBtn) removeAttBtn.addEventListener("click", clearAttachment);
+    // Clear all attachments button
+    const clearAllBtn = document.getElementById("ai-clear-all-attachments-btn");
+    if (clearAllBtn) clearAllBtn.addEventListener("click", clearAttachments);
 
     // Quick prompt chips
     const quickPrompts = document.getElementById("ai-quick-prompts");
@@ -929,7 +986,7 @@
       });
     }
 
-    // CLIPBOARD IMAGE PASTE (Ctrl+V) — Superpower for Packet Tracer screenshots!
+    // CLIPBOARD IMAGE PASTE (Ctrl+V) — Supports multiple consecutive pastes!
     window.addEventListener("paste", (e) => {
       const modal = document.getElementById("ai-tutor-modal");
       if (!modal || modal.hidden) return; // Only process when AI modal is open
@@ -938,18 +995,17 @@
       if (!items) return;
 
       for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf("image") !== -1) {
+        if (items[i].type && items[i].type.indexOf("image") !== -1) {
           e.preventDefault();
           const file = items[i].getAsFile();
           if (file) {
-            setAttachmentFromFile(file);
-            break;
+            addImageAttachment(file);
           }
         }
       }
     });
 
-    // DRAG & DROP Image into Chat Stream
+    // DRAG & DROP Multiple Images into Chat Stream
     const stream = document.getElementById("ai-chat-stream");
     if (stream) {
       stream.addEventListener("dragover", (e) => {
@@ -962,8 +1018,10 @@
       stream.addEventListener("drop", (e) => {
         e.preventDefault();
         stream.classList.remove("dragover");
-        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
-          setAttachmentFromFile(e.dataTransfer.files[0]);
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          for (let i = 0; i < e.dataTransfer.files.length; i++) {
+            addImageAttachment(e.dataTransfer.files[i]);
+          }
         }
       });
     }

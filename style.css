@@ -5923,12 +5923,9 @@ body.not-authenticated .flashcard-modal {
   40% { transform: scale(1); opacity: 1; }
 }
 
-/* Attachment Preview Bar */
+/* Multiple Image Attachments Preview */
 .ai-attachment-preview-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.55rem 1rem;
+  padding: 0.65rem 1rem;
   background: #eef2ff;
   border-top: 1px solid #c7d2fe;
 }
@@ -5938,26 +5935,80 @@ body.not-authenticated .flashcard-modal {
   border-color: #312e81;
 }
 
-.ai-attachment-thumb-wrap {
+.ai-attachments-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.ai-attachment-count {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #4338ca;
+}
+
+[data-theme="dark"] .ai-attachment-count {
+  color: #a5b4fc;
+}
+
+.ai-clear-all-attachments-btn {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.ai-clear-all-attachments-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  text-decoration: underline;
+}
+
+.ai-attachments-scroll {
+  display: flex;
+  gap: 0.65rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+}
+
+.ai-thumb-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.ai-chip-preview-wrap {
   position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid #818cf8;
+  background: #ffffff;
 }
 
-.ai-attachment-thumb {
-  width: 44px;
-  height: 44px;
-  border-radius: 7px;
+.ai-chip-thumb {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border: 1px solid #818cf8;
 }
 
-.ai-remove-attachment-btn {
+.ai-chip-del-btn {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 18px;
-  height: 18px;
+  top: 2px;
+  right: 2px;
+  width: 17px;
+  height: 17px;
   border-radius: 50%;
-  background: #ef4444;
+  background: rgba(239, 68, 68, 0.92);
   color: #ffffff;
   border: none;
   font-size: 0.65rem;
@@ -5965,17 +6016,73 @@ body.not-authenticated .flashcard-modal {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: transform 0.12s ease;
 }
 
-.ai-attachment-info {
-  display: flex;
-  flex-direction: column;
+.ai-chip-del-btn:hover {
+  transform: scale(1.15);
+  background: #dc2626;
 }
 
-.ai-attachment-name {
-  font-size: 0.8rem;
+.ai-chip-label {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  max-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Multiple Images in User Chat Bubble */
+.ai-msg-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ai-msg-images-grid.count-1 {
+  grid-template-columns: 1fr;
+  max-width: 320px;
+}
+
+.ai-msg-images-grid.count-2 {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 420px;
+}
+
+.ai-grid-img-wrap {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  aspect-ratio: 4 / 3;
+  background: #000000;
+}
+
+.ai-grid-img-wrap .ai-msg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.ai-grid-img-wrap .ai-msg-img:hover {
+  transform: scale(1.05);
+}
+
+.ai-img-num-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
   font-weight: 700;
-  color: var(--text-primary);
+  pointer-events: none;
 }
 
 .ai-attachment-desc {
