@@ -5,6 +5,19 @@
   <meta name="google" content="notranslate" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>CCNA Learning</title>
+  <script>
+    // Enforce constant document title CCNA Learning across all modules, tabs and auth states
+    (function() {
+      try {
+        document.title = "CCNA Learning";
+        Object.defineProperty(document, 'title', {
+          get: function() { return "CCNA Learning"; },
+          set: function() { return "CCNA Learning"; },
+          configurable: false
+        });
+      } catch(e) {}
+    })();
+  </script>
 
   <!-- Modern Browser Tab Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />

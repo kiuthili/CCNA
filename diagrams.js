@@ -3,72 +3,73 @@
 const MODULE_VISUALS = {
   1: {
     svg: `
-      <svg viewBox="0 0 840 330" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
-        <rect width="840" height="330" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-        <text x="20" y="24" font-size="12" font-weight="bold" fill="#0369a1">🏢 HỆ SINH THÁI MẠNG DOANH NGHIỆP: THIẾT BỊ ĐA HÃNG &amp; NGOẠI VI VĂN PHÒNG</text>
+      <svg viewBox="0 0 880 340" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+        <rect width="880" height="340" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+        <text x="25" y="26" font-size="12" font-weight="bold" fill="#0369a1">🏢 HỆ SINH THÁI MẠNG DOANH NGHIỆP: THIẾT BỊ ĐA HÃNG &amp; NGOẠI VI VĂN PHÒNG</text>
 
         <!-- Central Smart PoE Switch -->
-        <rect x="290" y="115" width="260" height="72" rx="8" fill="#0284c7" stroke="#0369a1" stroke-width="2"/>
-        <text x="420" y="140" font-size="12" font-weight="bold" text-anchor="middle" fill="#ffffff">🔀 Switch Quản Trị PoE+ (Aruba / UniFi / Cisco)</text>
-        <text x="420" y="158" font-size="10" text-anchor="middle" fill="#e0f2fe">Web GUI HTTPS • Cloud App • Cấp điện PoE 802.3at</text>
-        <text x="420" y="174" font-size="9.5" text-anchor="middle" fill="#bae6fd">VLAN 10 (Data), VLAN 150 (Voice), VLAN 20 (POS/In), VLAN 30 (CCTV)</text>
+        <rect x="275" y="110" width="290" height="82" rx="8" fill="#0284c7" stroke="#0369a1" stroke-width="2"/>
+        <text x="420" y="132" font-size="12" font-weight="bold" text-anchor="middle" fill="#ffffff">🔀 Switch PoE+ Quản Trị</text>
+        <text x="420" y="149" font-size="10" text-anchor="middle" fill="#e0f2fe">Cisco • Aruba Web GUI • UniFi Cloud</text>
+        <text x="420" y="165" font-size="9.5" text-anchor="middle" fill="#bae6fd">Cấp điện PoE 802.3at • Phân tách VLAN</text>
+        <text x="420" y="180" font-size="9" text-anchor="middle" fill="#93c5fd">VLAN 10, 20, 30 &amp; Voice 150</text>
 
         <!-- Left Side: Office Peripherals -->
         <!-- 1. MFP Printer & Scanner -->
-        <rect x="20" y="42" width="240" height="72" rx="6" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
-        <text x="32" y="62" font-size="11" font-weight="bold" fill="#0369a1">🖨️ Máy In Đa Năng LCD &amp; Máy Scan</text>
-        <text x="32" y="79" font-size="9.5" fill="#334155">• IP Tĩnh trên LCD • Web nhúng EWS (HTTPS)</text>
-        <text x="32" y="94" font-size="9.5" font-weight="bold" fill="#15803d">• In: Standard TCP/IP Port 9100 (RAW)</text>
-        <text x="32" y="108" font-size="9.5" fill="#475569">• Scan to Folder: SMBv2/v3 Port 445 / Email</text>
+        <rect x="20" y="42" width="235" height="72" rx="6" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
+        <text x="32" y="62" font-size="10.5" font-weight="bold" fill="#0369a1">🖨️ Máy In Đa Năng LCD &amp; Máy Scan</text>
+        <text x="32" y="79" font-size="9" fill="#334155">• IP Tĩnh trên LCD • Web nhúng EWS</text>
+        <text x="32" y="94" font-size="9" font-weight="bold" fill="#15803d">• In: Standard TCP/IP Port 9100 (RAW)</text>
+        <text x="32" y="108" font-size="9" fill="#475569">• Scan SMBv2/v3 Port 445 / Email</text>
 
         <!-- 2. Thermal POS Printer -->
-        <rect x="20" y="126" width="240" height="66" rx="6" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
-        <text x="32" y="146" font-size="11" font-weight="bold" fill="#b45309">🧾 Máy In Bill Quầy Thu Ngân / Bếp (POS)</text>
-        <text x="32" y="163" font-size="9.5" fill="#334155">• Cổng mạng LAN RJ-45 • Socket RAW Port 9100</text>
-        <text x="32" y="177" font-size="9.5" fill="#b45309">• Nhấn giữ nút FEED + Bật nguồn để in IP Self-Test</text>
-        <text x="32" y="189" font-size="9" fill="#64748b">• Tích hợp Jack RJ-11 giật mở két tiền thu ngân</text>
+        <rect x="20" y="126" width="235" height="66" rx="6" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+        <text x="32" y="146" font-size="10.5" font-weight="bold" fill="#b45309">🧾 Máy In Bill Thu Ngân / Bếp (POS)</text>
+        <text x="32" y="163" font-size="9" fill="#334155">• Cổng mạng RJ-45 • Socket Port 9100</text>
+        <text x="32" y="177" font-size="9" fill="#b45309">• Giữ nút FEED + Bật nguồn để in IP test</text>
+        <text x="32" y="189" font-size="8.5" fill="#64748b">• Jack RJ-11 giật mở két tiền thu ngân</text>
 
         <!-- 3. VoIP Phone + PC Daisy Chain -->
-        <rect x="20" y="204" width="240" height="76" rx="6" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
-        <text x="32" y="224" font-size="11" font-weight="bold" fill="#15803d">☎️ IP Phone PoE ──► 💻 PC Nhân Viên</text>
-        <text x="32" y="241" font-size="9.5" fill="#334155">• 1 Dây Switch cắm cổng SW: Cấp PoE + Voice VLAN</text>
-        <text x="32" y="256" font-size="9.5" font-weight="bold" fill="#166534">• Cổng PC nối tiếp ra máy tính: Nhận Data VLAN</text>
-        <text x="32" y="271" font-size="9" fill="#059669">• Tiết kiệm 50% số cổng Switch và chi phí kéo dây cáp!</text>
+        <rect x="20" y="204" width="235" height="76" rx="6" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+        <text x="32" y="224" font-size="10.5" font-weight="bold" fill="#15803d">☎️ IP Phone PoE ──► 💻 PC Nhân Viên</text>
+        <text x="32" y="241" font-size="9" fill="#334155">• 1 Dây Switch cắm SW: PoE + Voice VLAN</text>
+        <text x="32" y="256" font-size="9" font-weight="bold" fill="#166534">• Cổng PC nối tiếp ra máy tính: Data VLAN</text>
+        <text x="32" y="271" font-size="8.5" fill="#059669">• Tiết kiệm 50% số cổng Switch &amp; dây cáp!</text>
 
         <!-- Right Side: Infrastructure & Remote Mgmt -->
         <!-- 4. IT Remote Management -->
-        <rect x="580" y="42" width="240" height="72" rx="6" fill="#ffffff" stroke="#7c3aed" stroke-width="1.5"/>
-        <text x="592" y="62" font-size="10.5" font-weight="bold" fill="#6d28d9">🛠️ Quản Trị Từ Xa PC (Helpdesk/RMM)</text>
-        <text x="592" y="79" font-size="9" fill="#334155">• Remote: RustDesk / AnyDesk / RDP</text>
-        <text x="592" y="94" font-size="9" font-weight="bold" fill="#5b21b6">• RMM: Quản lý &amp; vá lỗi từ xa tự động</text>
-        <text x="592" y="108" font-size="9" fill="#475569">• Wake-on-LAN: Bật máy qua Magic Packet</text>
+        <rect x="585" y="42" width="275" height="72" rx="6" fill="#ffffff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="597" y="62" font-size="10.5" font-weight="bold" fill="#6d28d9">🛠️ Quản Trị Từ Xa PC (Helpdesk/RMM)</text>
+        <text x="597" y="79" font-size="9" fill="#334155">• Remote: RustDesk / AnyDesk / RDP</text>
+        <text x="597" y="94" font-size="9" font-weight="bold" fill="#5b21b6">• RMM: Quản lý &amp; vá lỗi từ xa tự động</text>
+        <text x="597" y="108" font-size="9" fill="#475569">• Wake-on-LAN: Bật máy qua Magic Packet</text>
 
         <!-- 5. Camera & Time Attendance -->
-        <rect x="580" y="126" width="240" height="66" rx="6" fill="#ffffff" stroke="#dc2626" stroke-width="1.5"/>
-        <text x="592" y="146" font-size="10.5" font-weight="bold" fill="#b91c1c">📹 Camera IP PoE &amp; Máy Chấm Công</text>
-        <text x="592" y="163" font-size="9" fill="#334155">• Camera an ninh: Nguồn PoE • RTSP 554</text>
-        <text x="592" y="177" font-size="9" fill="#b91c1c">• Tách VLAN Camera riêng chống nghẽn</text>
-        <text x="592" y="189" font-size="8.5" fill="#64748b">• Máy chấm công: TCP/UDP Port 4370</text>
+        <rect x="585" y="126" width="275" height="66" rx="6" fill="#ffffff" stroke="#dc2626" stroke-width="1.5"/>
+        <text x="597" y="146" font-size="10.5" font-weight="bold" fill="#b91c1c">📹 Camera IP PoE &amp; Máy Chấm Công</text>
+        <text x="597" y="163" font-size="9" fill="#334155">• Camera an ninh: Nguồn PoE • RTSP 554</text>
+        <text x="597" y="177" font-size="9" fill="#b91c1c">• Tách VLAN Camera riêng chống nghẽn</text>
+        <text x="597" y="189" font-size="8.5" fill="#64748b">• Máy chấm công: TCP/UDP Port 4370</text>
 
         <!-- 6. Multi-WAN Load Balancing Router -->
-        <rect x="580" y="204" width="240" height="76" rx="6" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
-        <text x="592" y="224" font-size="10.5" font-weight="bold" fill="#0369a1">🌐 Router Cân Bằng Tải (DrayTek/MikroTik)</text>
-        <text x="592" y="241" font-size="9" fill="#334155">• Quản lý Web GUI / Winbox • Quay PPPoE</text>
-        <text x="592" y="256" font-size="9" font-weight="bold" fill="#0284c7">• Dual-WAN: Viettel 500M + VNPT 500M</text>
-        <text x="592" y="271" font-size="9" fill="#0369a1">• SSL VPN Server cho nhân viên từ xa</text>
+        <rect x="585" y="204" width="275" height="76" rx="6" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
+        <text x="597" y="224" font-size="10.5" font-weight="bold" fill="#0369a1">🌐 Router Cân Bằng Tải (DrayTek/MikroTik)</text>
+        <text x="597" y="241" font-size="9" fill="#334155">• Web GUI / Winbox • PPPoE đa đường</text>
+        <text x="597" y="256" font-size="9" font-weight="bold" fill="#0284c7">• Dual-WAN: Viettel 500M + VNPT 500M</text>
+        <text x="597" y="271" font-size="9" fill="#0369a1">• SSL VPN Server cho nhân viên từ xa</text>
 
         <!-- Connecting Lines -->
-        <line x1="260" y1="78" x2="290" y2="135" stroke="#0284c7" stroke-width="2"/>
-        <line x1="260" y1="159" x2="290" y2="151" stroke="#d97706" stroke-width="2"/>
-        <line x1="260" y1="242" x2="290" y2="167" stroke="#16a34a" stroke-width="2"/>
-        <line x1="550" y1="135" x2="580" y2="78" stroke="#7c3aed" stroke-width="2"/>
-        <line x1="550" y1="151" x2="580" y2="159" stroke="#dc2626" stroke-width="2"/>
-        <line x1="550" y1="167" x2="580" y2="242" stroke="#0284c7" stroke-width="2.5"/>
+        <line x1="255" y1="78" x2="275" y2="135" stroke="#0284c7" stroke-width="2"/>
+        <line x1="255" y1="159" x2="275" y2="151" stroke="#d97706" stroke-width="2"/>
+        <line x1="255" y1="242" x2="275" y2="167" stroke="#16a34a" stroke-width="2"/>
+        <line x1="565" y1="135" x2="585" y2="78" stroke="#7c3aed" stroke-width="2"/>
+        <line x1="565" y1="151" x2="585" y2="159" stroke="#dc2626" stroke-width="2"/>
+        <line x1="565" y1="167" x2="585" y2="242" stroke="#0284c7" stroke-width="2.5"/>
 
         <!-- Bottom Legend -->
-        <rect x="20" y="290" width="800" height="30" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/>
-        <text x="35" y="310" font-size="10" font-weight="bold" fill="#334155">💡 Mẹo kỹ sư:</text>
-        <text x="120" y="310" font-size="9.5" fill="#0f172a">Thiết bị dùng chung (In, Scan, POS, Camera, AP) cần đặt Static IP ngoài dải DHCP để tránh mất kết nối!</text>
+        <rect x="20" y="295" width="840" height="30" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/>
+        <text x="35" y="315" font-size="10" font-weight="bold" fill="#334155">💡 Mẹo kỹ sư:</text>
+        <text x="120" y="315" font-size="9.5" fill="#0f172a">Thiết bị dùng chung (In, Scan, POS, Camera, AP) cần đặt Static IP ngoài dải DHCP để tránh mất kết nối!</text>
       </svg>
     `,
     hardwareSvg: `
@@ -633,7 +634,7 @@ const MODULE_VISUALS = {
         <text x="35" y="114" font-size="11.5" font-weight="bold" fill="#dc2626">• Đóng Frame với Dest MAC = FF-FF-FF-FF-FF-FF</text>
         <text x="35" y="136" font-size="11.5" fill="#78350f">• Nội dung: "Ai có IP 192.168.1.20 cho xin địa chỉ MAC?"</text>
         <text x="35" y="158" font-size="11.5" fill="#78350f">• Switch Flood gói này ra TẤT CẢ các cổng trong mạng LAN.</text>
-        <text x="35" y="185" font-size="11" font-style="italic" fill="#92400e">⚠️ Lưu ý: Nếu đích ở khác mạng, PC1 sẽ hỏi ARP MAC của Default Gateway!</text>
+        <text x="35" y="185" font-size="10.5" font-style="italic" fill="#92400e">⚠️ Khác mạng: PC1 hỏi ARP MAC của Default Gateway!</text>
 
         <!-- Step 2 -->
         <rect x="420" y="45" width="380" height="168" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
@@ -642,7 +643,7 @@ const MODULE_VISUALS = {
         <text x="435" y="114" font-size="11.5" font-weight="bold" fill="#15803d">• Đóng Frame Unicast gửi thẳng về MAC của PC1 (AA-AA)</text>
         <text x="435" y="136" font-size="11.5" fill="#14532d">• Nội dung: "Tôi là 192.168.1.20 đây, MAC của tôi là BB-BB!"</text>
         <text x="435" y="158" font-size="11.5" fill="#14532d">• PC1 lưu cặp [192.168.1.20 &lt;-&gt; BB-BB] vào bảng ARP Cache.</text>
-        <text x="435" y="185" font-size="11" font-style="italic" fill="#166534">💡 Trong IPv6: Thay ARP bằng ICMPv6 Neighbor Solicitation (NS) &amp; NA.</text>
+        <text x="435" y="185" font-size="10.5" font-style="italic" fill="#166534">💡 Trong IPv6: Dùng ICMPv6 Neighbor Solicitation (NS/NA) thay ARP.</text>
       </svg>
     `,
     hardwareSvg: `
@@ -701,8 +702,8 @@ const MODULE_VISUALS = {
         <!-- Status vs Protocol -->
         <rect x="20" y="142" width="780" height="68" rx="6" fill="#fff" stroke="#cbd5e1"/>
         <text x="35" y="165" font-size="12" font-weight="bold" fill="#0f172a">Cách đọc 2 cột cuối trong lệnh 'show ip interface brief':</text>
-        <text x="35" y="185" font-size="11.5" fill="#dc2626">• Status = administratively down: Quên gõ lệnh 'no shutdown'!  |  Status = down: Tuột cáp, đứt cáp hoặc đầu kia tắt nguồn.</text>
-        <text x="35" y="202" font-size="11.5" fill="#15803d">• Status = up &amp; Protocol = up: Cả Tầng 1 (Vật lý) và Tầng 2 (Data Link) đều hoạt động hoàn hảo!</text>
+        <text x="35" y="185" font-size="10.5" fill="#dc2626">• Status = administratively down: Chưa gõ 'no shutdown'! | Status = down: Tuột cáp hoặc đối tác tắt nguồn.</text>
+        <text x="35" y="202" font-size="10.5" fill="#15803d">• Status = up &amp; Protocol = up: Cả Tầng 1 (Vật lý) và Tầng 2 (Data Link) đều hoạt động hoàn hảo!</text>
       </svg>
     `,
     hardwareSvg: `
@@ -943,13 +944,13 @@ const MODULE_VISUALS = {
       <svg viewBox="0 0 820 110" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
         <rect width="820" height="110" rx="8" fill="#0f172a"/>
         <text x="20" y="24" font-size="12" font-weight="bold" fill="#38bdf8">SO SÁNH KÍCH THƯỚC HEADER TẦNG 4: TCP HEADER (20 BYTES) VS. UDP HEADER (8 BYTES)</text>
-        <rect x="20" y="36" width="480" height="60" rx="4" fill="#1e3a8a" stroke="#60a5fa"/>
+        <rect x="20" y="36" width="500" height="60" rx="4" fill="#1e3a8a" stroke="#60a5fa"/>
         <text x="35" y="55" font-size="11.5" font-weight="bold" fill="#93c5fd">TCP Header (Tối thiểu 20 Bytes — Đầy đủ kiểm soát):</text>
-        <text x="35" y="78" font-size="10.5" fill="#fff">Src Port(16b) | Dst Port(16b) | Sequence #(32b) | ACK #(32b) | Flags(SYN/ACK/FIN) | Window(16b) | Checksum</text>
+        <text x="35" y="76" font-size="9" fill="#fff">Src/Dst Port (32b) | Seq # (32b) | Ack # (32b) | Flags | Window | Checksum</text>
 
-        <rect x="515" y="36" width="285" height="60" rx="4" fill="#78350f" stroke="#fbbf24"/>
-        <text x="530" y="55" font-size="11.5" font-weight="bold" fill="#fde047">UDP Header (Chỉ 8 Bytes — Siêu gọn):</text>
-        <text x="530" y="78" font-size="10.5" fill="#fff">Src Port (16b) | Dst Port (16b) | Length | Checksum</text>
+        <rect x="535" y="36" width="265" height="60" rx="4" fill="#78350f" stroke="#fbbf24"/>
+        <text x="550" y="55" font-size="11.5" font-weight="bold" fill="#fde047">UDP Header (8 Bytes nhẹ):</text>
+        <text x="550" y="76" font-size="9" fill="#fff">Src Port (16b) | Dst Port (16b) | Length (16b) | Checksum (16b)</text>
       </svg>
     `,
     photos: [
@@ -1089,17 +1090,17 @@ const MODULE_VISUALS = {
 
         <!-- Left Branch: Ping Failed -->
         <rect x="20" y="122" width="375" height="92" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
-        <text x="35" y="145" font-size="12.5" font-weight="bold" fill="#b91c1c">❌ NẾU PING IP THẤT BẠI -&gt; Kiểm tra Tầng 1 - 2 - 3:</text>
-        <text x="35" y="166" font-size="11.5" fill="#7f1d1d">1. Tầng 1: Tuột dây cáp? Cổng Router quên 'no shutdown'?</text>
-        <text x="35" y="185" font-size="11.5" fill="#7f1d1d">2. Tầng 2: Sai VLAN? Lệch Duplex (Full vs Half)?</text>
-        <text x="35" y="204" font-size="11.5" fill="#7f1d1d">3. Tầng 3: PC đặt sai Default Gateway? Router thiếu Route?</text>
+        <text x="35" y="145" font-size="11.5" font-weight="bold" fill="#b91c1c">❌ PING THẤT BẠI -&gt; Kiểm tra Tầng 1 - 2 - 3:</text>
+        <text x="35" y="166" font-size="11" fill="#7f1d1d">1. Tầng 1: Tuột dây cáp? Cổng Router quên 'no shutdown'?</text>
+        <text x="35" y="185" font-size="11" fill="#7f1d1d">2. Tầng 2: Sai VLAN? Lệch Duplex (Full vs Half)?</text>
+        <text x="35" y="204" font-size="11" fill="#7f1d1d">3. Tầng 3: PC sai Default Gateway? Router thiếu Route?</text>
 
         <!-- Right Branch: Ping Succeeded -->
         <rect x="425" y="122" width="375" height="92" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
-        <text x="440" y="145" font-size="12.5" font-weight="bold" fill="#15803d">✅ NẾU PING IP THÀNH CÔNG -&gt; Tầng 1-2-3 Tốt 100%!</text>
-        <text x="440" y="166" font-size="11.5" fill="#14532d">• Kiểm tra lên Tầng 4 - 7 (Application / Transport):</text>
-        <text x="440" y="185" font-size="11.5" fill="#14532d">• Ping được 8.8.8.8 mà không vào được web google.com?</text>
-        <text x="440" y="204" font-size="11.5" font-weight="bold" fill="#15803d">  ---&gt; 100% lỗi thiếu hoặc sai địa chỉ DNS Server!</text>
+        <text x="440" y="145" font-size="11.5" font-weight="bold" fill="#15803d">✅ PING THÀNH CÔNG -&gt; Tầng 1-2-3 Hoạt động tốt!</text>
+        <text x="440" y="166" font-size="11" fill="#14532d">• Kiểm tra lên Tầng 4 - 7 (Application / Transport):</text>
+        <text x="440" y="185" font-size="11" fill="#14532d">• Ping được 8.8.8.8 mà không vào được web google.com?</text>
+        <text x="440" y="204" font-size="11" font-weight="bold" fill="#15803d">  ---&gt; 100% lỗi thiếu hoặc sai địa chỉ DNS Server!</text>
 
         <line x1="330" y1="97" x2="205" y2="122" stroke="#ef4444" stroke-width="2.5"/>
         <line x1="490" y1="97" x2="615" y2="122" stroke="#16a34a" stroke-width="2.5"/>
@@ -1359,6 +1360,8 @@ Object.keys(MODULE_EXTRA_PORT_PHOTOS).forEach((idStr) => {
 
 // Hàm vẽ Sơ Đồ Giải Phẫu Đa Góc Độ (Mặt Trước • Mặt Sau • Cận Cảnh Chân Cổng Port & Cách Cắm Cáp Thực Tế) tươi sáng, dễ nhìn cho từng Học Phần
 function renderMultiAnglePortAnatomySvg(modId) {
+  const isEn = typeof currentLang !== "undefined" && currentLang === "en";
+
   const portGuides = {
     1: {
       device: "Switch Cisco Catalyst 2960 & Thanh Đấu Nối Patch Panel",
@@ -1398,7 +1401,46 @@ function renderMultiAnglePortAnatomySvg(modId) {
     }
   };
 
-  const info = portGuides[modId] || {
+  const portGuidesEn = {
+    1: {
+      device: "Cisco Catalyst 2960 Switch & Patch Panel Cabling",
+      frontTitle: "ANGLE 1: FRONT PANEL — 24 RJ-45 Copper Ports + 2 SFP Gigabit Uplinks",
+      rearTitle: "ANGLE 2: REAR PANEL — RJ-45 Console Port, Cooling Fan & AC Power Inlet",
+      pinTitle: "ANGLE 3: PORT WIRING & PRODUCTION FIELD PRACTICES",
+      pinDesc1: "• Ports 1 → 24 (Access): Straight-through Cat6 patch cords terminating to PCs, Laptops, Printers, and VoIP Phones.",
+      pinDesc2: "• Ports Gi0/1 → Gi0/2 (Uplink): Connects upstream to Core Distribution Switch or Edge Router.",
+      pinDesc3: "• LED Status: Solid Green = Link Active (Up) | Blinking Green = Transmitting Data | Amber = STP Listening/Blocked."
+    },
+    2: {
+      device: "Cisco Switch & Router Console Management (Front vs. Rear Panel)",
+      frontTitle: "ANGLE 1: ENGINEER LAPTOP CONSOLE PORT (USB-A / USB-C → COM Port)",
+      rearTitle: "ANGLE 2: REAR OF SWITCH / ROUTER — RJ-45 Console Port (Light Cyan) & USB Mini-B",
+      pinTitle: "ANGLE 3: OUT-OF-BOX INITIAL CONSOLE SETUP STEP-BY-STEP",
+      pinDesc1: "• Step 1: Plug the light-blue RJ-45 console cable into the cyan-labeled CONSOLE port on the rear.",
+      pinDesc2: "• Step 2: Connect the other end via USB-to-Serial converter into your technician laptop.",
+      pinDesc3: "• Step 3: Open Device Manager to verify COM port (e.g. COM3) → Launch PuTTY with Serial 9600 bps, 8-N-1."
+    },
+    3: {
+      device: "Physical Port Anatomy & Packet Decapsulation Flow (PC → Switch → Router)",
+      frontTitle: "ANGLE 1: PC NETWORK INTERFACE CARD (NIC RJ-45) — Frame Origination & Physical Link",
+      rearTitle: "ANGLE 2: SWITCH PORT (Layer 2 MAC Lookup) vs. ROUTER PORT (Layer 3 IP Routing)",
+      pinTitle: "ANGLE 3: PORT LED BEHAVIOR DURING ACTIVE PACKET TRANSMISSION",
+      pinDesc1: "• Host NIC: Dual LEDs (Solid Link LED indicates physical voltage; Blinking Activity LED indicates frame traffic).",
+      pinDesc2: "• Switch Port: Inspects incoming Ethernet Frame MAC address, switches payload unchanged to destination port.",
+      pinDesc3: "• Router Port: Strips Layer 2 header/trailer, inspects destination IP, performs route lookup, and encapsulates new Layer 2 frame."
+    },
+    4: {
+      device: "RJ-45 8-Pin Copper Anatomy (Pins 1→8), SFP/SFP+ Optical Transceiver & LC Duplex Connectors",
+      frontTitle: "ANGLE 1: T568B WIRING PINOUT STANDARD (Pins 1 → 8)",
+      rearTitle: "ANGLE 2: SFP/SFP+ OPTICAL TRANSCEIVER BAY & LC DUPLEX CONNECTOR (TX / RX)",
+      pinTitle: "ANGLE 3: CABLE CRIMPING & SFP FIBER INSERTION GUIDE",
+      pinDesc1: "• T568B Standard (Pins 1-8): 1.White-Orange | 2.Orange | 3.White-Green | 4.Blue | 5.White-Blue | 6.Green | 7.White-Brown | 8.Brown.",
+      pinDesc2: "• Fast Ethernet 100M uses 4 pins (1-2 TX, 3-6 RX); Gigabit Ethernet 1G/10G utilizes all 8 copper conductors simultaneously!",
+      pinDesc3: "• Optical SFP: Slide transceiver firmly into switch cage until latched, then insert LC duplex fiber pair (TX into RX)."
+    }
+  };
+
+  const defaultVi = {
     device: `Hệ Thống Cổng Đấu Nối Vật Lý Trên Thiết Bị Mạng Thực Tế (Học Phần ${modId})`,
     frontTitle: "GÓC 1: MẶT TRƯỚC THIẾT BỊ (FRONT PANEL) — Dãy Cổng RJ-45 Access, Đèn LED & Khe Quang SFP",
     rearTitle: "GÓC 2: MẶT SAU THIẾT BỊ (REAR PANEL) — Cổng Console (Viền Xanh), Cổng WAN/LAN & Nguồn Điện",
@@ -1407,6 +1449,20 @@ function renderMultiAnglePortAnatomySvg(modId) {
     pinDesc2: "• Cổng Uplink / Trunk (Gi0/1..2 hoặc SFP Quang): Cấu hình 802.1Q Trunk nối giữa các Switch hoặc nối lên Router.",
     pinDesc3: "• Cổng Console (Viền xanh ngọc / USB Mini-B): Chỉ dùng để cắm cáp cấu hình từ Laptop kỹ sư, tuyệt đối không cắm dây mạng LAN vào đây!"
   };
+
+  const defaultEn = {
+    device: `Physical Port & Cabling Guide (Module ${modId})`,
+    frontTitle: "ANGLE 1: FRONT PANEL — Access RJ-45 Ports, LED Indicators & Optical SFP Bay",
+    rearTitle: "ANGLE 2: REAR PANEL — Management Console Port (Cyan), WAN/LAN & Power Inlets",
+    pinTitle: "ANGLE 3: HARDWARE PINOUTS & CABLING BEST PRACTICES",
+    pinDesc1: "• RJ-45 Access Ports (Fa0/1..24): Straight-through Cat6 patch cords terminating to Workstations, VoIP & APs.",
+    pinDesc2: "• Uplink / Trunk Ports (Gi0/1..2 or SFP): 802.1Q tagged trunks between switches or connecting to routers.",
+    pinDesc3: "• Console Port (Cyan / USB Mini-B): Dedicated out-of-band management only; never connect production LAN cables here!"
+  };
+
+  const info = isEn
+    ? (portGuidesEn[modId] || defaultEn)
+    : (portGuides[modId] || defaultVi);
 
   function safeDiagramEscape(str) {
     return String(str || "")
@@ -1425,10 +1481,13 @@ function renderMultiAnglePortAnatomySvg(modId) {
     return s;
   }
 
+  const frontSubTitle = info.frontTitle.replace(/^(GÓC 1:|ANGLE 1:)[^\—]*—\s*/, '');
+  const rearSubTitle = info.rearTitle.replace(/^(GÓC 2:|ANGLE 2:)[^\—]*—\s*/, '');
+
   return `
     <div class="port-anatomy-card">
       <div class="anatomy-main-header">
-        <span class="anatomy-header-badge">🔍 SƠ ĐỒ GIẢI PHẪU ĐA GÓC ĐỘ &amp; CẬN CẢNH CỔNG PORT</span>
+        <span class="anatomy-header-badge">${isEn ? "🔍 MULTI-ANGLE PORT ANATOMY &amp; HARDWARE WIRING" : "🔍 SƠ ĐỒ GIẢI PHẪU ĐA GÓC ĐỘ &amp; CẬN CẢNH CỔNG PORT"}</span>
         <h3 class="anatomy-device-title">${safeDiagramEscape(info.device.toUpperCase())}</h3>
       </div>
 
@@ -1436,8 +1495,8 @@ function renderMultiAnglePortAnatomySvg(modId) {
         <!-- Angle 1: Front Panel -->
         <div class="anatomy-angle-box angle-front-box">
           <div class="angle-header">
-            <span class="angle-tag front-tag">GÓC 1: MẶT TRƯỚC (FRONT PANEL)</span>
-            <h4 class="angle-title">${safeDiagramEscape(info.frontTitle.replace(/^GÓC 1:[^\—]*—\s*/, ''))}</h4>
+            <span class="angle-tag front-tag">${isEn ? "ANGLE 1: FRONT PANEL" : "GÓC 1: MẶT TRƯỚC (FRONT PANEL)"}</span>
+            <h4 class="angle-title">${safeDiagramEscape(frontSubTitle)}</h4>
           </div>
           <div class="angle-rack-wrapper">
             <svg viewBox="0 0 380 58" class="anatomy-rack-svg" xmlns="http://www.w3.org/2000/svg">
@@ -1447,28 +1506,28 @@ function renderMultiAnglePortAnatomySvg(modId) {
                 <rect x="36" y="0" width="30" height="24" rx="2" fill="#0f172a" stroke="#94a3b8"/><circle cx="43" cy="5" r="2.5" fill="#22c55e"/><circle cx="59" cy="5" r="2.5" fill="#22c55e"/><text x="51" y="36" font-size="8.5" text-anchor="middle" fill="#cbd5e1">Port 2</text>
                 <rect x="72" y="0" width="30" height="24" rx="2" fill="#0f172a" stroke="#94a3b8"/><circle cx="79" cy="5" r="2.5" fill="#f59e0b"/><circle cx="95" cy="5" r="2.5" fill="#64748b"/><text x="87" y="36" font-size="8.5" text-anchor="middle" fill="#fde047">STP</text>
                 <rect x="108" y="0" width="30" height="24" rx="2" fill="#0f172a" stroke="#94a3b8"/><circle cx="115" cy="5" r="2.5" fill="#22c55e"/><circle cx="131" cy="5" r="2.5" fill="#22c55e"/><text x="123" y="36" font-size="8.5" text-anchor="middle" fill="#cbd5e1">Port 4</text>
-                <rect x="144" y="0" width="30" height="24" rx="2" fill="#0f172a" stroke="#94a3b8"/><circle cx="151" cy="5" r="2.5" fill="#64748b"/><circle cx="167" cy="5" r="2.5" fill="#64748b"/><text x="159" y="36" font-size="8.5" text-anchor="middle" fill="#94a3b8">Trống</text>
+                <rect x="144" y="0" width="30" height="24" rx="2" fill="#0f172a" stroke="#94a3b8"/><circle cx="151" cy="5" r="2.5" fill="#64748b"/><circle cx="167" cy="5" r="2.5" fill="#64748b"/><text x="159" y="36" font-size="8.5" text-anchor="middle" fill="#94a3b8">${isEn ? "Empty" : "Trống"}</text>
                 <rect x="195" y="0" width="76" height="26" rx="3" fill="#0c4a6e" stroke="#38bdf8" stroke-width="1.5"/>
                 <text x="233" y="16" font-size="9" font-weight="bold" text-anchor="middle" fill="#7dd3fc">SFP+ Gi0/1</text>
-                <text x="233" y="38" font-size="8.5" text-anchor="middle" fill="#38bdf8">Cổng Quang LC</text>
+                <text x="233" y="38" font-size="8.5" text-anchor="middle" fill="#38bdf8">${isEn ? "LC Optical" : "Cổng Quang LC"}</text>
                 <rect x="280" y="0" width="76" height="26" rx="3" fill="#0c4a6e" stroke="#38bdf8" stroke-width="1.5"/>
                 <text x="318" y="16" font-size="9" font-weight="bold" text-anchor="middle" fill="#7dd3fc">SFP+ Gi0/2</text>
-                <text x="318" y="38" font-size="8.5" text-anchor="middle" fill="#38bdf8">Uplink Trunk</text>
+                <text x="318" y="38" font-size="8.5" text-anchor="middle" fill="#38bdf8">${isEn ? "Trunk Uplink" : "Uplink Trunk"}</text>
               </g>
             </svg>
           </div>
           <div class="angle-caption-box">
-            <span class="caption-item"><span class="led-indicator green"></span> Đèn Xanh: Hoạt động tốt</span>
-            <span class="caption-item"><span class="led-indicator orange"></span> Đèn Cam: Đang kiểm tra STP / Blocked</span>
-            <span class="caption-item"><span class="led-indicator off"></span> Tắt: Chưa cắm / Shutdown</span>
+            <span class="caption-item"><span class="led-indicator green"></span> ${isEn ? "Green: Link Active" : "Đèn Xanh: Hoạt động tốt"}</span>
+            <span class="caption-item"><span class="led-indicator orange"></span> ${isEn ? "Amber: STP / Blocked" : "Đèn Cam: Đang kiểm tra STP / Blocked"}</span>
+            <span class="caption-item"><span class="led-indicator off"></span> ${isEn ? "Off: Unplugged / Shut" : "Tắt: Chưa cắm / Shutdown"}</span>
           </div>
         </div>
 
         <!-- Angle 2: Rear Panel -->
         <div class="anatomy-angle-box angle-rear-box">
           <div class="angle-header">
-            <span class="angle-tag rear-tag">GÓC 2: MẶT SAU (REAR PANEL)</span>
-            <h4 class="angle-title">${safeDiagramEscape(info.rearTitle.replace(/^GÓC 2:[^\—]*—\s*/, ''))}</h4>
+            <span class="angle-tag rear-tag">${isEn ? "ANGLE 2: REAR PANEL" : "GÓC 2: MẶT SAU (REAR PANEL)"}</span>
+            <h4 class="angle-title">${safeDiagramEscape(rearSubTitle)}</h4>
           </div>
           <div class="angle-rack-wrapper">
             <svg viewBox="0 0 378 58" class="anatomy-rack-svg" xmlns="http://www.w3.org/2000/svg">
@@ -1484,7 +1543,7 @@ function renderMultiAnglePortAnatomySvg(modId) {
 
                 <rect x="182" y="0" width="85" height="34" rx="3" fill="#14532d" stroke="#4ade80" stroke-width="1.5"/>
                 <text x="224" y="15" font-size="8.5" font-weight="bold" text-anchor="middle" fill="#86efac">WAN Gi0/0/0</text>
-                <text x="224" y="27" font-size="8" text-anchor="middle" fill="#dcfce7">Nối Modem ISP</text>
+                <text x="224" y="27" font-size="8" text-anchor="middle" fill="#dcfce7">${isEn ? "ISP Modem" : "Nối Modem ISP"}</text>
 
                 <rect x="276" y="0" width="82" height="34" rx="3" fill="#3b0764" stroke="#c084fc" stroke-width="1.5"/>
                 <text x="317" y="15" font-size="8.5" font-weight="bold" text-anchor="middle" fill="#e9d5ff">LAN Gi0/0/1</text>
@@ -1494,7 +1553,7 @@ function renderMultiAnglePortAnatomySvg(modId) {
           </div>
           <div class="angle-caption-box tip-caption">
             <span class="tip-icon">💡</span>
-            <span class="tip-text"><strong>Mẹo phân biệt:</strong> Cổng Console luôn có viền màu Xanh Ngọc Lam, cổng LAN/WAN có viền màu khác!</span>
+            <span class="tip-text"><strong>${isEn ? "Pro Tip:" : "Mẹo phân biệt:"}</strong> ${isEn ? "Console ports always have a Light Cyan/Teal border; LAN/WAN ports have distinct colored bezels!" : "Cổng Console luôn có viền màu Xanh Ngọc Lam, cổng LAN/WAN có viền màu khác!"}</span>
           </div>
         </div>
       </div>

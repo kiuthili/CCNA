@@ -340,6 +340,7 @@ function initStudyToolsSelect() {
 
     // Reset select to default placeholder so user can select any tool again
     select.value = "";
+    select.selectedIndex = 0;
   });
 }
 
@@ -848,15 +849,19 @@ function renderMasteryView(masteryId) {
         `;
       }
 
+      const masteryEn = (typeof CCNA_EXAM_MASTERY_EN !== "undefined" && CCNA_EXAM_MASTERY_EN[m.id]) || {};
+      const cardTitle = isEn ? (masteryEn.title_en || m.title_vi) : m.title_vi;
+      const cardSummary = isEn ? (masteryEn.summary_en || m.summary_vi) : m.summary_vi;
+
       return `
         <article class="mastery-card" id="mastery-domain-${m.id}">
           <div class="mastery-header">
             <span class="mastery-badge">${escapeHtml(m.badge)}</span>
-            <h3 class="mastery-title">${escapeHtml(m.title_vi)}</h3>
+            <h3 class="mastery-title">${escapeHtml(cardTitle)}</h3>
           </div>
           <div class="mastery-body">
             <div class="mastery-summary">
-              <strong>Trọng tâm thi CCNA &amp; Đi làm:</strong> ${formatRichText(m.summary_vi)}
+              <strong>${isEn ? "CCNA Exam &amp; Field Focus:" : "Trọng tâm thi CCNA &amp; Đi làm:"}</strong> ${formatRichText(cardSummary)}
             </div>
             ${photosHtml}
             ${svgHtml}
@@ -876,7 +881,7 @@ function renderMasteryView(masteryId) {
       ${
         masteryId > 0
           ? `<button type="button" class="lesson-complete-toggle-btn ${isMasteryCompleted ? "completed" : ""}" id="mastery-complete-btn" data-key="mastery-${masteryId}">
-              ${isMasteryCompleted ? "✓ Đã học xong chuyên đề này" : "○ Đánh dấu đã học xong chuyên đề"}
+              ${isMasteryCompleted ? (isEn ? "✓ Domain Completed" : "✓ Đã học xong chuyên đề này") : (isEn ? "○ Mark Domain Completed" : "○ Đánh dấu đã học xong chuyên đề")}
             </button>`
           : ""
       }
@@ -885,7 +890,7 @@ function renderMasteryView(masteryId) {
           <path d="M12 20h9"/>
           <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
         </svg>
-        ${masteryId > 0 ? "Ghi chú chuyên đề này" : "Mở sổ tay ghi chú"}
+        ${masteryId > 0 ? (isEn ? "Notes on this Topic" : "Ghi chú chuyên đề này") : (isEn ? "Open Study Notebook" : "Mở sổ tay ghi chú")}
       </button>
     </div>
   `;
@@ -1067,11 +1072,21 @@ function selectModule(id) {
     : (mod.beginnerGuide_vi || []);
   const bgListSecondary = mod.beginnerGuide_en || [];
 
+  const enAnalogy = (typeof CCNA_ANALOGY_EN !== "undefined" && CCNA_ANALOGY_EN[mod.id]) || mod.analogy_en;
+  const activeAnalogyText = isEn
+    ? (enAnalogy || mod.analogy_vi)
+    : mod.analogy_vi;
+
   const analogyHtml = mod.analogy_vi
     ? `
       <div class="analogy-box">
-        <div class="analogy-title">💡 ${isEn ? "Real-World Metaphor & Intuitive Analogy" : "Ví dụ liên hệ thực tế đời thường cho người mới"}</div>
-        <div class="analogy-text">${formatRichText(mod.analogy_vi)}</div>
+        <div class="analogy-title">💡 ${isEn ? "Real-World Metaphor &amp; Intuitive Analogy" : "Ví dụ liên hệ thực tế đời thường cho người mới"}</div>
+        <div class="analogy-text">${formatRichText(activeAnalogyText)}</div>
+        ${
+          currentLang === "both" && enAnalogy
+            ? `<div class="concept-en-sub" style="margin-top:0.6rem;padding-top:0.6rem;border-top:1px dashed #cbd5e1;">🇬🇧 ${formatRichText(enAnalogy)}</div>`
+            : ""
+        }
       </div>
     `
     : "";
@@ -1207,25 +1222,39 @@ function selectModule(id) {
   let glossarySectionHtml = "";
   if (glossaryEntries.length > 0) {
     const cardsHtml = glossaryEntries
-      .map(
-        (g, idx) => `
+      .map((g, idx) => {
+        const enGlossary = (typeof CCNA_GLOSSARY_EN !== "undefined" && CCNA_GLOSSARY_EN[mod.id]) || [];
+        const enItem = enGlossary[idx] || {};
+        const term = isEn ? (enItem.term_en || g.term) : g.term;
+        const simple = isEn ? (enItem.simple_en || g.simple_vi) : g.simple_vi;
+        const detail = isEn ? (enItem.detail_en || g.detail_vi) : g.detail_vi;
+        const example = isEn ? (enItem.example_en || g.example_vi) : g.example_vi;
+
+        const bothSimple = currentLang === "both" && enItem.simple_en ? `<div class="concept-en-sub" style="margin-top:0.25rem;">🇬🇧 ${formatRichText(enItem.simple_en)}</div>` : "";
+        const bothDetail = currentLang === "both" && enItem.detail_en ? `<div class="concept-en-sub" style="margin-top:0.25rem;">🇬🇧 ${formatRichText(enItem.detail_en)}</div>` : "";
+        const bothExample = currentLang === "both" && enItem.example_en ? `<div class="concept-en-sub" style="margin-top:0.25rem;">🇬🇧 ${formatRichText(enItem.example_en)}</div>` : "";
+
+        return `
         <div class="glossary-card">
           <div class="glossary-term">
             <span class="pt-badge">${isEn ? `TERM ${idx + 1}` : `MỤC ${idx + 1}`}</span>
-            <span>${escapeHtml(g.term)}</span>
+            <span>${escapeHtml(term)}</span>
           </div>
           <div class="glossary-simple">
-            <strong>${isEn ? "Core Definition:" : "Khái niệm căn bản:"}</strong> ${formatRichText(g.simple_vi)}
+            <strong>${isEn ? "Core Definition:" : "Khái niệm căn bản:"}</strong> ${formatRichText(simple)}
+            ${bothSimple}
           </div>
           <div class="glossary-detail">
-            <strong>${isEn ? "Technical Deep Dive & Architecture:" : "Phân tích chuyên sâu & Nguyên lý:"}</strong> ${formatRichText(g.detail_vi)}
+            <strong>${isEn ? "Technical Deep Dive & Architecture:" : "Phân tích chuyên sâu & Nguyên lý:"}</strong> ${formatRichText(detail)}
+            ${bothDetail}
           </div>
           <div class="glossary-example">
-            <strong>${isEn ? "CCNA Exam & Real-World Note:" : "Ứng dụng & Lưu ý thi CCNA:"}</strong> ${formatRichText(g.example_vi)}
+            <strong>${isEn ? "CCNA Exam & Real-World Note:" : "Ứng dụng & Lưu ý thi CCNA:"}</strong> ${formatRichText(example)}
+            ${bothExample}
           </div>
         </div>
-      `
-      )
+      `;
+      })
       .join("");
 
     glossarySectionHtml = wrapSectionBlock(

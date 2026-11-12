@@ -652,3 +652,151 @@ const CCNA_JOB_SKILLS_EN = {
     "Field Practice 3 — Automated Configuration Rollback: When making risky routing changes remotely over SSH, use the `reload in 10` safeguard command. If your change severs connectivity, the router will automatically reboot back to its saved config after 10 minutes."
   ]
 };
+
+
+// ==============================================================================
+// CCNA English Metaphors & Real-World Analogies for All 17 Modules
+// ==============================================================================
+const CCNA_ANALOGY_EN = {
+  1: "Imagine computer networking as a nationwide logistics and postal system: End devices (PCs, phones, servers) are houses and warehouses producing and consuming goods; Network media (copper cables, optical fiber, wireless airwaves) are highways, railroads, and shipping lanes; Intermediary devices (Switches, Routers, Firewalls) act as traffic roundabouts, border checkpoints, and distribution sorting hubs ensuring packets reach the exact intended destination.",
+  2: "Navigating Cisco IOS CLI is identical to exploring folders in an operating system: User EXEC Mode ('>') is like a Guest account with basic read-only status commands; Privileged EXEC Mode ('#') is like running Administrator/Root mode; Global Configuration Mode ('(config)#') is like opening the Master System Control Panel to install drivers and modify global device settings.",
+  3: "Protocols in networking are like diplomatic rules and etiquette when two people converse: they must agree on a common language (syntax), speak at a mutually intelligible speed without shouting (flow control), and pause to confirm 'Did you hear that?' (acknowledgment). OSI and TCP/IP models organize these rules into clean hierarchical layers.",
+  4: "Physical transmission media is like transportation pipelines: Copper UTP cables are standard paved city streets (affordable, fast up to 100 meters, but vulnerable to electromagnetic noise); Fiber-optic cables are subterranean vacuum tube bullet trains carrying laser light pulses across tens of kilometers at light speed without interference.",
+  5: "Binary and Hexadecimal counting: Humans have 10 fingers, so we intuitively count in Base-10 (Decimal 0–9). Inside router silicon and computer CPUs, there are only billions of electronic transistor switches: Power On = 1, Power Off = 0 (Base-2 Binary). When you type IP 192.168.1.1, the machine instantly converts it into 32 binary bits (11000000.10101000.00000001.00000001) to calculate routing.",
+  6: "The Data Link Layer is like an armored envelope with a postal stamp: It wraps raw Layer 3 packets into structured Ethernet Frames, complete with sender and recipient hardware MAC addresses stamped on both ends, and an Error Check FCS checksum at the back to discard damaged deliveries.",
+  7: "Ethernet Switching is like a smart postal distribution mailroom: Hubs were reckless bullhorns broadcasting every incoming package out to all workers in the building; Switches maintain an internal MAC Address Table, quietly learning which device sits at which desk, forwarding frames strictly to the destination port.",
+  8: "Network Layer addressing (IP) is like a global courier delivery system: A MAC address is like your citizen ID number (unique to you but doesn't tell a mail carrier where your house is located); An IP address is your full physical postal address (Country, City, Street, House Number), allowing international couriers to route packets across continents.",
+  9: "Address Resolution Protocol (ARP) is like walking into an office room and asking out loud: 'Who here is assigned IP address 192.168.1.50? Please whisper your hardware MAC address back to me!' Once PC2 replies privately, PC1 caches the answer into its ARP table for 5 to 20 minutes.",
+  10: "A Router is like a smart air traffic control tower and international immigration hub: It inspects packet destination IP headers, consults its Routing Table for the best outbound path (Metric/Administrative Distance), strips the old incoming Ethernet header, and encapsulates the packet in a new Layer 2 frame outbound.",
+  11: "IPv4 Subnetting is like dividing a large commercial building into private office suites: Instead of having 250 employees sharing one noisy open hall (causing massive broadcast storms), you build partitions and give each department its own private subnet room, separated by router gateways.",
+  12: "IPv6 is like upgrading from phone numbers to a boundless global GPS grid: IPv4 ran out with 4.3 billion addresses. IPv6 delivers 340 undecillion addresses (enough to assign billions of unique public IPs to every grain of sand on Earth), eliminating the need for complex NAT translations.",
+  13: "Layer 4 Transport protocols (TCP vs. UDP) are like Registered Certified Mail vs. a Fast Courier Flyer: TCP is Registered Mail that requires a 3-way handshake signature, tracks every sequence number, and retransmits lost parcels; UDP is a live streaming broadcast that fires data continuously with minimal overhead.",
+  14: "Application Layer services: DNS is the internet's phonebook translating human names like google.com into IP 142.250.190.46; DHCP is the automatic concierge handing out room keys (IP, subnet mask, default gateway, DNS) to guests the instant they plug into the network.",
+  15: "Network Security is like airport defense-in-depth: Perimeter fences are your Edge Firewalls, metal detectors and baggage scanners are IPS/WSA, passenger ID boarding passes are 802.1X / RADIUS authentication, and security cameras are Syslog monitoring.",
+  16: "Network Automation is like transitioning from manually tightening every screw by hand on an assembly line to programming industrial robotic arms: Rather than typing commands into 200 switches one-by-one, engineers write Python scripts and Ansible playbooks to configure all 200 devices simultaneously via REST APIs in seconds.",
+  17: "Systematic Troubleshooting is like a medical emergency triage: Never guess blindly! Use the Divide-and-Conquer approach starting at Layer 3: Ping the Default Gateway and 8.8.8.8 to immediately isolate whether the breakdown is down in physical wiring/switching (Layers 1–2) or up in DNS/firewall/application configs (Layers 4–7)."
+};
+
+// ==============================================================================
+// CCNA English Exam Mastery Topics (10 Domains)
+// ==============================================================================
+const CCNA_EXAM_MASTERY_EN = {
+  1: {
+    title_en: "Mastery Topic 1: Enterprise Switching Deep Dive — VLANs, 802.1Q Trunking, DTP, Spanning Tree (STP/RSTP) & EtherChannel",
+    summary_en: "Master all core Layer 2 enterprise switching concepts tested on the CCNA 200-301 exam: Specialized VLAN architectures (Data, Voice, Management, Native), Dynamic Trunking Protocol (DTP) negotiation, Spanning Tree Root Bridge election criteria (802.1D / 802.1w), and EtherChannel link aggregation (LACP vs. PAgP vs. Static)."
+  },
+  2: {
+    title_en: "Mastery Topic 2: Enterprise Routing Protocols — OSPFv2, OSPFv3 & Dynamic Routing Mechanics",
+    summary_en: "Comprehensive mastery of Link-State routing: OSPF 7-state neighbor adjacency progression, DR/BDR election in multiaccess broadcast networks, OSPF cost calculations, LSA types, and Area 0 backbone hierarchy."
+  },
+  3: {
+    title_en: "Mastery Topic 3: IP Services & High Availability — FHRP (HSRP/VRRP), DHCP Snooping & NTP",
+    summary_en: "First-Hop Redundancy Protocols (HSRP active/standby virtual gateway failover, preemption), Network Time Protocol (NTP stratum hierarchy for synchronized logging), and DHCP relay agents."
+  },
+  4: {
+    title_en: "Mastery Topic 4: Network Security Fundamentals — Standard & Extended ACLs, Port Security & DAI",
+    summary_en: "Securing access switches and routed boundaries: Port Security (Violation modes: protect, restrict, shutdown), Dynamic ARP Inspection (DAI), DHCP Snooping untrusted port filtering, and IPv4/IPv6 Access Control Lists."
+  },
+  5: {
+    title_en: "Mastery Topic 5: Network Address Translation (NAT) & Private Addressing (RFC 1918)",
+    summary_en: "Static NAT (1-to-1 hosting), Dynamic NAT (pool allocation), and Port Address Translation (PAT / NAT Overload) using ephemeral port multiplexing to preserve public IPv4 addresses."
+  },
+  6: {
+    title_en: "Mastery Topic 6: Enterprise Wireless LANs (WLAN) — Architectures, WLC, CAPWAP & 802.11 Standards",
+    summary_en: "Autonomous APs vs. Lightweight APs (Split-MAC architecture), CAPWAP tunnel encapsulation (Control UDP 5246, Data UDP 5247), Cisco Wireless LAN Controllers (WLC), WPA2/WPA3 Personal vs. Enterprise 802.1X."
+  },
+  7: {
+    title_en: "Mastery Topic 7: Network Automation, Programmability & Software-Defined Networking (SDN)",
+    summary_en: "Cisco DNA Center / Catalyst Center, Software-Defined Access (SDA) Fabric (Underlay vs. Overlay, LISP, VXLAN), REST APIs (GET, POST, PUT, DELETE), JSON / XML / YAML data serialization, and Ansible / Puppet / Chef / Terraform configuration management."
+  },
+  8: {
+    title_en: "Mastery Topic 8: Quality of Service (QoS) & Traffic Management",
+    summary_en: "Classification and Marking (CoS Layer 2, ToS/DSCP Layer 3: EF, AF, CS, Best Effort), Queuing mechanisms (FIFO, WFQ, CBWFQ, LLQ Strict Priority for Voice), Traffic Policing (drop) vs. Traffic Shaping (buffer/smooth)."
+  },
+  9: {
+    title_en: "Mastery Topic 9: WAN Technologies & Modern Cloud Connectivity",
+    summary_en: "Leased lines, Metro Ethernet, MPLS VPNs, Site-to-Site IPsec VPNs, Generic Routing Encapsulation (GRE), SD-WAN architectures (vManage, vSmart, vBond, vEdge), and Public Cloud on-ramps (AWS Direct Connect, Azure ExpressRoute)."
+  },
+  10: {
+    title_en: "Mastery Topic 10: Network Operations, Monitoring & Production Troubleshooting Toolkit",
+    summary_en: "Syslog severity levels 0–7 (Emergency down to Debugging), SNMPv2c vs. SNMPv3 (AuthNoPriv, AuthPriv encryption), Cisco Discovery Protocol (CDP) vs. Link Layer Discovery Protocol (LLDP), and Cisco IOS system baseline recovery."
+  }
+};
+
+// ==============================================================================
+// CCNA English In-Depth Glossary for Modules 1 - 17
+// ==============================================================================
+const CCNA_GLOSSARY_EN = {
+  1: [
+    {
+      term_en: "Host / End Device",
+      simple_en: "Any computing device directly interacted with by humans or acting as the ultimate source/destination of data across a network (PCs, laptops, smartphones, servers, network printers, IP cameras, VoIP phones).",
+      detail_en: "In CCNA terminology, every IP-connected endpoint is called a **Host**. To communicate over a network, each host requires: 1) A **Network Interface Card (NIC)**; 2) A burned-in **48-bit Physical MAC Address** for local subnet communication; and 3) A **Logical IP Address (32-bit IPv4 or 128-bit IPv6)** for end-to-end global routing. Hosts operate as **Clients** (requesting services, such as a web browser), **Servers** (providing services like HTTP, DNS, File storage), or both simultaneously (Peer-to-Peer).",
+      example_en: "When streaming a video on your smartphone, your phone is the Client End Device, while the Google/YouTube data center server in Singapore is the Server End Device."
+    },
+    {
+      term_en: "Intermediary Device",
+      simple_en: "Infrastructure appliances located inside network racks responsible for interconnecting endpoints and directing data packets along optimal paths.",
+      detail_en: "Intermediary devices do NOT generate user application payload. They perform four critical functions: 1) Regenerate and retransmit degraded electrical or optical signals; 2) Maintain topologies and forward tables (MAC address tables on switches, Routing tables on routers); 3) Forward frames/packets and alert administrators on link failures; 4) Enforce Quality of Service (QoS) priorities and filter threats (Firewall/ACL). The four primary intermediary devices in CCNA are **Switches (Layer 2)**, **Routers (Layer 3)**, **Wireless Access Points (WAPs)**, and **Next-Generation Firewalls (NGFW)**.",
+      example_en: "In the CCNA exam: Network printers and servers are classified as End Devices, whereas switches, routers, and firewalls are Intermediary Devices."
+    },
+    {
+      term_en: "Network Media",
+      simple_en: "The physical transmission pathways that carry encoded signals between devices: Copper cables, Fiber-optic strands, and Wireless radio frequencies.",
+      detail_en: "There are three primary media types: 1) **Copper (UTP, STP, Coaxial)**: Encodes binary 0 and 1 into **electrical voltage pulses**, cost-effective up to 100 meters but susceptible to electromagnetic interference (EMI); 2) **Fiber-Optic (Single-mode, Multi-mode)**: Encodes data as **pulses of light (Laser or LED)** through high-purity silica glass cores, spanning tens of kilometers at ultra-high speeds with 100% immunity to EMI and lightning surges; 3) **Wireless (RF)**: Encodes data into **electromagnetic waves** transmitted through free space.",
+      example_en: "From your workstation to the floor wiring closet uses Cat6 UTP copper cable; connecting the enterprise building to the ISP uplink uses single-mode optical fiber."
+    },
+    {
+      term_en: "LAN vs. WAN vs. WLAN vs. MAN vs. SAN",
+      simple_en: "Classifications of computer networks based on geographical scale, operational span, and organizational ownership.",
+      detail_en: "• **LAN (Local Area Network)**: Small geographical scope (single room, office floor, campus building), operated by a **single individual or organization**, delivering high speeds (1 Gbps - 10 Gbps). • **WAN (Wide Area Network)**: Interconnects distant LANs separated by hundreds or thousands of kilometers across telecom service provider (TSP/ISP) infrastructure. • **WLAN (Wireless LAN)**: Local area network using Wi-Fi radio waves instead of physical ethernet cabling. • **MAN (Metropolitan Area Network)**: City-wide public or municipal network. • **SAN (Storage Area Network)**: High-speed dedicated back-end fabric connecting enterprise servers to centralized storage arrays.",
+      example_en: "The global Internet is literally a 'Network of Networks' stitching together millions of private LANs and public WANs worldwide."
+    },
+    {
+      term_en: "Intranet vs. Extranet vs. Internet",
+      simple_en: "Three progressive access tiers defining who is authorized to reach an organization's network assets.",
+      detail_en: "• **Intranet (Private Internal Network)**: Strictly reserved for **authenticated internal employees** (e.g., HR portals, internal payroll, development environments). • **Extranet (Extended Partner Network)**: Private network zones granting controlled, authorized access to **external suppliers, trusted partners, and enterprise customers** (e.g., supplier inventory lookups). • **Internet (Public Global Network)**: Globally accessible public network reachable by anyone across the world.",
+      example_en: "CCNA Exam Memory Rule: Internal employees only = **Intranet**; Trusted external partners/vendors = **Extranet**; Everyone worldwide = **Internet**."
+    },
+    {
+      term_en: "Converged Network",
+      simple_en: "A modern unified network infrastructure that merges computer data, voice telephony (VoIP), and video streams onto a single common cabling infrastructure.",
+      detail_en: "Legacy buildings required three separate, redundant physical wiring networks: copper Cat3 for analog telephones, Cat5 for computers, and coaxial for CCTV cameras. A modern **Converged Network** digitizes all voice and surveillance video into standard IP packets routed over unified Cisco switch/router infrastructure—dramatically reducing installation costs and enabling centralized policy management.",
+      example_en: "On corporate office desks, a single ethernet cable from the wall jack connects to a Cisco IP Phone, and a passthrough port on the phone daisy-chains directly to the employee's PC!"
+    }
+  ],
+  2: [
+    {
+      term_en: "Cisco IOS (Internetwork Operating System)",
+      simple_en: "The specialized operating system family executing inside Cisco hardware routers, switches, and security appliances.",
+      detail_en: "Cisco IOS is a modular, monolithic or microkernel multitasking OS tailored for high-speed hardware switching and routing. IOS executes out of RAM (volatile memory) during runtime and stores permanent configuration files in NVRAM (`startup-config`), while the binary operating system image (`.bin`) resides in Flash memory. Administrators interact with IOS through the Command Line Interface (CLI) via Console, Telnet, or secure SSHv2.",
+      example_en: "When a Cisco switch powers on, the bootstrap code loads the IOS image from `flash:c2960-lanbasek9-mz.150-2.SE4.bin` into RAM and applies `startup-config` from NVRAM."
+    },
+    {
+      term_en: "User EXEC vs. Privileged EXEC Mode",
+      simple_en: "The two foundational command execution privilege levels in Cisco IOS.",
+      detail_en: "• **User EXEC Mode (Prompt: `Router>`)**: Level 1 view-only mode allowing basic diagnostic commands (`ping`, `traceroute`, `show version`), but prohibiting any system configuration changes. • **Privileged EXEC Mode (Prompt: `Router#`)**: Level 15 administrator/enable mode entered by typing `enable`. Unlocks full administrative visibility (`show running-config`), file system operations (`copy run start`, `reload`), and debug operations.",
+      example_en: "Exam question: Which prompt allows saving configurations to NVRAM? Answer: Privileged EXEC mode (`Router# copy running-config startup-config`)."
+    },
+    {
+      term_en: "RAM vs. NVRAM vs. Flash vs. ROM",
+      simple_en: "The four distinct hardware memory components inside Cisco enterprise network equipment.",
+      detail_en: "• **RAM (Random Access Memory)**: Volatile working memory holding the running IOS image, active routing tables, ARP tables, and the `running-config`. Contents vanish instantly upon power loss. • **NVRAM (Non-Volatile RAM)**: Retains the saved `startup-config` permanently across power cycles and reboots. • **Flash Memory**: Electronically erasable non-volatile memory storing the Cisco IOS software binary image (`.bin`). • **ROM (Read-Only Memory)**: Firmware chip housing the initial Power-On Self-Test (POST) diagnostic instructions, bootstrap loader, and the ROMMON recovery shell.",
+      example_en: "If you modify a switch configuration but forget to execute `copy run start` or `write memory`, every change is lost the moment the power cable is unplugged!"
+    }
+  ],
+  3: [
+    {
+      term_en: "OSI 7-Layer Reference Model",
+      simple_en: "A standard architectural blueprint created by ISO dividing computer network communications into seven distinct, standardized functional layers.",
+      detail_en: "From Layer 7 down to Layer 1: **Layer 7 (Application)**: User-facing interface (HTTP, DNS); **Layer 6 (Presentation)**: Data representation, compression, encryption (TLS/SSL); **Layer 5 (Session)**: Session management (RPC); **Layer 4 (Transport)**: End-to-end reliability and port multiplexing (TCP, UDP); **Layer 3 (Network)**: Logical IP addressing and best path routing (IPv4, IPv6); **Layer 2 (Data Link)**: Physical MAC addressing and framing (Ethernet 802.3, Wi-Fi 802.11); **Layer 1 (Physical)**: Binary bit encoding into physical signals (Voltage, Light, Radio).",
+      example_en: "Mnemonic to remember all 7 layers from Layer 7 down: **A**ll **P**eople **S**eem **T**o **N**eed **D**ata **P**rocessing."
+    },
+    {
+      term_en: "Encapsulation & Decapsulation (PDU)",
+      simple_en: "The packaging process as data travels down the network stack (encapsulation) and unwrapping process upon arrival (decapsulation).",
+      detail_en: "Each layer wraps the incoming payload with its own specialized Protocol Data Unit (PDU) header: Layer 7-5 produces **Data**; Layer 4 adds Port numbers to create a **Segment**; Layer 3 adds IP addresses to create a **Packet**; Layer 2 adds MAC addresses and an FCS trailer to create a **Frame**; Layer 1 converts the frame into raw **Bits**.",
+      example_en: "When your PC sends a web request: Browser payload → TCP Segment → IP Packet → Ethernet Frame → Electrical bits on copper cable."
+    }
+  ]
+};

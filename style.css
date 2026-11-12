@@ -1460,7 +1460,8 @@ body {
   height: auto;
   min-width: 680px;
   display: block;
-  overflow: visible;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 [data-theme="dark"] .svg-diagram-wrapper {
