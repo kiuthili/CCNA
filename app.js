@@ -697,6 +697,11 @@ function renderLabsView(labId) {
     </div>
   `;
 
+  const isEn = currentLang === "en";
+  document.title = labId > 0 && labsToShow[0]
+    ? (isEn ? `Lab ${labId}: ${labsToShow[0].title_en || labsToShow[0].title_vi.replace(/^Lab \d+:\s*/, "")} — CCNA Learning` : `${labsToShow[0].title_vi} — CCNA Learning`)
+    : (isEn ? "35 Packet Tracer Labs — CCNA Learning" : "35 Bài thực hành Lab — CCNA Learning");
+
   updateTopbarBreadcrumb();
 
   const labCompleteBtn = document.getElementById("lab-complete-btn");
@@ -792,7 +797,10 @@ function renderMasteryView(masteryId) {
     })
     .join("");
 
-  document.title = "10 Chuyên Đề Thi CCNA 200-301 (v1.1 & v2.0), Thiết Bị Đa Hãng, Ngoại Vi & Phỏng Vấn Đi Làm";
+  const isEn = currentLang === "en";
+  document.title = masteryId > 0 && itemsToShow[0]
+    ? (isEn ? `Mastery ${masteryId}: ${itemsToShow[0].title_en || itemsToShow[0].title_vi} — CCNA Learning` : `Chuyên đề ${masteryId}: ${itemsToShow[0].title_vi} — CCNA Learning`)
+    : (isEn ? "10 CCNA Exam Mastery Topics — CCNA Learning" : "10 Chuyên đề CCNA — CCNA Learning");
 
   const isMasteryCompleted = masteryId > 0 && !!completedItems["mastery-" + masteryId];
   const masteryActionsHtml = `
@@ -1357,8 +1365,8 @@ function selectModule(id) {
 
   // Dynamic SEO Title update
   document.title = isEn
-    ? `Module ${mod.id}: ${mainTitle} — CCNA 200-301 Complete Curriculum`
-    : `Học phần ${mod.id}: ${mainTitle} — CCNA 200-301 (v1.1 & v2.0) Toàn Diện`;
+    ? `Module ${mod.id}: ${mainTitle} — CCNA Learning`
+    : `Học phần ${mod.id}: ${mainTitle} — CCNA Learning`;
   closeMobileSidebar();
 
   // Estimate reading time & word count

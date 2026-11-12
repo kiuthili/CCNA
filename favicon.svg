@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="ccnaBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="50%" stop-color="#0369a1" />
+      <stop offset="100%" stop-color="#0b1329" />
+    </linearGradient>
+    <linearGradient id="nodeGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Squircle Base with high-tech cyan border -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#ccnaBg)" stroke="#38bdf8" stroke-width="1.6" stroke-opacity="0.45" />
+
+  <!-- Network Interconnect Mesh Lines -->
+  <line x1="32" y1="16" x2="15" y2="45" stroke="#38bdf8" stroke-width="2.6" stroke-linecap="round" stroke-opacity="0.8" />
+  <line x1="32" y1="16" x2="49" y2="45" stroke="#38bdf8" stroke-width="2.6" stroke-linecap="round" stroke-opacity="0.8" />
+  <line x1="15" y1="45" x2="49" y2="45" stroke="#38bdf8" stroke-width="2.6" stroke-linecap="round" stroke-opacity="0.8" />
+  
+  <line x1="32" y1="16" x2="32" y2="35" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-opacity="0.9" />
+  <line x1="15" y1="45" x2="32" y2="35" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-opacity="0.9" />
+  <line x1="49" y1="45" x2="32" y2="35" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-opacity="0.9" />
+
+  <!-- Central Switch/Routing Core -->
+  <circle cx="32" cy="35" r="4.5" fill="#ffffff" filter="url(#softGlow)" />
+  <circle cx="32" cy="35" r="2.2" fill="#0284c7" />
+
+  <!-- Network Edge Nodes (Gateway, Switches, Access) -->
+  <circle cx="32" cy="16" r="5" fill="url(#nodeGlow)" stroke="#ffffff" stroke-width="2" />
+  <circle cx="15" cy="45" r="5" fill="url(#nodeGlow)" stroke="#ffffff" stroke-width="2" />
+  <circle cx="49" cy="45" r="5" fill="url(#nodeGlow)" stroke="#ffffff" stroke-width="2" />
+
+  <!-- Glowing Packet Signals -->
+  <circle cx="23.5" cy="30.5" r="1.6" fill="#bae6fd" />
+  <circle cx="40.5" cy="30.5" r="1.6" fill="#bae6fd" />
+  <circle cx="32" cy="45" r="1.6" fill="#bae6fd" />
+</svg>
