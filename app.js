@@ -299,8 +299,39 @@ async function initApp() {
   initZenMode();
   initTextSelectionHighlighter();
   initFlashcardsSystem();
+  initToolsDropdown();
   updateProgressSummary();
   updateNotesCountBadges();
+}
+
+function initToolsDropdown() {
+  const dropdownWrap = document.getElementById("tools-dropdown-wrap");
+  const menuBtn = document.getElementById("tools-menu-btn");
+  if (!dropdownWrap || !menuBtn) return;
+
+  menuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    dropdownWrap.classList.toggle("open");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!dropdownWrap.contains(e.target)) {
+      dropdownWrap.classList.remove("open");
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      dropdownWrap.classList.remove("open");
+    }
+  });
+
+  const menuItems = dropdownWrap.querySelectorAll(".dropdown-menu-item");
+  menuItems.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      dropdownWrap.classList.remove("open");
+    });
+  });
 }
 
 function renderAll() {
@@ -335,6 +366,8 @@ function updateHeaderLabels() {
     if (tabMasteryBtn) tabMasteryBtn.innerHTML = `<span class="tab-label">Chuyên đề</span><span class="tab-pill">10</span>`;
   }
 
+  const toolsBtnLabel = document.getElementById("tools-btn-label");
+  if (toolsBtnLabel) toolsBtnLabel.textContent = isEn ? "Study Tools" : "Công cụ học tập";
   const notesBtnText = document.querySelector("#open-notes-btn .btn-text");
   if (notesBtnText) notesBtnText.textContent = isEn ? "Notes" : "Ghi chú";
   const flashcardBtnText = document.querySelector("#open-flashcards-btn .btn-text");

@@ -137,53 +137,67 @@
     </div>
 
     <div class="topbar-right">
-      <!-- Quick Notes Sidebar Toggle Button -->
-      <button type="button" class="topbar-action-btn notes-btn" id="open-notes-btn" title="Bật/Tắt Sổ tay ghi chú bên phải (Alt+N)">
-        <svg class="action-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 20h9"/>
-          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-        </svg>
-        <span class="btn-text">Ghi chú</span>
-        <span class="notes-count-badge" id="notes-count-badge" style="display:none;">0</span>
-      </button>
-
-      <!-- Flashcards Quick Study Button -->
-      <button type="button" class="topbar-action-btn flashcards-btn" id="open-flashcards-btn" title="Ôn tập nhanh bằng thẻ ghi nhớ Flashcards">
-        <svg class="action-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-          <path d="M7 7h10"/>
-          <path d="M7 12h10"/>
-          <path d="M7 17h6"/>
-        </svg>
-        <span class="btn-text">Flashcard</span>
-      </button>
-
-      <!-- Pearson VUE Mock Exam Simulator Button -->
-      <button type="button" class="topbar-action-btn exam-btn" id="open-exam-btn" onclick="if(typeof openMockExam==='function')openMockExam();" title="Thi thử trắc nghiệm CCNA 200-301 chuẩn Pearson VUE">
-        <svg class="action-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="m9 12 2 2 4-4"/>
-        </svg>
-        <span class="btn-text">Thi thử</span>
-      </button>
-
-      <!-- Cisco IOS CLI Cheat Sheet & Cram Tables Button -->
-      <button type="button" class="topbar-action-btn cheatsheet-btn" id="open-cheatsheet-btn" onclick="if(typeof openCheatSheet==='function')openCheatSheet();" title="Tra cứu hơn 120+ câu lệnh Cisco IOS & Bảng công thức thi">
-        <svg class="action-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="4 17 10 11 4 5"/>
-          <line x1="12" y1="19" x2="20" y2="19"/>
-        </svg>
-        <span class="btn-text">Lệnh CLI</span>
-      </button>
-
-      <!-- Focus / Zen Mode Toggle Button -->
-      <button type="button" class="topbar-action-btn zen-btn" id="zen-mode-btn" title="Chế độ tập trung đọc bài học (Ẩn mọi thanh bên)">
-        <svg class="action-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <circle cx="12" cy="12" r="3"/>
-        </svg>
-        <span class="btn-text">Tập trung</span>
-      </button>
+      <!-- Grouped Study Tools Dropdown (Gôm gọn thành 1 Dropbox tiện ích) -->
+      <div class="topbar-dropdown-menu-wrap" id="tools-dropdown-wrap">
+        <button type="button" class="topbar-action-btn tools-menu-btn" id="tools-menu-btn" aria-haspopup="true" aria-expanded="false" title="Menu công cụ học tập CCNA">
+          <svg class="action-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+          <span class="btn-text" id="tools-btn-label">Công cụ học tập</span>
+          <svg class="dropdown-chevron-svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <div class="topbar-dropdown-panel" id="tools-dropdown-panel" role="menu">
+          <button type="button" class="dropdown-menu-item" id="open-notes-btn" role="menuitem" title="Bật/Tắt Sổ tay ghi chú (Alt+N)">
+            <span class="menu-item-icon green-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </span>
+            <div class="menu-item-content">
+              <div class="menu-item-title">Sổ tay ghi chú <span class="hotkey-pill">Alt+N</span></div>
+              <div class="menu-item-desc">Ghi chép bên phải màn hình, tự động lưu</div>
+            </div>
+            <span class="notes-count-badge" id="notes-count-badge" style="display:none;">0</span>
+          </button>
+          <button type="button" class="dropdown-menu-item" id="open-flashcards-btn" role="menuitem" title="Ôn tập nhanh bằng Flashcard">
+            <span class="menu-item-icon blue-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h6"/></svg>
+            </span>
+            <div class="menu-item-content">
+              <div class="menu-item-title">Thẻ nhớ Flashcard</div>
+              <div class="menu-item-desc">Lật thẻ ôn kiến thức, câu lệnh và trắc nghiệm</div>
+            </div>
+          </button>
+          <button type="button" class="dropdown-menu-item" id="open-exam-btn" onclick="if(typeof openMockExam==='function')openMockExam();" role="menuitem" title="Thi thử CCNA chuẩn Pearson VUE">
+            <span class="menu-item-icon emerald-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            </span>
+            <div class="menu-item-content">
+              <div class="menu-item-title">Phòng thi thử CCNA</div>
+              <div class="menu-item-desc">Mô phỏng 30 câu hỏi theo chuẩn Pearson VUE</div>
+            </div>
+          </button>
+          <button type="button" class="dropdown-menu-item" id="open-cheatsheet-btn" onclick="if(typeof openCheatSheet==='function')openCheatSheet();" role="menuitem" title="Tra cứu nhanh lệnh Cisco IOS">
+            <span class="menu-item-icon amber-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            </span>
+            <div class="menu-item-content">
+              <div class="menu-item-title">Tra cứu lệnh CLI Cisco</div>
+              <div class="menu-item-desc">Hơn 120+ câu lệnh & bảng công thức thi</div>
+            </div>
+          </button>
+          <div class="dropdown-menu-divider"></div>
+          <button type="button" class="dropdown-menu-item" id="zen-mode-btn" role="menuitem" title="Bật/Tắt chế độ tập trung đọc bài">
+            <span class="menu-item-icon indigo-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            </span>
+            <div class="menu-item-content">
+              <div class="menu-item-title" id="menu-zen-label">Chế độ tập trung (Zen Mode)</div>
+              <div class="menu-item-desc">Ẩn mọi thanh bên để tập trung tối đa</div>
+            </div>
+          </button>
+        </div>
+      </div>
 
       <!-- Font Zoom Adjuster -->
       <div class="font-zoom-group" role="group" aria-label="Điều chỉnh kích cỡ chữ">
@@ -684,6 +698,32 @@
         </div>
         <button type="button" class="cs-close-btn" id="cheatsheet-close-btn" aria-label="Đóng tra cứu">✕</button>
       </header>
+
+      <!-- Sticky Dedicated Search Bar for Quick CLI Lookup -->
+      <div class="cs-sticky-search-section">
+        <div class="cs-search-input-wrap">
+          <svg class="cs-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="cs-main-search-input" class="cs-main-search-input" placeholder="Tìm kiếm nhanh lệnh Cisco IOS (ví dụ: ospf, vlan, trunk, port-security, nat, dhcp, show)..." autocomplete="off" />
+          <button type="button" class="cs-search-clear-btn" id="cs-search-clear-btn" style="display:none;" title="Xóa tìm kiếm">✕</button>
+        </div>
+        <div class="cs-quick-tags-bar">
+          <span class="cs-tags-label">Gợi ý tìm kiếm:</span>
+          <button type="button" class="cs-tag-chip" data-search="ospf">OSPF</button>
+          <button type="button" class="cs-tag-chip" data-search="vlan">VLAN</button>
+          <button type="button" class="cs-tag-chip" data-search="trunk">Trunking</button>
+          <button type="button" class="cs-tag-chip" data-search="stp">STP</button>
+          <button type="button" class="cs-tag-chip" data-search="etherchannel">EtherChannel</button>
+          <button type="button" class="cs-tag-chip" data-search="nat">NAT / PAT</button>
+          <button type="button" class="cs-tag-chip" data-search="dhcp">DHCP</button>
+          <button type="button" class="cs-tag-chip" data-search="acl">ACL</button>
+          <button type="button" class="cs-tag-chip" data-search="port-security">Port Security</button>
+          <button type="button" class="cs-tag-chip" data-search="show">Show</button>
+          <span class="cs-result-count-badge" id="cs-result-count-badge">Tất cả lệnh</span>
+        </div>
+      </div>
 
       <div class="cs-tabs-bar">
         <button type="button" class="cs-tab-btn active" data-tab="commands">120+ Lệnh Cisco IOS</button>

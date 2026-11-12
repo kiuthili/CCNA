@@ -976,6 +976,9 @@ function closeMockExamModal() {
 // --------------------------------------------------------------------------
 // 5. CHEAT SHEET & CRAM TABLES UI RENDERER
 // --------------------------------------------------------------------------
+let csCurrentCat = "all";
+let csCurrentSearch = "";
+
 function openCheatSheetModal(defaultTab = "commands") {
   const modal = document.getElementById("cheatsheet-modal");
   if (modal) {
@@ -983,6 +986,14 @@ function openCheatSheetModal(defaultTab = "commands") {
     modal.removeAttribute("hidden");
     modal.classList.add("active");
     renderCheatSheetTab(defaultTab);
+
+    // Auto-focus search input for instant typing
+    setTimeout(() => {
+      const searchInput = document.getElementById("cs-main-search-input");
+      if (searchInput) {
+        searchInput.focus();
+      }
+    }, 120);
   }
 }
 
@@ -1028,115 +1039,131 @@ function renderCheatSheetTab(tabKey) {
 
 function renderCheatSheetCommands(container) {
   container.innerHTML = `
-    <div class="cs-toolbar">
-      <input type="text" class="cs-search-input" id="cs-search-input" placeholder="Tìm kiếm nhanh lệnh Cisco IOS (ví dụ: ospf, trunk, nat, vlan, portfast, show)..." autocomplete="off" />
+    <div class="cs-toolbar" style="margin-bottom: 1.1rem;">
       <div class="cs-category-pills" id="cs-category-filter">
-        <button type="button" class="cs-cat-pill active" data-cat="all">Tất cả (${CCNA_CHEAT_SHEET_DATA.length})</button>
-        <button type="button" class="cs-cat-pill" data-cat="basic">Căn bản</button>
-        <button type="button" class="cs-cat-pill" data-cat="vlan">VLAN & Trunk</button>
-        <button type="button" class="cs-cat-pill" data-cat="stp">STP & EtherChannel</button>
-        <button type="button" class="cs-cat-pill" data-cat="routing">Định tuyến L3</button>
-        <button type="button" class="cs-cat-pill" data-cat="services">Dịch vụ IP</button>
-        <button type="button" class="cs-cat-pill" data-cat="security">Bảo mật & ACL</button>
-        <button type="button" class="cs-cat-pill" data-cat="ipv6">IPv6</button>
-        <button type="button" class="cs-cat-pill" data-cat="troubleshoot">Show & Kiểm tra</button>
+        <button type="button" class="cs-cat-pill ${csCurrentCat === "all" ? "active" : ""}" data-cat="all">Tất cả (${CCNA_CHEAT_SHEET_DATA.length})</button>
+        <button type="button" class="cs-cat-pill ${csCurrentCat === "basic" ? "active" : ""}" data-cat="basic">Căn bản</button>
+        <button type="button" class="cs-cat-pill ${csCurrentCat === "vlan" ? "active" : ""}" data-cat="vlan">VLAN & Trunk</button>
+        <button type="button" class="cs-cat-pill ${csCurrentCat === "stp" ? "active" : ""}" data-cat="stp">STP & EtherChannel</button>
+        <button type="button" class="cs-cat-pill ${csCurrentCat === "routing" ? "active" : ""}" data-cat="routing">Định tuyến L3</button>
+        <button type="button" class="cs-cat-pill ${csCurrentCat === "services" ? "active" : ""}" data-cat="services">Dịch vụ IP</button>
+        <button type="button" class="cs-cat-pill ${csCurrentCat === "security" ? "active" : ""}" data-cat="security">Bảo mật & ACL</button>
+        <button type="button" class="cs-cat-pill ${csCurrentCat === "ipv6" ? "active" : ""}" data-cat="ipv6">IPv6</button>
+        <button type="button" class="cs-cat-pill ${csCurrentCat === "troubleshoot" ? "active" : ""}" data-cat="troubleshoot">Show & Kiểm tra</button>
       </div>
     </div>
     <div class="cs-commands-list" id="cs-commands-list"></div>
   `;
 
-  const searchInput = document.getElementById("cs-search-input");
-  const listEl = document.getElementById("cs-commands-list");
   const catPills = container.querySelectorAll(".cs-cat-pill");
-
-  let currentCat = "all";
-  let currentSearch = "";
-
-  const filterAndDraw = () => {
-    const q = currentSearch.toLowerCase();
-    const filtered = CCNA_CHEAT_SHEET_DATA.filter((item) => {
-      const matchCat = currentCat === "all" || item.category === currentCat;
-      const matchSearch =
-        !q ||
-        (item.title && item.title.toLowerCase().includes(q)) ||
-        (item.cmd && item.cmd.toLowerCase().includes(q)) ||
-        (item.scenario && item.scenario.toLowerCase().includes(q)) ||
-        (item.why && item.why.toLowerCase().includes(q)) ||
-        (item.example && item.example.toLowerCase().includes(q)) ||
-        (item.verify && item.verify.toLowerCase().includes(q));
-      return matchCat && matchSearch;
-    });
-
-    if (filtered.length === 0) {
-      listEl.innerHTML = `<div class="cs-empty" style="text-align:center;padding:2.5rem;color:var(--text-muted);">Không tìm thấy lệnh nào khớp với từ khóa "<strong>${escapeHtml(currentSearch)}</strong>".</div>`;
-      return;
-    }
-
-    listEl.innerHTML = filtered
-      .map(
-        (item) => `
-        <div class="cs-cmd-card" id="${item.id}">
-          <div class="cs-cmd-header">
-            <h4 class="cs-cmd-title">${escapeHtml(item.title)}</h4>
-            <div class="cs-cmd-meta">
-              <span class="cs-badge">${escapeHtml(item.categoryName)}</span>
-              <span class="cs-mode">${escapeHtml(item.mode)}</span>
-            </div>
-          </div>
-
-          <pre class="cs-code-wrap"><code>${escapeHtml(item.cmd)}</code><button type="button" class="cs-copy-btn" title="Sao chép cú pháp lệnh" onclick="copyCheatSheetCmd(this, \`${item.cmd.replace(/`/g, "\\`").replace(/\\/g, "\\\\")}\`)">Copy Lệnh</button></pre>
-
-          <div class="cs-details-grid">
-            <div class="cs-detail-box">
-              <span class="cs-detail-label">🎯 Trường hợp sử dụng:</span>
-              <span class="cs-detail-text">${formatExamRichText(item.scenario)}</span>
-            </div>
-            <div class="cs-detail-box">
-              <span class="cs-detail-label">💡 Tại sao &amp; Công dụng kỹ thuật:</span>
-              <span class="cs-detail-text">${formatExamRichText(item.why)}</span>
-            </div>
-            <div class="cs-detail-box">
-              <span class="cs-detail-label">⚙️ Điều kiện tiên quyết:</span>
-              <span class="cs-detail-text">${formatExamRichText(item.prereq)}</span>
-            </div>
-          </div>
-
-          <div class="cs-example-wrap">
-            <div class="cs-example-head">
-              <span>💻 VÍ DỤ CẤU HÌNH THỰC TẾ CHI TIẾT</span>
-              <button type="button" class="cs-copy-btn" title="Sao chép ví dụ" onclick="copyCheatSheetCmd(this, \`${item.example.replace(/`/g, "\\`").replace(/\\/g, "\\\\")}\`)">Copy Ví Dụ</button>
-            </div>
-            <pre class="cs-example-code"><code>${escapeHtml(item.example)}</code></pre>
-          </div>
-
-          <div class="cs-verify-row">
-            <span class="cs-verify-label">🔍 Kiểm tra nghiệm thu:</span>
-            <span class="cs-verify-cmd">${formatExamRichText(item.verify)}</span>
-          </div>
-        </div>
-      `
-      )
-      .join("");
-  };
-
-  if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
-      currentSearch = e.target.value.trim();
-      filterAndDraw();
-    });
-  }
-
   catPills.forEach((p) => {
-    p.addEventListener("click", () => {
+    p.onclick = () => {
       catPills.forEach((pill) => pill.classList.remove("active"));
       p.classList.add("active");
-      currentCat = p.dataset.cat;
-      filterAndDraw();
-    });
+      csCurrentCat = p.dataset.cat;
+      drawFilteredCommands();
+    };
   });
 
-  filterAndDraw();
+  drawFilteredCommands();
 }
+
+function drawFilteredCommands() {
+  const listEl = document.getElementById("cs-commands-list");
+  if (!listEl) return;
+
+  const q = csCurrentSearch.toLowerCase().trim();
+  const filtered = CCNA_CHEAT_SHEET_DATA.filter((item) => {
+    const matchCat = csCurrentCat === "all" || item.category === csCurrentCat;
+    const matchSearch =
+      !q ||
+      (item.title && item.title.toLowerCase().includes(q)) ||
+      (item.cmd && item.cmd.toLowerCase().includes(q)) ||
+      (item.categoryName && item.categoryName.toLowerCase().includes(q)) ||
+      (item.scenario && item.scenario.toLowerCase().includes(q)) ||
+      (item.why && item.why.toLowerCase().includes(q)) ||
+      (item.prereq && item.prereq.toLowerCase().includes(q)) ||
+      (item.example && item.example.toLowerCase().includes(q)) ||
+      (item.verify && item.verify.toLowerCase().includes(q));
+    return matchCat && matchSearch;
+  });
+
+  // Update badge
+  const countBadge = document.getElementById("cs-result-count-badge");
+  if (countBadge) {
+    countBadge.textContent = q ? `Tìm thấy ${filtered.length} lệnh` : `Hiển thị ${filtered.length} / ${CCNA_CHEAT_SHEET_DATA.length} lệnh`;
+  }
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = `
+      <div class="cs-empty" style="text-align:center;padding:3rem 1.5rem;color:var(--text-muted);">
+        <div style="font-size:2.2rem;margin-bottom:0.75rem;">🔍</div>
+        <div style="font-size:1.05rem;font-weight:700;color:var(--text-primary);margin-bottom:0.4rem;">Không tìm thấy câu lệnh nào khớp với từ khóa "${escapeHtml(csCurrentSearch)}"</div>
+        <div style="font-size:0.86rem;color:var(--text-secondary);margin-bottom:1rem;">Hãy thử từ khóa khác (ví dụ: ospf, vlan, trunk, nat, show...) hoặc xóa bộ lọc.</div>
+        <button type="button" class="cs-tag-chip active" onclick="clearCheatSheetSearch()" style="padding:0.4rem 1rem;font-size:0.82rem;">Xem tất cả câu lệnh</button>
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = filtered
+    .map(
+      (item) => `
+      <div class="cs-cmd-card" id="${item.id}">
+        <div class="cs-cmd-header">
+          <h4 class="cs-cmd-title">${escapeHtml(item.title)}</h4>
+          <div class="cs-cmd-meta">
+            <span class="cs-badge">${escapeHtml(item.categoryName)}</span>
+            <span class="cs-mode">${escapeHtml(item.mode)}</span>
+          </div>
+        </div>
+
+        <pre class="cs-code-wrap"><code>${escapeHtml(item.cmd)}</code><button type="button" class="cs-copy-btn" title="Sao chép cú pháp lệnh" onclick="copyCheatSheetCmd(this, \`${item.cmd.replace(/`/g, "\\`").replace(/\\/g, "\\\\")}\`)">Copy Lệnh</button></pre>
+
+        <div class="cs-details-grid">
+          <div class="cs-detail-box">
+            <span class="cs-detail-label">🎯 Trường hợp sử dụng:</span>
+            <span class="cs-detail-text">${formatExamRichText(item.scenario)}</span>
+          </div>
+          <div class="cs-detail-box">
+            <span class="cs-detail-label">💡 Tại sao &amp; Công dụng kỹ thuật:</span>
+            <span class="cs-detail-text">${formatExamRichText(item.why)}</span>
+          </div>
+          <div class="cs-detail-box">
+            <span class="cs-detail-label">⚙️ Điều kiện tiên quyết:</span>
+            <span class="cs-detail-text">${formatExamRichText(item.prereq)}</span>
+          </div>
+        </div>
+
+        <div class="cs-example-wrap">
+          <div class="cs-example-head">
+            <span>💻 VÍ DỤ CẤU HÌNH THỰC TẾ CHI TIẾT</span>
+            <button type="button" class="cs-copy-btn" title="Sao chép ví dụ" onclick="copyCheatSheetCmd(this, \`${item.example.replace(/`/g, "\\`").replace(/\\/g, "\\\\")}\`)">Copy Ví Dụ</button>
+          </div>
+          <pre class="cs-example-code"><code>${escapeHtml(item.example)}</code></pre>
+        </div>
+
+        <div class="cs-verify-row">
+          <span class="cs-verify-label">🔍 Kiểm tra nghiệm thu:</span>
+          <span class="cs-verify-cmd">${formatExamRichText(item.verify)}</span>
+        </div>
+      </div>
+    `
+    )
+    .join("");
+}
+
+window.clearCheatSheetSearch = function() {
+  csCurrentSearch = "";
+  csCurrentCat = "all";
+  const searchInput = document.getElementById("cs-main-search-input");
+  if (searchInput) searchInput.value = "";
+  const clearBtn = document.getElementById("cs-search-clear-btn");
+  if (clearBtn) clearBtn.style.display = "none";
+  const chips = document.querySelectorAll(".cs-tag-chip");
+  chips.forEach((c) => c.classList.remove("active"));
+  renderCheatSheetTab("commands");
+};
 
 window.copyCheatSheetCmd = async function(btn, text) {
   try {
@@ -1356,7 +1383,7 @@ function initExamAndCheatSheetUI() {
     examBackdrop.onclick = closeMockExamModal;
   }
 
-  // Cheat Sheet UI buttons
+  // Cheat Sheet UI buttons & Dedicated Search
   const csCloseBtn = document.getElementById("cheatsheet-close-btn");
   if (csCloseBtn) csCloseBtn.onclick = closeCheatSheetModal;
 
@@ -1367,6 +1394,45 @@ function initExamAndCheatSheetUI() {
   csTabBtns.forEach((b) => {
     b.onclick = () => {
       renderCheatSheetTab(b.dataset.tab);
+    };
+  });
+
+  // Dedicated CLI Search Bar event listeners
+  const mainSearchInput = document.getElementById("cs-main-search-input");
+  const searchClearBtn = document.getElementById("cs-search-clear-btn");
+  if (mainSearchInput) {
+    mainSearchInput.oninput = (e) => {
+      csCurrentSearch = e.target.value;
+      if (searchClearBtn) {
+        searchClearBtn.style.display = csCurrentSearch ? "flex" : "none";
+      }
+      // If user types while on another tab, switch to commands tab
+      const activeTabBtn = document.querySelector(".cs-tab-btn.active");
+      if (activeTabBtn && activeTabBtn.dataset.tab !== "commands") {
+        renderCheatSheetTab("commands");
+      } else {
+        drawFilteredCommands();
+      }
+    };
+  }
+
+  if (searchClearBtn) {
+    searchClearBtn.onclick = () => {
+      clearCheatSheetSearch();
+    };
+  }
+
+  // Quick tag chips for instant filtering
+  const tagChips = document.querySelectorAll(".cs-tag-chip");
+  tagChips.forEach((chip) => {
+    chip.onclick = () => {
+      const q = chip.dataset.search || "";
+      if (mainSearchInput) mainSearchInput.value = q;
+      csCurrentSearch = q;
+      if (searchClearBtn) searchClearBtn.style.display = q ? "flex" : "none";
+      tagChips.forEach((c) => c.classList.remove("active"));
+      chip.classList.add("active");
+      renderCheatSheetTab("commands");
     };
   });
 }
