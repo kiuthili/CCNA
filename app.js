@@ -21,6 +21,13 @@ try {
   studyNotes = {};
 }
 
+let studyHighlights = {};
+try {
+  studyHighlights = JSON.parse(localStorage.getItem("ccna_study_highlights") || "{}");
+} catch {
+  studyHighlights = {};
+}
+
 let cloudSyncKey = localStorage.getItem("ccna_cloud_sync_key") || "";
 if (!cloudSyncKey) {
   cloudSyncKey = "ccna-" + Math.random().toString(36).substring(2, 8) + Date.now().toString(36).slice(-4);
@@ -289,9 +296,14 @@ async function initApp() {
     `;
   }
 
-  // Initial cloud sync pull in background if key is present
+  // Initialize sync key & cloud sync
+  initSyncKey();
+  checkUrlForSyncParam();
+
+  // Initial cloud sync pull in background & start real-time listener
   if (cloudSyncKey) {
     pullNotesFromCloud(cloudSyncKey, true);
+    initRealtimeSyncListener();
   }
 
   initNotesSystem();
@@ -784,6 +796,9 @@ function renderLabsView(labId) {
   if (labQuickNoteBtn) {
     labQuickNoteBtn.addEventListener("click", () => openNotesModal("current"));
   }
+
+  // Restore saved highlights for this lab
+  applySavedHighlights(labId > 0 ? "lab-" + labId : "labs-general");
 }
 
 // Render 6 CCNA 200-301 Exam Mastery & Real-World Job Readiness Domains
@@ -925,6 +940,9 @@ function renderMasteryView(masteryId) {
   if (masteryQuickNoteBtn) {
     masteryQuickNoteBtn.addEventListener("click", () => openNotesModal("current"));
   }
+
+  // Restore saved highlights for this mastery domain
+  applySavedHighlights(masteryId > 0 ? "mastery-" + masteryId : "mastery-general");
 }
 
 // Build interactive Subnet / Binary Calculator for Modules 5 & 11
@@ -1703,6 +1721,9 @@ function selectModule(id) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
+
+  // Restore saved highlights for this module
+  applySavedHighlights("module-" + id);
 }
 
 function filterAndRenderSidebar() {
@@ -2287,20 +2308,81 @@ function initSyncKey() {
   updateQrCode();
 }
 
+let realtimeSyncSource = null;
+
+function getSyncTopic(key) {
+  return "ccna_sync_" + String(key || "default").replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
+function initRealtimeSyncListener() {
+  if (!cloudSyncKey) return;
+  if (realtimeSyncSource) {
+    try { realtimeSyncSource.close(); } catch {}
+  }
+
+  const topic = getSyncTopic(cloudSyncKey);
+  try {
+    realtimeSyncSource = new EventSource(`https://ntfy.sh/${topic}/sse`);
+    realtimeSyncSource.onmessage = async (e) => {
+      try {
+        const eventData = JSON.parse(e.data);
+        if (eventData.event === "message") {
+          let payload = null;
+          if (eventData.attachment && eventData.attachment.url) {
+            const res = await fetch(eventData.attachment.url);
+            if (res.ok) payload = await res.json();
+          } else if (eventData.message) {
+            try { payload = JSON.parse(eventData.message); } catch {}
+          }
+          if (payload && (payload.notes || payload.highlights || payload.completedItems)) {
+            mergeIncomingSyncPayload(payload, true);
+          }
+        }
+      } catch {}
+    };
+  } catch {}
+}
+
 function checkUrlForSyncParam() {
   try {
     const hash = window.location.hash;
     const urlParams = new URLSearchParams(window.location.search);
     let keyFromUrl = urlParams.get("sync");
+    let dataFromUrl = urlParams.get("sync-data");
+
     if (!keyFromUrl && hash.includes("sync=")) {
       const match = hash.match(/sync=([^&]+)/);
       if (match) keyFromUrl = decodeURIComponent(match[1]);
     }
+    if (!dataFromUrl && hash.includes("sync-data=")) {
+      const match = hash.match(/sync-data=([^&]+)/);
+      if (match) dataFromUrl = decodeURIComponent(match[1]);
+    }
+
+    if (dataFromUrl) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(dataFromUrl))));
+        if (decoded) {
+          mergeIncomingSyncPayload(decoded, true);
+          if (decoded.syncKey) {
+            cloudSyncKey = decoded.syncKey;
+            localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
+            if (cloudSyncKeyDisplay) cloudSyncKeyDisplay.value = cloudSyncKey;
+          }
+          history.replaceState(null, "", window.location.pathname + window.location.search);
+          return;
+        }
+      } catch (e) {
+        console.warn("Failed to decode sync-data from URL:", e);
+      }
+    }
+
     if (keyFromUrl && keyFromUrl !== cloudSyncKey) {
       cloudSyncKey = keyFromUrl;
       localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
       if (cloudSyncKeyDisplay) cloudSyncKeyDisplay.value = cloudSyncKey;
-      pullNotesFromCloud(cloudSyncKey);
+      pullNotesFromCloud(cloudSyncKey, false);
+      initRealtimeSyncListener();
     }
   } catch {}
 }
@@ -2320,107 +2402,159 @@ function triggerAutoSync() {
 
 async function pushNotesToCloud() {
   if (!cloudSyncKey) return;
-  setCloudSyncStatus("syncing", "Đang đồng bộ...");
+  const isEn = typeof currentLang !== "undefined" && currentLang === "en";
+  setCloudSyncStatus("syncing", isEn ? "Syncing..." : "Đang đồng bộ...");
 
   const payload = {
-    name: "ccna-study-notes",
-    data: {
-      syncKey: cloudSyncKey,
-      notes: studyNotes,
-      completedItems: completedItems,
-      updatedAt: Date.now()
-    }
+    syncKey: cloudSyncKey,
+    notes: studyNotes,
+    highlights: studyHighlights,
+    completedItems: completedItems,
+    updatedAt: Date.now()
   };
 
   try {
-    let success = false;
-    try {
-      const apiRes = await fetch(`/api/sync?key=${encodeURIComponent(cloudSyncKey)}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      if (apiRes.ok) success = true;
-    } catch {}
+    const topic = getSyncTopic(cloudSyncKey);
+    const jsonStr = JSON.stringify(payload);
 
-    if (!success) {
-      const directUrl = `https://api.restful-api.dev/objects/${encodeURIComponent(cloudSyncKey)}`;
-      let res = await fetch(directUrl, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        await fetch("https://api.restful-api.dev/objects", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-      }
+    // 1. Upload to ntfy.sh with attachment for full size persistence (supports up to 15MB)
+    await fetch(`https://ntfy.sh/${topic}`, {
+      method: "PUT",
+      headers: {
+        "Filename": "sync.json",
+        "Title": "CCNA Study Sync"
+      },
+      body: jsonStr
+    });
+
+    // 2. Also send compact message for instant real-time SSE delivery if size permits
+    if (jsonStr.length < 3900) {
+      fetch(`https://ntfy.sh/${topic}`, {
+        method: "POST",
+        headers: { "Title": "CCNA Study Sync Compact" },
+        body: jsonStr
+      }).catch(() => {});
     }
 
-    setCloudSyncStatus("synced", "Đã đồng bộ");
+    setCloudSyncStatus("synced", isEn ? "Cloud Synced" : "Đã đồng bộ đám mây");
     if (noteSaveStatusText) {
-      noteSaveStatusText.textContent = "Đã lưu & đồng bộ cloud";
+      noteSaveStatusText.textContent = isEn ? "Saved & Synced to Cloud" : "Đã lưu & đồng bộ cloud";
     }
-  } catch {
-    setCloudSyncStatus("synced", "Đã lưu (Cục bộ)");
+  } catch (err) {
+    console.warn("Cloud sync push error:", err);
+    setCloudSyncStatus("synced", isEn ? "Saved (Local)" : "Đã lưu (Cục bộ)");
     if (noteSaveStatusText) {
-      noteSaveStatusText.textContent = "Đã lưu (Cục bộ)";
+      noteSaveStatusText.textContent = isEn ? "Saved (Local)" : "Đã lưu (Cục bộ)";
     }
   }
 }
 
 async function pullNotesFromCloud(key, silent = false) {
   if (!key) return;
-  if (!silent) setCloudSyncStatus("syncing", "Đang tải về...");
+  const isEn = typeof currentLang !== "undefined" && currentLang === "en";
+  if (!silent) setCloudSyncStatus("syncing", isEn ? "Downloading from cloud..." : "Đang tải về...");
 
   try {
-    let cloudData = null;
-    try {
-      const apiRes = await fetch(`/api/sync?key=${encodeURIComponent(key)}`);
-      if (apiRes.ok) {
-        const json = await apiRes.json();
-        cloudData = json.data || json;
-      }
-    } catch {}
+    const topic = getSyncTopic(key);
+    const res = await fetch(`https://ntfy.sh/${topic}/json?poll=1&since=all`);
+    if (!res.ok) throw new Error("HTTP error " + res.status);
 
-    if (!cloudData) {
-      const directRes = await fetch(`https://api.restful-api.dev/objects/${encodeURIComponent(key)}`);
-      if (directRes.ok) {
-        const json = await directRes.json();
-        cloudData = json.data || json;
-      }
+    const text = await res.text();
+    const lines = text.trim().split("\n").filter(Boolean);
+    let latestPayload = null;
+
+    // Scan messages from newest to oldest to pick up the latest sync state
+    for (let i = lines.length - 1; i >= 0; i--) {
+      try {
+        const item = JSON.parse(lines[i]);
+        if (item.event === "message") {
+          if (item.attachment && item.attachment.url) {
+            const fileRes = await fetch(item.attachment.url);
+            if (fileRes.ok) {
+              latestPayload = await fileRes.json();
+              break;
+            }
+          } else if (item.message) {
+            try {
+              const parsed = JSON.parse(item.message);
+              if (parsed && (parsed.notes || parsed.highlights || parsed.completedItems)) {
+                latestPayload = parsed;
+                break;
+              }
+            } catch {}
+          }
+        }
+      } catch {}
     }
 
-    if (cloudData && cloudData.notes) {
-      Object.keys(cloudData.notes).forEach((k) => {
-        if (!studyNotes[k] || (cloudData.notes[k].updatedAt || 0) > (studyNotes[k].updatedAt || 0)) {
-          studyNotes[k] = cloudData.notes[k];
-        }
-      });
-      if (cloudData.completedItems) {
-        completedItems = { ...completedItems, ...cloudData.completedItems };
-        localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
-      }
-      localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
-      updateNotesCountBadges();
-      loadCurrentNoteIntoEditor();
-      renderAllNotesList();
-      updateProgressSummary();
-      filterAndRenderSidebar();
-      setCloudSyncStatus("synced", "Đã đồng bộ đám mây");
+    if (latestPayload) {
+      mergeIncomingSyncPayload(latestPayload, silent);
+      initRealtimeSyncListener();
       if (!silent) {
-        alert("Đã kết nối và đồng bộ toàn bộ ghi chú từ đám mây thành công!");
+        alert(isEn ? "Successfully synchronized all notes and highlights from the cloud!" : "Đã kết nối và đồng bộ toàn bộ ghi chú & highlight từ đám mây thành công!");
       }
     } else {
-      if (!silent) alert("Không tìm thấy dữ liệu ghi chú trên đám mây với mã này.");
-      setCloudSyncStatus("synced", "Chưa có dữ liệu mây");
+      if (!silent) {
+        alert(isEn ? "No cloud data found for this sync key. Ready to sync!" : "Chưa có dữ liệu trên đám mây với mã này. Đã sẵn sàng đồng bộ!");
+      }
+      setCloudSyncStatus("synced", isEn ? "Ready for sync" : "Sẵn sàng đồng bộ");
+      initRealtimeSyncListener();
     }
-  } catch {
-    if (!silent) alert("Không thể kết nối đến máy chủ đồng bộ. Vui lòng kiểm tra lại kết nối mạng.");
-    setCloudSyncStatus("synced", "Đã lưu (Cục bộ)");
+  } catch (err) {
+    console.warn("Cloud sync pull error:", err);
+    if (!silent) {
+      alert(isEn ? "Could not connect to cloud sync server. Please check your network." : "Không thể kết nối đến máy chủ đồng bộ. Vui lòng kiểm tra lại kết nối mạng.");
+    }
+    setCloudSyncStatus("synced", isEn ? "Saved (Local)" : "Đã lưu (Cục bộ)");
   }
+}
+
+function mergeIncomingSyncPayload(cloudData, silent = false) {
+  if (!cloudData) return;
+  const isEn = typeof currentLang !== "undefined" && currentLang === "en";
+
+  // 1. Merge Notes
+  if (cloudData.notes) {
+    Object.keys(cloudData.notes).forEach((k) => {
+      if (!studyNotes[k] || (cloudData.notes[k].updatedAt || 0) >= (studyNotes[k].updatedAt || 0)) {
+        studyNotes[k] = cloudData.notes[k];
+      }
+    });
+    localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+  }
+
+  // 2. Merge Highlights
+  if (cloudData.highlights) {
+    Object.keys(cloudData.highlights).forEach((k) => {
+      const incomingList = cloudData.highlights[k] || [];
+      if (!studyHighlights[k]) {
+        studyHighlights[k] = incomingList;
+      } else {
+        const existingTexts = new Set(studyHighlights[k].map((h) => h.text));
+        incomingList.forEach((incomingHl) => {
+          if (!existingTexts.has(incomingHl.text)) {
+            studyHighlights[k].push(incomingHl);
+            existingTexts.add(incomingHl.text);
+          }
+        });
+      }
+    });
+    localStorage.setItem("ccna_study_highlights", JSON.stringify(studyHighlights));
+    applySavedHighlights(getCurrentLessonNoteKey());
+  }
+
+  // 3. Merge Course Completion Progress
+  if (cloudData.completedItems) {
+    completedItems = { ...completedItems, ...cloudData.completedItems };
+    localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
+  }
+
+  updateNotesCountBadges();
+  loadCurrentNoteIntoEditor();
+  renderAllNotesList();
+  updateProgressSummary();
+  filterAndRenderSidebar();
+  setCloudSyncStatus("synced", isEn ? "Cloud Synced" : "Đã đồng bộ đám mây");
 }
 
 function setCloudSyncStatus(status, text) {
@@ -2436,6 +2570,7 @@ function exportNotesJson() {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
     syncKey: cloudSyncKey,
     notes: studyNotes,
+    highlights: studyHighlights,
     completedItems: completedItems,
     exportedAt: new Date().toISOString()
   }, null, 2));
@@ -2456,6 +2591,11 @@ function importNotesJson(file) {
         studyNotes = { ...studyNotes, ...parsed.notes };
         localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
       }
+      if (parsed.highlights) {
+        studyHighlights = { ...studyHighlights, ...parsed.highlights };
+        localStorage.setItem("ccna_study_highlights", JSON.stringify(studyHighlights));
+        applySavedHighlights(getCurrentLessonNoteKey());
+      }
       if (parsed.completedItems) {
         completedItems = { ...completedItems, ...parsed.completedItems };
         localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
@@ -2468,6 +2608,15 @@ function importNotesJson(file) {
       updateNotesCountBadges();
       loadCurrentNoteIntoEditor();
       renderAllNotesList();
+      updateProgressSummary();
+      filterAndRenderSidebar();
+      triggerAutoSync();
+    } catch {
+      alert("Tệp sao lưu không hợp lệ.");
+    }
+  };
+  reader.readAsText(file);
+}
       updateProgressSummary();
       filterAndRenderSidebar();
       triggerAutoSync();
@@ -2723,6 +2872,92 @@ function initZenMode() {
 }
 
 // --------------------------------------------------------------------------
+// Persistent Multi-Device Highlight System
+// --------------------------------------------------------------------------
+function applySavedHighlights(contextKey) {
+  const container = document.getElementById("module-detail");
+  if (!container) return;
+
+  const highlights = (studyHighlights && studyHighlights[contextKey]) || [];
+  if (!Array.isArray(highlights) || highlights.length === 0) return;
+
+  const isEn = typeof currentLang !== "undefined" && currentLang === "en";
+
+  highlights.forEach((hl) => {
+    if (!hl.text || hl.text.length < 2) return;
+    highlightTextInElement(container, hl.text, hl.color, hl.id, () => {
+      if (confirm(isEn ? "Remove this highlight?" : "Xóa đoạn highlight này?")) {
+        studyHighlights[contextKey] = (studyHighlights[contextKey] || []).filter((h) => h.id !== hl.id);
+        localStorage.setItem("ccna_study_highlights", JSON.stringify(studyHighlights));
+        const markEls = container.querySelectorAll(`mark[data-hl-id="${hl.id}"]`);
+        markEls.forEach((m) => m.replaceWith(...m.childNodes));
+        triggerAutoSync();
+      }
+    });
+  });
+}
+
+function highlightTextInElement(rootElement, searchText, color, id, onClickRemove) {
+  if (!rootElement || !searchText) return;
+  const isEn = typeof currentLang !== "undefined" && currentLang === "en";
+
+  const walker = document.createTreeWalker(rootElement, NodeFilter.SHOW_TEXT, {
+    acceptNode: function (node) {
+      if (!node.textContent || !node.textContent.includes(searchText)) return NodeFilter.FILTER_SKIP;
+      const parent = node.parentElement;
+      if (!parent) return NodeFilter.FILTER_SKIP;
+      if (
+        parent.closest("mark") ||
+        parent.closest("script") ||
+        parent.closest("style") ||
+        parent.closest("svg") ||
+        parent.closest("textarea") ||
+        parent.closest("input")
+      ) {
+        return NodeFilter.FILTER_SKIP;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  const nodesToProcess = [];
+  let currentNode;
+  while ((currentNode = walker.nextNode())) {
+    nodesToProcess.push(currentNode);
+  }
+
+  nodesToProcess.forEach((textNode) => {
+    const parent = textNode.parentNode;
+    if (!parent) return;
+    const content = textNode.textContent;
+    const index = content.indexOf(searchText);
+    if (index === -1) return;
+
+    const before = content.substring(0, index);
+    const match = content.substring(index, index + searchText.length);
+    const after = content.substring(index + searchText.length);
+
+    const mark = document.createElement("mark");
+    mark.className = `ccna-hl-${color}`;
+    mark.dataset.hlId = id || "";
+    mark.textContent = match;
+    mark.style.cursor = "pointer";
+    mark.title = isEn ? "Click to remove highlight" : "Bấm để xóa highlight này";
+
+    if (onClickRemove) {
+      mark.addEventListener("click", onClickRemove);
+    }
+
+    const frag = document.createDocumentFragment();
+    if (before) frag.appendChild(document.createTextNode(before));
+    frag.appendChild(mark);
+    if (after) frag.appendChild(document.createTextNode(after));
+
+    parent.replaceChild(frag, textNode);
+  });
+}
+
+// --------------------------------------------------------------------------
 // Text Selection Floating Toolbar (Highlight & Quick Quote into Note)
 // --------------------------------------------------------------------------
 function initTextSelectionHighlighter() {
@@ -2793,28 +3028,64 @@ function initTextSelectionHighlighter() {
   colorBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       const color = btn.dataset.color;
-      if (!currentSelectionRange) return;
+      if (!currentSelectionRange || !currentSelectedText) return;
 
       const sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(currentSelectionRange);
 
+      const key = getCurrentLessonNoteKey();
+      if (!studyHighlights[key]) studyHighlights[key] = [];
+      const isEn = typeof currentLang !== "undefined" && currentLang === "en";
+
       if (color === "none") {
-        // Strip mark elements within selection
-        const contents = currentSelectionRange.extractContents();
-        const walker = document.createTreeWalker(contents, NodeFilter.SHOW_ELEMENT);
-        const marksToRemove = [];
-        let node;
-        while ((node = walker.nextNode())) {
-          if (node.tagName === "MARK") marksToRemove.push(node);
-        }
-        marksToRemove.forEach((m) => {
-          m.replaceWith(...m.childNodes);
-        });
-        currentSelectionRange.insertNode(contents);
+        // Strip mark elements within selection and remove from storage
+        studyHighlights[key] = studyHighlights[key].filter(
+          (h) => !h.text.includes(currentSelectedText) && !currentSelectedText.includes(h.text)
+        );
+        localStorage.setItem("ccna_study_highlights", JSON.stringify(studyHighlights));
+
+        try {
+          const contents = currentSelectionRange.extractContents();
+          const walker = document.createTreeWalker(contents, NodeFilter.SHOW_ELEMENT);
+          const marksToRemove = [];
+          let node;
+          while ((node = walker.nextNode())) {
+            if (node.tagName === "MARK") marksToRemove.push(node);
+          }
+          marksToRemove.forEach((m) => {
+            m.replaceWith(...m.childNodes);
+          });
+          currentSelectionRange.insertNode(contents);
+        } catch {}
+
+        triggerAutoSync();
       } else {
+        const hlId = "hl-" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36).slice(-4);
+        studyHighlights[key] = studyHighlights[key].filter((h) => h.text !== currentSelectedText);
+        studyHighlights[key].push({
+          id: hlId,
+          text: currentSelectedText,
+          color: color,
+          createdAt: Date.now()
+        });
+        localStorage.setItem("ccna_study_highlights", JSON.stringify(studyHighlights));
+
         const mark = document.createElement("mark");
         mark.className = `ccna-hl-${color}`;
+        mark.dataset.hlId = hlId;
+        mark.style.cursor = "pointer";
+        mark.title = isEn ? "Click to remove highlight" : "Bấm để xóa highlight này";
+
+        mark.addEventListener("click", () => {
+          if (confirm(isEn ? "Remove this highlight?" : "Xóa đoạn highlight này?")) {
+            studyHighlights[key] = (studyHighlights[key] || []).filter((h) => h.id !== hlId);
+            localStorage.setItem("ccna_study_highlights", JSON.stringify(studyHighlights));
+            mark.replaceWith(...mark.childNodes);
+            triggerAutoSync();
+          }
+        });
+
         try {
           currentSelectionRange.surroundContents(mark);
         } catch {
@@ -2822,6 +3093,8 @@ function initTextSelectionHighlighter() {
           mark.appendChild(contents);
           currentSelectionRange.insertNode(mark);
         }
+
+        triggerAutoSync();
       }
 
       sel.removeAllRanges();
