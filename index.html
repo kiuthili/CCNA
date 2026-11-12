@@ -160,6 +160,24 @@
         <span class="btn-text">Flashcard</span>
       </button>
 
+      <!-- Pearson VUE Mock Exam Simulator Button -->
+      <button type="button" class="topbar-action-btn exam-btn" id="open-exam-btn" title="Thi thử trắc nghiệm CCNA 200-301 chuẩn Pearson VUE">
+        <svg class="action-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+        <span class="btn-text">Thi thử CCNA</span>
+      </button>
+
+      <!-- Cisco IOS CLI Cheat Sheet & Cram Tables Button -->
+      <button type="button" class="topbar-action-btn cheatsheet-btn" id="open-cheatsheet-btn" title="Tra cứu nhanh hơn 120+ câu lệnh Cisco IOS & Bảng công thức thi">
+        <svg class="action-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 10 11 4 5"/>
+          <line x1="12" y1="19" x2="20" y2="19"/>
+        </svg>
+        <span class="btn-text">Tra cứu CLI</span>
+      </button>
+
       <!-- Focus / Zen Mode Toggle Button -->
       <button type="button" class="topbar-action-btn zen-btn" id="zen-mode-btn" title="Chế độ tập trung đọc bài học (Ẩn mọi thanh bên)">
         <svg class="action-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -587,11 +605,96 @@
     </div>
   </div>
 
+  <!-- CCNA 200-301 Full Mock Exam Simulation Modal (Pearson VUE Environment) -->
+  <div class="mock-exam-modal" id="mock-exam-modal" role="dialog" aria-modal="true" aria-label="Phòng thi thử CCNA 200-301" hidden>
+    <div class="mock-exam-backdrop" id="mock-exam-backdrop"></div>
+    <div class="mock-exam-container">
+      <header class="mock-exam-header">
+        <div class="exam-header-left">
+          <span class="exam-badge-tag">CISCO CCNA 200-301 MOCK EXAM</span>
+          <span class="exam-q-num" id="exam-q-num">Câu hỏi 1 / 30</span>
+          <span class="exam-q-domain" id="exam-q-domain">Domain 1.0</span>
+        </div>
+        <div class="exam-header-right">
+          <div class="exam-timer-box" title="Thời gian làm bài còn lại">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span class="exam-timer-display" id="exam-timer-display">40:00</span>
+          </div>
+          <button type="button" class="exam-close-icon-btn" id="mock-exam-close-btn" title="Thoát phòng thi">✕</button>
+        </div>
+      </header>
+
+      <!-- Exam Active Testing Body -->
+      <div class="mock-exam-body">
+        <div class="mock-exam-main">
+          <div class="exam-q-text" id="exam-q-text">Đang tải câu hỏi...</div>
+          <div class="exam-q-options" id="exam-q-options"></div>
+
+          <div class="exam-bottom-bar">
+            <div class="exam-bottom-left">
+              <button type="button" class="exam-flag-btn" id="exam-flag-btn">
+                ⚐ Gắn cờ xem lại
+              </button>
+            </div>
+            <div class="exam-bottom-right">
+              <button type="button" class="exam-nav-action-btn" id="exam-prev-btn">&larr; Câu trước</button>
+              <button type="button" class="exam-nav-action-btn primary" id="exam-next-btn">Câu tiếp &rarr;</button>
+              <button type="button" class="exam-submit-direct-btn" id="exam-submit-now-btn">Nộp bài thi</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Question Navigator (Grid 1..N) -->
+        <aside class="mock-exam-sidebar">
+          <div class="exam-sidebar-header">
+            <h4>Bảng Câu Hỏi</h4>
+            <div class="exam-nav-legend">
+              <span class="legend-item"><span class="dot answered"></span> Đã làm</span>
+              <span class="legend-item"><span class="dot flagged"></span> Gắn cờ</span>
+            </div>
+          </div>
+          <div class="exam-nav-grid" id="exam-nav-grid"></div>
+        </aside>
+      </div>
+
+      <!-- Exam Result Report Card (Shown upon completion) -->
+      <div class="mock-exam-result-view" id="mock-exam-result-view"></div>
+    </div>
+  </div>
+
+  <!-- Cisco IOS CLI Command Cheat Sheet & Golden Cram Tables Modal -->
+  <div class="cheatsheet-modal" id="cheatsheet-modal" role="dialog" aria-modal="true" aria-label="Tra cứu lệnh Cisco IOS & Bảng công thức thi" hidden>
+    <div class="cheatsheet-backdrop" id="cheatsheet-backdrop"></div>
+    <div class="cheatsheet-container">
+      <header class="cheatsheet-header">
+        <div class="cs-header-left">
+          <span class="brand-badge">POCKET GUIDE</span>
+          <h2 class="cs-title">Sổ Tay Tra Cứu Lệnh Cisco IOS &amp; Bảng Công Thức CCNA</h2>
+        </div>
+        <button type="button" class="cs-close-btn" id="cheatsheet-close-btn" aria-label="Đóng tra cứu">✕</button>
+      </header>
+
+      <div class="cs-tabs-bar">
+        <button type="button" class="cs-tab-btn active" data-tab="commands">120+ Lệnh Cisco IOS</button>
+        <button type="button" class="cs-tab-btn" data-tab="ad">Bảng AD Tuyến Đường</button>
+        <button type="button" class="cs-tab-btn" data-tab="ports">Cổng Port Dịch Vụ</button>
+        <button type="button" class="cs-tab-btn" data-tab="syslog">8 Mức Syslog</button>
+        <button type="button" class="cs-tab-btn" data-tab="multicast">Địa Chỉ Multicast</button>
+      </div>
+
+      <div class="cheatsheet-content" id="cheatsheet-content"></div>
+    </div>
+  </div>
+
   <script src="diagrams.js?v=20261112_v1"></script>
   <script src="glossary.js?v=20261112_v1"></script>
   <script src="labs.js?v=20261112_v1"></script>
   <script src="exam_mastery.js?v=20261112_v1"></script>
   <script src="en_translations.js?v=20261112_v2"></script>
+  <script src="exam_sim.js?v=20261112_v1"></script>
   <script src="app.js?v=20261112_v1"></script>
 </body>
 </html>
