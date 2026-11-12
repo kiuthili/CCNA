@@ -383,19 +383,19 @@ function updateHeaderLabels() {
   const optZen = document.getElementById("opt-tool-zen");
 
   if (isEn) {
-    if (optDefault) optDefault.textContent = "⚡ Study Tools";
-    if (optNotes) optNotes.textContent = "📝 Study Notebook (Alt+N)";
-    if (optFlashcard) optFlashcard.textContent = "🗂️ Flashcard Deck";
-    if (optExam) optExam.textContent = "🎯 CCNA Mock Exam (30Q)";
-    if (optCheatsheet) optCheatsheet.textContent = "⌨️ Cisco CLI Cheatsheet";
-    if (optZen) optZen.textContent = "👁️ Zen / Focus Mode";
+    if (optDefault) optDefault.textContent = "Study Tools";
+    if (optNotes) optNotes.textContent = "Study Notebook (Alt+N)";
+    if (optFlashcard) optFlashcard.textContent = "Flashcard Deck";
+    if (optExam) optExam.textContent = "CCNA Mock Exam (30Q)";
+    if (optCheatsheet) optCheatsheet.textContent = "Cisco CLI Cheatsheet";
+    if (optZen) optZen.textContent = "Zen Mode";
   } else {
-    if (optDefault) optDefault.textContent = "⚡ Công cụ học tập";
-    if (optNotes) optNotes.textContent = "📝 Sổ tay ghi chú (Alt+N)";
-    if (optFlashcard) optFlashcard.textContent = "🗂️ Thẻ nhớ Flashcard";
-    if (optExam) optExam.textContent = "🎯 Phòng thi thử CCNA (30 câu)";
-    if (optCheatsheet) optCheatsheet.textContent = "⌨️ Tra cứu lệnh CLI Cisco";
-    if (optZen) optZen.textContent = "👁️ Chế độ tập trung (Zen Mode)";
+    if (optDefault) optDefault.textContent = "Công cụ học tập";
+    if (optNotes) optNotes.textContent = "Sổ tay ghi chú (Alt+N)";
+    if (optFlashcard) optFlashcard.textContent = "Thẻ nhớ Flashcard";
+    if (optExam) optExam.textContent = "Phòng thi thử CCNA (30 câu)";
+    if (optCheatsheet) optCheatsheet.textContent = "Tra cứu lệnh CLI Cisco";
+    if (optZen) optZen.textContent = "Chế độ tập trung (Zen Mode)";
   }
 
   const notesBtnText = document.querySelector("#open-notes-btn .btn-text");
@@ -1099,7 +1099,7 @@ function selectModule(id) {
   let visualSectionHtml = "";
   if (visualData) {
     const portAnatomySvgHtml = typeof renderMultiAnglePortAnatomySvg === "function"
-      ? `<div class="svg-diagram-wrapper">${renderMultiAnglePortAnatomySvg(mod.id)}</div>`
+      ? renderMultiAnglePortAnatomySvg(mod.id)
       : "";
 
     const hardwareSvgHtml = visualData.hardwareSvg

@@ -1446,19 +1446,274 @@ body {
 
 .svg-diagram-wrapper {
   width: 100%;
-  background: #ffffff;
-  border: 1.5px solid #dbe5f0;
+  background: var(--bg-card, #ffffff);
+  border: 1.5px solid var(--border-color, #dbe5f0);
   border-radius: 12px;
   padding: 1rem;
   overflow-x: auto;
-  box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.02);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  box-sizing: border-box;
 }
 
 .svg-diagram-wrapper svg {
   width: 100%;
   height: auto;
-  min-width: 600px;
+  min-width: 680px;
   display: block;
+  overflow: visible;
+}
+
+[data-theme="dark"] .svg-diagram-wrapper {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Responsive Port Anatomy & Multi-Angle Equipment Diagram Card              */
+/* -------------------------------------------------------------------------- */
+.port-anatomy-card {
+  width: 100%;
+  background: var(--bg-card, #ffffff);
+  border: 1.5px solid #bae6fd;
+  border-radius: 12px;
+  padding: 1.15rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.05);
+}
+
+[data-theme="dark"] .port-anatomy-card {
+  background: #0f172a;
+  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: none;
+}
+
+[data-theme="sepia"] .port-anatomy-card {
+  background: #fdfbf7;
+  border-color: #fde68a;
+}
+
+.anatomy-main-header {
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  padding-bottom: 0.65rem;
+}
+
+.anatomy-header-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #0284c7;
+  text-transform: uppercase;
+}
+
+[data-theme="dark"] .anatomy-header-badge {
+  color: #38bdf8;
+}
+
+.anatomy-device-title {
+  margin: 0.25rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.anatomy-panels-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.anatomy-angle-box {
+  background: var(--bg-page, #f8fafc);
+  border: 1.5px solid #0284c7;
+  border-radius: 10px;
+  padding: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .anatomy-angle-box {
+  background: #1e293b;
+  border-color: #0284c7;
+}
+
+.anatomy-angle-box.angle-rear-box {
+  border-color: #0d9488;
+}
+
+.angle-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.angle-tag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.18rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  align-self: flex-start;
+  letter-spacing: 0.03em;
+}
+
+.angle-tag.front-tag {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+[data-theme="dark"] .angle-tag.front-tag {
+  background: rgba(3, 105, 161, 0.35);
+  color: #7dd3fc;
+}
+
+.angle-tag.rear-tag {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+[data-theme="dark"] .angle-tag.rear-tag {
+  background: rgba(15, 118, 110, 0.35);
+  color: #5eead4;
+}
+
+.angle-title {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.angle-rack-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 6px;
+  background: #0f172a;
+}
+
+.anatomy-rack-svg {
+  width: 100%;
+  min-width: 310px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.angle-caption-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.85rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin-top: auto;
+  padding-top: 0.3rem;
+}
+
+.caption-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  word-break: break-word;
+}
+
+.led-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.led-indicator.green { background: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.6); }
+.led-indicator.orange { background: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.6); }
+.led-indicator.off { background: #64748b; }
+
+.tip-caption {
+  color: #b45309;
+  background: #fffbeb;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #fef3c7;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+
+[data-theme="dark"] .tip-caption {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #fde68a;
+}
+
+.tip-icon {
+  flex-shrink: 0;
+}
+
+.tip-text {
+  flex: 1;
+  word-break: break-word;
+}
+
+.anatomy-guide-panel {
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+[data-theme="dark"] .anatomy-guide-panel {
+  background: rgba(22, 101, 52, 0.2);
+  border-color: rgba(74, 222, 128, 0.3);
+}
+
+.guide-panel-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #166534;
+  margin-bottom: 0.55rem;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+[data-theme="dark"] .guide-panel-title {
+  color: #4ade80;
+}
+
+.guide-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.guide-line {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #14532d;
+  word-break: break-word;
+}
+
+[data-theme="dark"] .guide-line {
+  color: #cbd5e1;
+}
+
+.guide-line.highlight-line {
+  font-weight: 700;
+  color: #0369a1;
+}
+
+[data-theme="dark"] .guide-line.highlight-line {
+  color: #38bdf8;
 }
 
 .real-photos-grid {
