@@ -2099,6 +2099,10 @@ function openNotesModal(targetPanel = "current") {
     closeNotesModal();
     return;
   }
+  // Tự động đóng Trợ lý AI nếu đang mở để tránh chồng lấn giao diện sidebar
+  if (typeof window.closeAiTutorModal === "function") {
+    window.closeAiTutorModal();
+  }
   notesModal.hidden = false;
   document.body.classList.add("notes-sidebar-open");
   switchNotesPanel(targetPanel);

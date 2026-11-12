@@ -355,10 +355,15 @@
     if (document.getElementById("ai-tutor-modal")) return;
 
     const modalHtml = `
-      <!-- AI CCNA & Cisco Packet Tracer Tutor Modal -->
-      <div class="ai-tutor-modal" id="ai-tutor-modal" role="dialog" aria-modal="true" aria-label="Trợ lý AI Cisco Packet Tracer" hidden>
-        <div class="ai-tutor-backdrop" id="ai-tutor-backdrop"></div>
-        <div class="ai-tutor-container">
+      <!-- Backdrop for mobile screens -->
+      <div class="ai-backdrop ai-tutor-backdrop" id="ai-tutor-backdrop" aria-hidden="true"></div>
+
+      <!-- Right Collapsible AI Sidebar (Split View with Lesson / Lab) -->
+      <aside class="ai-sidebar ai-tutor-modal" id="ai-tutor-modal" aria-label="Trợ lý AI Cisco Packet Tracer" hidden>
+        <!-- Draggable Resizer Handle -->
+        <div class="ai-resizer" id="ai-resizer" title="Kéo sang trái/phải để co giãn độ rộng Trợ lý AI"></div>
+
+        <div class="ai-container ai-tutor-container">
           <!-- Header -->
           <header class="ai-tutor-header">
             <div class="ai-header-left">
@@ -369,7 +374,7 @@
               <div class="ai-header-info">
                 <div class="ai-header-title-row">
                   <h3 class="ai-header-title">Trợ Lý AI Cisco Lab</h3>
-                  <span class="ai-model-badge" id="ai-active-model-badge">Gemini 2.0 Flash</span>
+                  <span class="ai-model-badge" id="ai-active-model-badge">2.5 FLASH-LITE</span>
                 </div>
                 <p class="ai-header-sub">Chuyên gia CCNA 200-301 &amp; Chẩn đoán hình ảnh Packet Tracer</p>
               </div>
@@ -382,7 +387,7 @@
               <button type="button" class="ai-tool-btn" id="ai-clear-chat-btn" title="Xóa lịch sử hội thoại">
                 🗑️
               </button>
-              <button type="button" class="ai-close-btn" id="ai-tutor-close-btn" aria-label="Đóng Trợ lý AI" title="Đóng (Esc)">
+              <button type="button" class="ai-close-btn" id="ai-tutor-close-btn" aria-label="Thu gọn Trợ lý AI" title="Thu gọn (Alt+A hoặc Esc)">
                 ✕
               </button>
             </div>
@@ -451,11 +456,11 @@
               </button>
             </div>
             <div class="ai-footer-hint">
-              <span>💡 Mẹo: Dùng <strong>Win + Shift + S</strong> chụp màn hình Packet Tracer &rarr; Bấm <strong>Ctrl + V</strong> vào khung chat để dán ảnh tức thì!</span>
+              <span>💡 Mẹo: Dùng <strong>Win + Shift + S</strong> chụp Packet Tracer &rarr; Bấm <strong>Ctrl + V</strong> vào khung chat để dán nhiều ảnh!</span>
             </div>
           </footer>
         </div>
-      </div>
+      </aside>
 
       <!-- AI Settings Modal (API Key & Model Selection) -->
       <div class="ai-settings-modal" id="ai-settings-modal" role="dialog" aria-modal="true" aria-label="Cài đặt AI" hidden>
