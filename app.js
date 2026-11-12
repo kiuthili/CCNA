@@ -172,8 +172,8 @@ function initSecurityAndAuth() {
       if (!u || !p) {
         if (loginErrorMsg) {
           loginErrorMsg.textContent = currentLang === "en"
-            ? "Please enter both username and password."
-            : "Vui lòng nhập đầy đủ tài khoản và mật khẩu.";
+            ? "Please enter username and password."
+            : "Vui lòng nhập tài khoản và mật khẩu.";
           loginErrorMsg.hidden = false;
         }
         return;
@@ -200,8 +200,8 @@ function initSecurityAndAuth() {
         } else {
           if (loginErrorMsg) {
             loginErrorMsg.textContent = currentLang === "en"
-              ? "Invalid username or password. Please verify credentials."
-              : "Tài khoản hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.";
+              ? "Invalid username or password."
+              : "Tài khoản hoặc mật khẩu không đúng.";
             loginErrorMsg.hidden = false;
           }
           if (loginPass) {
