@@ -151,6 +151,10 @@ async function initApp() {
   }
 
   initNotesSystem();
+  initNotesResizer();
+  initZenMode();
+  initTextSelectionHighlighter();
+  initFlashcardsSystem();
   updateProgressSummary();
   updateNotesCountBadges();
 }
@@ -655,41 +659,35 @@ function renderMasteryView(masteryId) {
 function buildInteractiveCalculator(modId) {
   if (modId === 5) {
     const isEn = currentLang === "en";
-    return `
-      <section class="section-block" aria-labelledby="heading-calc-bin">
-        <h3 class="section-title" id="heading-calc-bin">
-          <span>${isEn ? "🧮 Interactive Binary - Decimal - Hexadecimal Converter" : "🧮 Công Cụ Thực Hành Quy Đổi Nhị Phân - Thập Phân - Thập Lục Phân"}</span>
-        </h3>
-        <div class="calc-grid">
-          <div class="calc-input-group">
-            <label for="bin-dec-input">${isEn ? "Enter Decimal (0 - 255) or IPv4 Address:" : "Nhập số Thập phân (0 - 255) hoặc địa chỉ IPv4:"}</label>
-            <input type="text" id="bin-dec-input" class="calc-input" value="192.168.10.150" />
-          </div>
+    return wrapSectionBlock(
+      "heading-calc-bin",
+      `<span>${isEn ? "Interactive Binary - Decimal - Hexadecimal Converter" : "Công cụ thực hành quy đổi Nhị phân - Thập phân - Thập lục phân"}</span>`,
+      `<div class="calc-grid">
+        <div class="calc-input-group">
+          <label for="bin-dec-input">${isEn ? "Enter Decimal (0 - 255) or IPv4 Address:" : "Nhập số Thập phân (0 - 255) hoặc địa chỉ IPv4:"}</label>
+          <input type="text" id="bin-dec-input" class="calc-input" value="192.168.10.150" />
         </div>
-        <div class="calc-result-box" id="bin-calc-output"></div>
-      </section>
-    `;
+      </div>
+      <div class="calc-result-box" id="bin-calc-output"></div>`
+    );
   }
   if (modId === 11) {
     const isEn = currentLang === "en";
-    return `
-      <section class="section-block" aria-labelledby="heading-calc-sub">
-        <h3 class="section-title" id="heading-calc-sub">
-          <span>${isEn ? "🧮 Interactive IPv4 Subnetting & VLSM Calculator" : "🧮 Máy Tính Chia Mạng Con IPv4 (Subnetting & VLSM) Thực Hành"}</span>
-        </h3>
-        <div class="calc-grid">
-          <div class="calc-input-group">
-            <label for="sub-ip-input">${isEn ? "IPv4 Address:" : "Địa chỉ IPv4:"}</label>
-            <input type="text" id="sub-ip-input" class="calc-input" value="192.168.10.150" />
-          </div>
-          <div class="calc-input-group">
-            <label for="sub-cidr-input">${isEn ? "Prefix Length (/8 to /30):" : "Độ dài Prefix (/8 đến /30):"}</label>
-            <input type="number" id="sub-cidr-input" class="calc-input" min="8" max="30" value="26" />
-          </div>
+    return wrapSectionBlock(
+      "heading-calc-sub",
+      `<span>${isEn ? "Interactive IPv4 Subnetting & VLSM Calculator" : "Máy tính chia mạng con IPv4 (Subnetting & VLSM) thực hành"}</span>`,
+      `<div class="calc-grid">
+        <div class="calc-input-group">
+          <label for="sub-ip-input">${isEn ? "IPv4 Address:" : "Địa chỉ IPv4:"}</label>
+          <input type="text" id="sub-ip-input" class="calc-input" value="192.168.10.150" />
         </div>
-        <div class="calc-result-box" id="sub-calc-output"></div>
-      </section>
-    `;
+        <div class="calc-input-group">
+          <label for="sub-cidr-input">${isEn ? "Prefix Length (/8 to /30):" : "Độ dài Prefix (/8 đến /30):"}</label>
+          <input type="number" id="sub-cidr-input" class="calc-input" min="8" max="30" value="26" />
+        </div>
+      </div>
+      <div class="calc-result-box" id="sub-calc-output"></div>`
+    );
   }
   return "";
 }
@@ -754,6 +752,28 @@ function attachCalculatorEvents(modId) {
   }
 }
 
+// Helper to wrap each section with collapsible header & clean card layout
+function wrapSectionBlock(id, titleHtml, bodyHtml, rightActionHtml = "") {
+  return `
+    <section class="section-block" id="sec-block-${id}">
+      <div class="section-header-wrap" data-target="${id}" role="button" tabindex="0" title="Bấm để thu gọn hoặc mở rộng phần này">
+        <h3 class="section-title" id="${id}">
+          ${titleHtml}
+        </h3>
+        <div class="section-meta-actions">
+          ${rightActionHtml}
+          <span class="section-toggle-icon" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </div>
+      </div>
+      <div class="section-content-body">
+        ${bodyHtml}
+      </div>
+    </section>
+  `;
+}
+
 // Select and display a module in the main content area without page reload
 function selectModule(id) {
   const mod = modulesData.find((item) => item.id === id);
@@ -802,21 +822,11 @@ function selectModule(id) {
       })
       .join("");
 
-    beginnerSectionHtml = `
-      <section class="section-block" aria-labelledby="heading-beginner">
-        <h3 class="section-title" id="heading-beginner">
-          <span>${
-            currentLang === "en"
-              ? "Part 1: Step-by-Step Foundation for Beginners"
-              : "Phần 1: Nền tảng nhập môn căn bản"
-          }</span>
-        </h3>
-        <ul class="beginner-list">
-          ${bgItemsHtml}
-        </ul>
-        ${analogyHtml}
-      </section>
-    `;
+    beginnerSectionHtml = wrapSectionBlock(
+      "heading-beginner",
+      `<span>${currentLang === "en" ? "Part 1: Foundation for Beginners" : "Phần 1: Nền tảng nhập môn căn bản"}</span>`,
+      `<ul class="beginner-list">${bgItemsHtml}</ul>${analogyHtml}`
+    );
   }
 
   // 2. Real Hardware Photos Gallery (Multi-Angle & Close-up Ports) + Visual Architecture Diagrams
@@ -879,23 +889,15 @@ function selectModule(id) {
       `
         : "";
 
-    visualSectionHtml = `
-      <section class="section-block" aria-labelledby="heading-visual">
-        <h3 class="section-title" id="heading-visual">
-          <span>${
-            currentLang === "en"
-              ? `Part 2: Hardware Photos, Ports & Architecture Diagrams (${(visualData.photos || []).length} Photos)`
-              : `Phần 2: Hình ảnh thực tế thiết bị & Cổng kết nối (${(visualData.photos || []).length} ảnh minh họa)`
-          }</span>
-        </h3>
-        <div class="visual-container">
-          ${photosHtml}
-          ${portAnatomySvgHtml}
-          ${svgDiagramHtml}
-          ${hardwareSvgHtml}
-        </div>
-      </section>
-    `;
+    visualSectionHtml = wrapSectionBlock(
+      "heading-visual",
+      `<span>${
+        currentLang === "en"
+          ? `Part 2: Hardware Photos, Ports & Architecture Diagrams (${(visualData.photos || []).length} Photos)`
+          : `Phần 2: Hình ảnh thực tế thiết bị & Cổng kết nối (${(visualData.photos || []).length} ảnh minh họa)`
+      }</span>`,
+      `<div class="visual-container">${photosHtml}${portAnatomySvgHtml}${svgDiagramHtml}${hardwareSvgHtml}</div>`
+    );
   }
 
   // 3. Overview & Core Technical Concepts
@@ -930,6 +932,16 @@ function selectModule(id) {
     })
     .join("");
 
+  const overviewSectionHtml = wrapSectionBlock(
+    "heading-overview",
+    `<span>${
+      currentLang === "en"
+        ? `Part 3: Core Theory & Key Technical Concepts (${primaryConcepts.length})`
+        : `Phần 3: Lý thuyết cốt lõi & Nguyên lý kỹ thuật (${primaryConcepts.length} nội dung trọng tâm)`
+    }</span>`,
+    `${overviewHtml}<ul class="concepts-list" style="margin-top: 1.2rem;">${conceptsHtml}</ul>`
+  );
+
   // 4. Deep Glossary & Encyclopedia Breakdown (Term-by-Term Explanation)
   const glossaryEntries =
     typeof MODULE_DEEP_GLOSSARY !== "undefined" && MODULE_DEEP_GLOSSARY[mod.id]
@@ -959,16 +971,11 @@ function selectModule(id) {
       )
       .join("");
 
-    glossarySectionHtml = `
-      <section class="section-block" aria-labelledby="heading-glossary">
-        <h3 class="section-title" id="heading-glossary">
-          <span>Phần 4: Giải thích thuật ngữ &amp; Khái niệm chuyên sâu (${glossaryEntries.length} chủ đề)</span>
-        </h3>
-        <div class="glossary-grid">
-          ${cardsHtml}
-        </div>
-      </section>
-    `;
+    glossarySectionHtml = wrapSectionBlock(
+      "heading-glossary",
+      `<span>Phần 4: Giải thích thuật ngữ &amp; Khái niệm chuyên sâu (${glossaryEntries.length} chủ đề)</span>`,
+      `<div class="glossary-grid">${cardsHtml}</div>`
+    );
   }
 
   // 5. Advanced Expansion Topics
@@ -990,20 +997,15 @@ function selectModule(id) {
       })
       .join("");
 
-    advancedSectionHtml = `
-      <section class="section-block" aria-labelledby="heading-advanced">
-        <h3 class="section-title" id="heading-advanced">
-          <span>${
-            currentLang === "en"
-              ? `Part 5: Advanced Deep Dive (${advList.length} Topics)`
-              : `Phần 5: Kiến thức mở rộng &amp; Cơ chế chuyên sâu (${advList.length} chủ đề)`
-          }</span>
-        </h3>
-        <ul class="advanced-list">
-          ${advItemsHtml}
-        </ul>
-      </section>
-    `;
+    advancedSectionHtml = wrapSectionBlock(
+      "heading-advanced",
+      `<span>${
+        currentLang === "en"
+          ? `Part 5: Advanced Deep Dive (${advList.length} Topics)`
+          : `Phần 5: Kiến thức mở rộng &amp; Cơ chế chuyên sâu (${advList.length} chủ đề)`
+      }</span>`,
+      `<ul class="advanced-list">${advItemsHtml}</ul>`
+    );
   }
 
   // 6. Technical Comparison Table
@@ -1019,19 +1021,16 @@ function selectModule(id) {
       )
       .join("");
 
-    tableSectionHtml = `
-      <section class="section-block" aria-labelledby="heading-table">
-        <h3 class="section-title" id="heading-table">
-          <span>Phần 6: ${escapeHtml(mod.comparisonTable.title_vi)}</span>
-        </h3>
-        <div class="table-responsive">
-          <table class="tech-table">
-            <thead><tr>${headersHtml}</tr></thead>
-            <tbody>${rowsHtml}</tbody>
-          </table>
-        </div>
-      </section>
-    `;
+    tableSectionHtml = wrapSectionBlock(
+      "heading-table",
+      `<span>Phần 6: ${escapeHtml(mod.comparisonTable.title_vi)}</span>`,
+      `<div class="table-responsive">
+        <table class="tech-table">
+          <thead><tr>${headersHtml}</tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>`
+    );
   }
 
   // 7. Real-World Network Engineer Job Skills
@@ -1040,16 +1039,11 @@ function selectModule(id) {
     const itemsHtml = mod.jobSkills_vi
       .map((skill) => `<li class="job-skill-item">${formatRichText(skill)}</li>`)
       .join("");
-    jobSkillsHtml = `
-      <section class="section-block" aria-labelledby="heading-job">
-        <h3 class="section-title" id="heading-job">
-          <span>Phần 7: Kinh nghiệm thực chiến khi đi làm kỹ sư mạng</span>
-        </h3>
-        <ul class="job-skills-list">
-          ${itemsHtml}
-        </ul>
-      </section>
-    `;
+    jobSkillsHtml = wrapSectionBlock(
+      "heading-job",
+      `<span>Phần 7: Kinh nghiệm thực chiến khi đi làm kỹ sư mạng</span>`,
+      `<ul class="job-skills-list">${itemsHtml}</ul>`
+    );
   }
 
   // 8. Step-by-step Worked Example
@@ -1071,21 +1065,18 @@ function selectModule(id) {
             .join("<br/>")}</div>`
         : "";
 
-    exampleSectionHtml = `
-      <section class="section-block" aria-labelledby="heading-example">
-        <h3 class="section-title" id="heading-example">
-          <span>${
-            currentLang === "en"
-              ? "Part 8: Practical Example & Step-by-Step Walkthrough"
-              : "Phần 8: Ví dụ minh họa thực tế & Lời giải chi tiết"
-          }</span>
-        </h3>
-        <div class="example-box">
-          ${exampleLines}
-          ${enExampleLines}
-        </div>
-      </section>
-    `;
+    exampleSectionHtml = wrapSectionBlock(
+      "heading-example",
+      `<span>${
+        currentLang === "en"
+          ? "Part 8: Practical Example & Step-by-Step Walkthrough"
+          : "Phần 8: Ví dụ minh họa thực tế & Lời giải chi tiết"
+      }</span>`,
+      `<div class="example-box">
+        ${exampleLines}
+        ${enExampleLines}
+      </div>`
+    );
   }
 
   const calcSectionHtml = buildInteractiveCalculator(mod.id);
@@ -1098,17 +1089,12 @@ function selectModule(id) {
   let moduleLabsHtml = "";
   if (moduleLabs.length > 0) {
     const labCards = moduleLabs.map((l) => renderSinglePacketTracerLabCard(l)).join("");
-    moduleLabsHtml = `
-      <section class="section-block" aria-labelledby="heading-pt-labs">
-        <h3 class="section-title" id="heading-pt-labs">
-          <span>Phần 9: Bài thực hành Cisco Packet Tracer (${moduleLabs.length} bài Lab)</span>
-          <button type="button" class="copy-btn" id="view-all-30-labs-btn">Xem tất cả 35 Lab &rarr;</button>
-        </h3>
-        <div class="pt-labs-wrapper">
-          ${labCards}
-        </div>
-      </section>
-    `;
+    moduleLabsHtml = wrapSectionBlock(
+      "heading-pt-labs",
+      `<span>Phần 9: Bài thực hành Cisco Packet Tracer (${moduleLabs.length} bài Lab)</span>`,
+      `<div class="pt-labs-wrapper">${labCards}</div>`,
+      `<button type="button" class="copy-btn" id="view-all-30-labs-btn" style="pointer-events: auto;">Xem tất cả 35 Lab &rarr;</button>`
+    );
   }
 
   // 10. Interactive CCNA 200-301 Exam Quiz
@@ -1137,25 +1123,49 @@ function selectModule(id) {
       })
       .join("");
 
-    quizSectionHtml = `
-      <section class="section-block" aria-labelledby="heading-quiz">
-        <h3 class="section-title" id="heading-quiz">
-          <span>Phần 11: Câu hỏi trắc nghiệm ôn thi CCNA (${mod.quiz.length} câu)</span>
-        </h3>
-        <div class="quiz-container">
-          ${quizCardsHtml}
-        </div>
-      </section>
-    `;
+    quizSectionHtml = wrapSectionBlock(
+      "heading-quiz",
+      `<span>Phần 11: Câu hỏi trắc nghiệm ôn thi CCNA (${mod.quiz.length} câu)</span>`,
+      `<div class="quiz-container">${quizCardsHtml}</div>`
+    );
   }
 
-  const commandsText = mod.commands.join("\n");
+  let commandsSectionHtml = "";
+  if (mod.commands && mod.commands.length > 0) {
+    commandsSectionHtml = wrapSectionBlock(
+      "heading-commands",
+      `<span>${
+        currentLang === "en"
+          ? "Part 10: Cisco IOS CLI Commands & Reference"
+          : "Phần 10: Tập lệnh thực hành Cisco IOS CLI & Tra cứu"
+      }</span>`,
+      `<pre class="cli-block"><code id="cli-code">${formatCliCommands(mod.commands)}</code></pre>`,
+      `<button type="button" class="copy-btn" id="copy-cli-btn" style="pointer-events: auto;">${
+        currentLang === "en" ? "Copy Commands" : "Sao chép lệnh"
+      }</button>`
+    );
+  }
+
+  const commandsText = (mod.commands || []).join("\n");
   const prevId = id > 1 ? id - 1 : null;
   const nextId = id < modulesData.length ? id + 1 : null;
 
   // Dynamic SEO Title update
   document.title = `Học phần ${mod.id}: ${mainTitle} — CCNA 200-301 (v1.1 & v2.0) Toàn Diện`;
   closeMobileSidebar();
+
+  // Estimate reading time & word count
+  const fullTextSample = [
+    mod.overview_vi || mod.overview || "",
+    (mod.keyConcepts_vi || []).join(" "),
+    (mod.beginnerGuide_vi || []).join(" "),
+    (mod.advancedTopics_vi || []).join(" "),
+    (mod.jobSkills_vi || []).join(" "),
+    mod.realWorldExample_vi || "",
+    (mod.commands || []).join(" ")
+  ].join(" ");
+  const wordCount = fullTextSample.trim().split(/\s+/).filter(Boolean).length;
+  const readingTimeMinutes = Math.max(3, Math.ceil(wordCount / 180));
 
   const quickJumpItems = [];
   if (beginnerSectionHtml) quickJumpItems.push({ id: "heading-beginner", label: "Nhập môn" });
@@ -1166,8 +1176,9 @@ function selectModule(id) {
   if (tableSectionHtml) quickJumpItems.push({ id: "heading-table", label: "Bảng so sánh" });
   if (jobSkillsHtml) quickJumpItems.push({ id: "heading-job", label: "Kinh nghiệm thực tế" });
   if (exampleSectionHtml) quickJumpItems.push({ id: "heading-example", label: "Ví dụ giải mẫu" });
+  if (calcSectionHtml) quickJumpItems.push({ id: mod.id === 5 ? "heading-calc-bin" : "heading-calc-sub", label: "Công cụ tính" });
   if (moduleLabsHtml) quickJumpItems.push({ id: "heading-pt-labs", label: "Bài Lab" });
-  if (mod.commands && mod.commands.length > 0) quickJumpItems.push({ id: "heading-commands", label: "Lệnh CLI" });
+  if (commandsSectionHtml) quickJumpItems.push({ id: "heading-commands", label: "Lệnh CLI" });
   if (quizSectionHtml) quickJumpItems.push({ id: "heading-quiz", label: "Trắc nghiệm ôn thi" });
 
   const quickJumpHtml = quickJumpItems.length > 0
@@ -1180,6 +1191,36 @@ function selectModule(id) {
       </nav>
     `
     : "";
+
+  const lessonControlBarHtml = `
+    <div class="lesson-control-bar">
+      <div class="lesson-stats">
+        <span class="lesson-stat-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          Thời gian đọc: ~<strong>${readingTimeMinutes} phút</strong> (${wordCount.toLocaleString()} từ)
+        </span>
+      </div>
+      <div class="lesson-expand-controls">
+        <button type="button" class="lesson-expand-btn" id="collapse-all-sections-btn" title="Thu gọn tất cả để nhìn tổng quát">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4 14 12 6 20 14"/>
+            <polyline points="4 20 12 12 20 20"/>
+          </svg>
+          Thu gọn tất cả
+        </button>
+        <button type="button" class="lesson-expand-btn" id="expand-all-sections-btn" title="Mở rộng tất cả nội dung">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4 6 12 14 20 6"/>
+            <polyline points="4 12 12 20 20 12"/>
+          </svg>
+          Mở rộng tất cả
+        </button>
+      </div>
+    </div>
+  `;
 
   const isCompleted = !!completedItems["module-" + mod.id];
   const studyActionsHtml = `
@@ -1194,6 +1235,13 @@ function selectModule(id) {
         </svg>
         Ghi chú học phần
       </button>
+      <button type="button" class="lesson-flashcards-trigger-btn" id="module-flashcards-btn" title="Luyện thẻ ghi nhớ nhanh cho học phần này">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+          <path d="M7 7h10M7 12h10M7 17h6"/>
+        </svg>
+        Flashcards bài này
+      </button>
     </div>
   `;
 
@@ -1207,23 +1255,13 @@ function selectModule(id) {
 
     ${quickJumpHtml}
 
+    ${lessonControlBarHtml}
+
     ${beginnerSectionHtml}
 
     ${visualSectionHtml}
 
-    <section class="section-block" aria-labelledby="heading-overview">
-      <h3 class="section-title" id="heading-overview">
-        <span>${
-          currentLang === "en"
-            ? `Part 3: Core Theory & Key Technical Concepts (${primaryConcepts.length})`
-            : `Phần 3: Lý thuyết cốt lõi & Nguyên lý kỹ thuật (${primaryConcepts.length} nội dung trọng tâm)`
-        }</span>
-      </h3>
-      ${overviewHtml}
-      <ul class="concepts-list" style="margin-top: 1.2rem;">
-        ${conceptsHtml}
-      </ul>
-    </section>
+    ${overviewSectionHtml}
 
     ${glossarySectionHtml}
 
@@ -1239,19 +1277,7 @@ function selectModule(id) {
 
     ${moduleLabsHtml}
 
-    <section class="section-block" aria-labelledby="heading-commands">
-      <h3 class="section-title" id="heading-commands">
-        <span>${
-          currentLang === "en"
-            ? "Part 10: Cisco IOS CLI Commands & Reference"
-            : "Phần 10: Tập lệnh thực hành Cisco IOS CLI & Tra cứu"
-        }</span>
-        <button type="button" class="copy-btn" id="copy-cli-btn">
-          ${currentLang === "en" ? "Copy Commands" : "Sao chép lệnh"}
-        </button>
-      </h3>
-      <pre class="cli-block"><code id="cli-code">${formatCliCommands(mod.commands)}</code></pre>
-    </section>
+    ${commandsSectionHtml}
 
     ${quizSectionHtml}
 
@@ -1269,6 +1295,7 @@ function selectModule(id) {
   `;
 
   updateTopbarBreadcrumb();
+  attachSectionCollapseEvents();
 
   const lessonCompleteBtn = document.getElementById("lesson-complete-btn");
   if (lessonCompleteBtn) {
@@ -1281,6 +1308,10 @@ function selectModule(id) {
   const lessonNoteBtn = document.getElementById("lesson-note-btn");
   if (lessonNoteBtn) {
     lessonNoteBtn.addEventListener("click", () => openNotesModal("current"));
+  }
+  const moduleFlashcardsBtn = document.getElementById("module-flashcards-btn");
+  if (moduleFlashcardsBtn) {
+    moduleFlashcardsBtn.addEventListener("click", () => openFlashcardsModal(mod.id));
   }
 
   attachCalculatorEvents(mod.id);
@@ -2202,6 +2233,455 @@ function initNotesSystem() {
       }
     });
   }
+}
+
+// --------------------------------------------------------------------------
+// Collapsible Sections & Lesson Focus Controls
+// --------------------------------------------------------------------------
+function attachSectionCollapseEvents() {
+  const headerWraps = document.querySelectorAll(".section-header-wrap");
+  headerWraps.forEach((header) => {
+    header.addEventListener("click", (e) => {
+      // Don't toggle if clicking an interactive element inside actions (e.g. copy or view lab button)
+      if (e.target.closest("button") || e.target.closest("a") || e.target.closest("input")) {
+        return;
+      }
+      const sectionBlock = header.closest(".section-block");
+      if (sectionBlock) {
+        sectionBlock.classList.toggle("is-collapsed");
+      }
+    });
+
+    header.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        const sectionBlock = header.closest(".section-block");
+        if (sectionBlock) {
+          sectionBlock.classList.toggle("is-collapsed");
+        }
+      }
+    });
+  });
+
+  const collapseAllBtn = document.getElementById("collapse-all-sections-btn");
+  if (collapseAllBtn) {
+    collapseAllBtn.addEventListener("click", () => {
+      const blocks = document.querySelectorAll("#module-detail .section-block");
+      blocks.forEach((b) => b.classList.add("is-collapsed"));
+    });
+  }
+
+  const expandAllBtn = document.getElementById("expand-all-sections-btn");
+  if (expandAllBtn) {
+    expandAllBtn.addEventListener("click", () => {
+      const blocks = document.querySelectorAll("#module-detail .section-block");
+      blocks.forEach((b) => b.classList.remove("is-collapsed"));
+    });
+  }
+
+  // Quick jump pill smooth scroll & uncollapse target if collapsed
+  const quickJumpLinks = document.querySelectorAll(".quick-jump-pill");
+  quickJumpLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      const href = link.getAttribute("href");
+      const targetId = href ? href.replace("#", "") : null;
+      if (!targetId) return;
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        const parentBlock = targetEl.closest(".section-block");
+        if (parentBlock && parentBlock.classList.contains("is-collapsed")) {
+          parentBlock.classList.remove("is-collapsed");
+        }
+      }
+    });
+  });
+}
+
+// --------------------------------------------------------------------------
+// Draggable Notes Sidebar Resizer
+// --------------------------------------------------------------------------
+function initNotesResizer() {
+  const resizer = document.getElementById("notes-resizer");
+  if (!resizer) return;
+
+  const savedWidth = localStorage.getItem("ccna_notes_sidebar_width");
+  if (savedWidth) {
+    document.documentElement.style.setProperty("--notes-sidebar-width", savedWidth);
+  }
+
+  let isResizing = false;
+
+  const startResize = (e) => {
+    if (window.innerWidth <= 1024) return; // Only enable drag on desktop
+    isResizing = true;
+    resizer.classList.add("is-resizing");
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = "col-resize";
+    e.preventDefault();
+  };
+
+  const doResize = (clientX) => {
+    if (!isResizing) return;
+    const calculatedWidth = window.innerWidth - clientX;
+    const clampedWidth = Math.min(Math.max(calculatedWidth, 320), Math.min(window.innerWidth * 0.75, 880));
+    document.documentElement.style.setProperty("--notes-sidebar-width", `${clampedWidth}px`);
+  };
+
+  const stopResize = () => {
+    if (!isResizing) return;
+    isResizing = false;
+    resizer.classList.remove("is-resizing");
+    document.body.style.userSelect = "";
+    document.body.style.cursor = "";
+    const currentWidth = getComputedStyle(document.documentElement).getPropertyValue("--notes-sidebar-width");
+    if (currentWidth) {
+      localStorage.setItem("ccna_notes_sidebar_width", currentWidth.trim());
+    }
+  };
+
+  resizer.addEventListener("mousedown", startResize);
+  window.addEventListener("mousemove", (e) => doResize(e.clientX));
+  window.addEventListener("mouseup", stopResize);
+
+  // Touch support for tablets/stylus
+  resizer.addEventListener("touchstart", (e) => {
+    if (e.touches && e.touches[0]) startResize(e);
+  }, { passive: false });
+  window.addEventListener("touchmove", (e) => {
+    if (isResizing && e.touches && e.touches[0]) doResize(e.touches[0].clientX);
+  });
+  window.addEventListener("touchend", stopResize);
+}
+
+// --------------------------------------------------------------------------
+// Zen / Focus Mode
+// --------------------------------------------------------------------------
+function initZenMode() {
+  const zenBtn = document.getElementById("zen-mode-btn");
+  if (!zenBtn) return;
+
+  const savedZen = localStorage.getItem("ccna_zen_mode") === "true";
+  if (savedZen) {
+    document.body.classList.add("zen-mode");
+    zenBtn.classList.add("active");
+  }
+
+  zenBtn.addEventListener("click", () => {
+    const isZen = document.body.classList.toggle("zen-mode");
+    zenBtn.classList.toggle("active", isZen);
+    localStorage.setItem("ccna_zen_mode", isZen ? "true" : "false");
+  });
+}
+
+// --------------------------------------------------------------------------
+// Text Selection Floating Toolbar (Highlight & Quick Quote into Note)
+// --------------------------------------------------------------------------
+function initTextSelectionHighlighter() {
+  const tooltip = document.getElementById("selection-tooltip");
+  const addToNoteBtn = document.getElementById("sel-add-to-note-btn");
+  if (!tooltip) return;
+
+  let currentSelectedText = "";
+  let currentSelectionRange = null;
+
+  const handleSelection = () => {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) {
+      tooltip.hidden = true;
+      currentSelectedText = "";
+      currentSelectionRange = null;
+      return;
+    }
+
+    const text = sel.toString().trim();
+    if (text.length < 3) {
+      tooltip.hidden = true;
+      currentSelectedText = "";
+      currentSelectionRange = null;
+      return;
+    }
+
+    // Check if selection is within #module-detail
+    const anchorNode = sel.anchorNode;
+    if (!anchorNode) return;
+    const container = anchorNode.nodeType === 3 ? anchorNode.parentElement : anchorNode;
+    if (!container || !container.closest("#module-detail")) {
+      tooltip.hidden = true;
+      return;
+    }
+
+    currentSelectedText = text;
+    currentSelectionRange = sel.getRangeAt(0).cloneRange();
+
+    const rect = currentSelectionRange.getBoundingClientRect();
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+    tooltip.style.left = `${Math.max(10, rect.left + scrollX + (rect.width / 2) - 110)}px`;
+    tooltip.style.top = `${Math.max(10, rect.top + scrollY - 45)}px`;
+    tooltip.hidden = false;
+  };
+
+  document.addEventListener("mouseup", (e) => {
+    if (tooltip.contains(e.target)) return;
+    setTimeout(handleSelection, 25);
+  });
+
+  document.addEventListener("keyup", (e) => {
+    if (e.key === "Shift" || e.key.startsWith("Arrow")) {
+      setTimeout(handleSelection, 25);
+    }
+  });
+
+  document.addEventListener("mousedown", (e) => {
+    if (tooltip && !tooltip.contains(e.target)) {
+      tooltip.hidden = true;
+    }
+  });
+
+  // Color Highlight Buttons
+  const colorBtns = tooltip.querySelectorAll(".sel-btn[data-color]");
+  colorBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const color = btn.dataset.color;
+      if (!currentSelectionRange) return;
+
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(currentSelectionRange);
+
+      if (color === "none") {
+        // Strip mark elements within selection
+        const contents = currentSelectionRange.extractContents();
+        const walker = document.createTreeWalker(contents, NodeFilter.SHOW_ELEMENT);
+        const marksToRemove = [];
+        let node;
+        while ((node = walker.nextNode())) {
+          if (node.tagName === "MARK") marksToRemove.push(node);
+        }
+        marksToRemove.forEach((m) => {
+          m.replaceWith(...m.childNodes);
+        });
+        currentSelectionRange.insertNode(contents);
+      } else {
+        const mark = document.createElement("mark");
+        mark.className = `ccna-hl-${color}`;
+        try {
+          currentSelectionRange.surroundContents(mark);
+        } catch {
+          const contents = currentSelectionRange.extractContents();
+          mark.appendChild(contents);
+          currentSelectionRange.insertNode(mark);
+        }
+      }
+
+      sel.removeAllRanges();
+      tooltip.hidden = true;
+    });
+  });
+
+  // Quote into Note
+  if (addToNoteBtn) {
+    addToNoteBtn.addEventListener("click", () => {
+      if (!currentSelectedText) return;
+      const quoteBlock = `\n> ${currentSelectedText.replace(/\n+/g, "\n> ")}\n\n`;
+      insertTextIntoNote(quoteBlock);
+      openNotesModal("current");
+      tooltip.hidden = true;
+      const sel = window.getSelection();
+      if (sel) sel.removeAllRanges();
+    });
+  }
+}
+
+// --------------------------------------------------------------------------
+// Interactive Flashcards Study Deck System
+// --------------------------------------------------------------------------
+let flashcardDeck = [];
+let currentFlashcardIndex = 0;
+let isFlashcardFlipped = false;
+
+function buildFlashcardDeck(targetModId = null) {
+  const deck = [];
+  const modulesToScan = targetModId
+    ? modulesData.filter((m) => m.id === targetModId)
+    : (modulesData.length > 0 ? modulesData : []);
+
+  modulesToScan.forEach((m) => {
+    // 1. From Glossary
+    if (typeof MODULE_DEEP_GLOSSARY !== "undefined" && MODULE_DEEP_GLOSSARY[m.id]) {
+      MODULE_DEEP_GLOSSARY[m.id].forEach((g) => {
+        deck.push({
+          modId: m.id,
+          type: "Thuật ngữ",
+          front: g.term,
+          back: `<strong>${escapeHtml(g.simple_vi)}</strong><br/><br/>${escapeHtml(g.detail_vi)}`
+        });
+      });
+    }
+
+    // 2. From Key Concepts
+    const concepts = m.keyConcepts_vi || m.keyConcepts || [];
+    concepts.forEach((c, idx) => {
+      const parts = c.split(":");
+      if (parts.length > 1) {
+        deck.push({
+          modId: m.id,
+          type: "Khái niệm",
+          front: parts[0].trim(),
+          back: parts.slice(1).join(":").trim()
+        });
+      } else {
+        deck.push({
+          modId: m.id,
+          type: "Khái niệm",
+          front: `Học phần ${m.id} — Điểm mấu chốt ${idx + 1}`,
+          back: c
+        });
+      }
+    });
+
+    // 3. From Quiz questions
+    if (m.quiz && Array.isArray(m.quiz)) {
+      m.quiz.forEach((q) => {
+        const correctOpt = q.options_vi && q.options_vi[q.answerIndex] ? q.options_vi[q.answerIndex] : "";
+        deck.push({
+          modId: m.id,
+          type: "Câu hỏi trắc nghiệm",
+          front: q.question_vi,
+          back: `<strong>Đáp án đúng:</strong> ${escapeHtml(correctOpt)}<br/><br/><strong>Giải thích:</strong> ${escapeHtml(q.explanation_vi)}`
+        });
+      });
+    }
+  });
+
+  // Fisher-Yates shuffle
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+
+  return deck;
+}
+
+function renderCurrentFlashcard() {
+  const counterEl = document.getElementById("flashcard-counter");
+  const cardTextEl = document.getElementById("flashcard-card-text");
+  const hintPillEl = document.getElementById("flashcard-hint-pill");
+  const flipperEl = document.getElementById("flashcard-flipper");
+  const prevBtn = document.getElementById("flashcard-prev-btn");
+  const nextBtn = document.getElementById("flashcard-next-btn");
+
+  if (!cardTextEl || flashcardDeck.length === 0) {
+    if (cardTextEl) cardTextEl.innerHTML = "Không có thẻ ghi nhớ nào trong học phần này.";
+    return;
+  }
+
+  const card = flashcardDeck[currentFlashcardIndex];
+  if (counterEl) counterEl.textContent = `${currentFlashcardIndex + 1} / ${flashcardDeck.length}`;
+
+  if (prevBtn) prevBtn.disabled = currentFlashcardIndex === 0;
+  if (nextBtn) nextBtn.disabled = currentFlashcardIndex === flashcardDeck.length - 1;
+
+  if (isFlashcardFlipped) {
+    if (flipperEl) flipperEl.classList.add("is-flipped");
+    if (hintPillEl) hintPillEl.textContent = `Đáp án & Giải thích [${card.type} — Bài ${card.modId}]`;
+    cardTextEl.innerHTML = formatRichText(card.back);
+  } else {
+    if (flipperEl) flipperEl.classList.remove("is-flipped");
+    if (hintPillEl) hintPillEl.textContent = `Câu hỏi / Khái niệm [${card.type} — Bài ${card.modId}] (Bấm để lật)`;
+    cardTextEl.innerHTML = `<strong>${formatRichText(card.front)}</strong>`;
+  }
+}
+
+function openFlashcardsModal(targetModId = null) {
+  const modal = document.getElementById("flashcard-modal");
+  if (!modal) return;
+  flashcardDeck = buildFlashcardDeck(targetModId || activeModuleId);
+  currentFlashcardIndex = 0;
+  isFlashcardFlipped = false;
+  modal.hidden = false;
+  renderCurrentFlashcard();
+}
+
+function closeFlashcardsModal() {
+  const modal = document.getElementById("flashcard-modal");
+  if (modal) modal.hidden = true;
+}
+
+function initFlashcardsSystem() {
+  const openTopbarBtn = document.getElementById("open-flashcards-btn");
+  const closeBtn = document.getElementById("flashcard-close-btn");
+  const backdrop = document.getElementById("flashcard-backdrop");
+  const flipTrigger = document.getElementById("flashcard-flip-trigger");
+  const flipBtn = document.getElementById("flashcard-flip-btn");
+  const prevBtn = document.getElementById("flashcard-prev-btn");
+  const nextBtn = document.getElementById("flashcard-next-btn");
+
+  if (openTopbarBtn) {
+    openTopbarBtn.addEventListener("click", () => openFlashcardsModal(activeModuleId));
+  }
+  if (closeBtn) closeBtn.addEventListener("click", closeFlashcardsModal);
+  if (backdrop) backdrop.addEventListener("click", closeFlashcardsModal);
+
+  const toggleFlip = () => {
+    isFlashcardFlipped = !isFlashcardFlipped;
+    renderCurrentFlashcard();
+  };
+
+  if (flipTrigger) flipTrigger.addEventListener("click", toggleFlip);
+  if (flipBtn) {
+    flipBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleFlip();
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (currentFlashcardIndex > 0) {
+        currentFlashcardIndex--;
+        isFlashcardFlipped = false;
+        renderCurrentFlashcard();
+      }
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (currentFlashcardIndex < flashcardDeck.length - 1) {
+        currentFlashcardIndex++;
+        isFlashcardFlipped = false;
+        renderCurrentFlashcard();
+      }
+    });
+  }
+
+  window.addEventListener("keydown", (e) => {
+    const modal = document.getElementById("flashcard-modal");
+    if (!modal || modal.hidden) return;
+
+    if (e.key === "Escape") {
+      closeFlashcardsModal();
+    } else if (e.key === " " && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
+      e.preventDefault();
+      toggleFlip();
+    } else if (e.key === "ArrowLeft") {
+      if (currentFlashcardIndex > 0) {
+        currentFlashcardIndex--;
+        isFlashcardFlipped = false;
+        renderCurrentFlashcard();
+      }
+    } else if (e.key === "ArrowRight") {
+      if (currentFlashcardIndex < flashcardDeck.length - 1) {
+        currentFlashcardIndex++;
+        isFlashcardFlipped = false;
+        renderCurrentFlashcard();
+      }
+    }
+  });
 }
 
 // Responsive Mobile Sidebar Drawer & Photo Lightbox & Back-to-Top Logic
