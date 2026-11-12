@@ -58,7 +58,11 @@
   <header class="app-topbar" id="app-topbar" aria-label="Thanh công cụ học tập">
     <div class="topbar-left">
       <button type="button" class="topbar-btn sidebar-toggle-btn" id="sidebar-toggle-btn" aria-label="Thu gọn hoặc mở rộng thanh bài học (Ctrl+B)" title="Thu gọn / Mở rộng danh mục bài học (Ctrl+B)">
-        <span class="hamburger-icon">☰</span>
+        <svg class="toggle-svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+          <line x1="9" x2="9" y1="3" y2="21"/>
+          <path d="m14 9-3 3 3 3"/>
+        </svg>
         <span class="btn-text">Mục lục</span>
       </button>
 
@@ -67,7 +71,7 @@
           <span class="brand-badge">CCNA 200-301</span>
         </a>
         <span class="brand-divider">/</span>
-        <span class="topbar-breadcrumb" id="topbar-breadcrumb">📘 Học phần 01</span>
+        <span class="topbar-breadcrumb" id="topbar-breadcrumb">Học phần 01</span>
       </div>
     </div>
 
@@ -114,40 +118,52 @@
 
   <div class="app-layout" id="app-layout">
     <!-- Left Collapsible Sidebar -->
-    <aside class="sidebar" id="app-sidebar" aria-label="Điều hướng Học phần, Chuyên đề thi và Bài Lab">
+    <aside class="sidebar" id="app-sidebar" aria-label="Danh mục học tập CCNA">
       <div class="sidebar-header">
-        <div class="header-top-row">
-          <span class="course-badge">CCNA 200-301 • v1.1 &amp; v2.0 MỚI</span>
+        <div class="sidebar-top-meta">
+          <div class="sidebar-badge-group">
+            <span class="sidebar-indicator-dot"></span>
+            <span class="sidebar-curriculum-label" id="app-title">Chương trình CCNA 200-301</span>
+          </div>
           <div class="sidebar-actions-group">
-            <button type="button" class="sidebar-collapse-icon-btn" id="sidebar-collapse-btn" title="Thu gọn thanh bên để mở rộng không gian học (Ctrl+B)" aria-label="Thu gọn thanh bên">
-              <span class="collapse-icon">◀</span>
-              <span class="collapse-text">Thu gọn</span>
+            <button type="button" class="sidebar-collapse-icon-btn" id="sidebar-collapse-btn" title="Thu gọn thanh bên (Ctrl+B)" aria-label="Thu gọn thanh bên">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                <line x1="9" x2="9" y1="3" y2="21"/>
+                <path d="m14 9-3 3 3 3"/>
+              </svg>
             </button>
             <button type="button" class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Đóng menu trên di động">✕</button>
           </div>
         </div>
-        <h1 class="sidebar-title" id="app-title">CCNA 200-301 (v2.0) &amp; 35 Lab</h1>
 
-        <!-- Mode Switcher: 17 Modules vs. 35 Packet Tracer Labs vs. 10 Exam v2.0/Job Mastery Domains -->
+        <!-- Sleek Segmented Control for 3 Modes -->
         <div class="mode-tabs" role="tablist">
           <button type="button" class="mode-tab-btn active" id="tab-modules-btn" data-mode="modules">
-            📘 17 Học Phần Nền Tảng
+            <span class="tab-label">Lý thuyết</span>
+            <span class="tab-pill">17</span>
           </button>
           <button type="button" class="mode-tab-btn" id="tab-labs-btn" data-mode="labs">
-            🟦 35 Lab Packet Tracer
+            <span class="tab-label">Bài Lab</span>
+            <span class="tab-pill">35</span>
           </button>
-          <button type="button" class="mode-tab-btn mode-tab-btn-full" id="tab-mastery-btn" data-mode="mastery">
-            🏆 10 Chuyên Đề Thi CCNA v2.0, Thiết Bị Ngoại Vi &amp; Đi Làm Thực Tế
+          <button type="button" class="mode-tab-btn" id="tab-mastery-btn" data-mode="mastery">
+            <span class="tab-label">Chuyên đề</span>
+            <span class="tab-pill">10</span>
           </button>
         </div>
 
         <div class="search-wrapper">
+          <svg class="search-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
           <input
             type="search"
             id="module-search"
             class="search-input"
-            placeholder="🔍 Tìm học phần, Switch Aruba, máy in LCD, SMB, VoIP, Router..."
-            aria-label="Tìm kiếm học phần, chuyên đề hoặc bài Lab"
+            placeholder="Lọc bài học, lệnh CLI, từ khóa..."
+            aria-label="Tìm kiếm bài học"
             autocomplete="off"
           />
           <button type="button" class="search-clear-btn" id="search-clear-btn" title="Xóa tìm kiếm" aria-label="Xóa tìm kiếm" style="display:none;">✕</button>
@@ -169,8 +185,12 @@
 
   <!-- Floating Expand Sidebar Button (Shown when sidebar is collapsed on desktop) -->
   <button type="button" class="floating-expand-btn" id="floating-expand-btn" title="Mở lại danh mục bài học (Ctrl+B)" aria-label="Mở danh mục bài học">
-    <span class="btn-icon">📖</span>
-    <span>Danh mục bài</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+      <line x1="9" x2="9" y1="3" y2="21"/>
+      <path d="m11 9 3 3-3 3"/>
+    </svg>
+    <span>Mục lục</span>
   </button>
 
   <!-- Floating Action Button for Quick Notes -->

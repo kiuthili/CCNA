@@ -169,17 +169,17 @@ function renderAll() {
 
 function updateHeaderLabels() {
   if (currentLang === "en") {
-    appTitleEl.textContent = "CCNA 200-301 (v2.0) & 35 Labs";
-    searchInputEl.placeholder = "Filter modules, Aruba Web GUI, printers, scanners, VoIP or labs...";
-    if (tabModulesBtn) tabModulesBtn.textContent = "📘 17 Foundation Modules";
-    if (tabLabsBtn) tabLabsBtn.textContent = "🟦 35 PT Labs";
-    if (tabMasteryBtn) tabMasteryBtn.textContent = "🏆 10 Exam v2.0, Multi-Vendor & Job Mastery";
+    if (appTitleEl) appTitleEl.textContent = "CCNA 200-301 Curriculum";
+    if (searchInputEl) searchInputEl.placeholder = "Filter lessons, CLI, labs...";
+    if (tabModulesBtn) tabModulesBtn.innerHTML = `<span class="tab-label">Modules</span><span class="tab-pill">17</span>`;
+    if (tabLabsBtn) tabLabsBtn.innerHTML = `<span class="tab-label">Labs</span><span class="tab-pill">35</span>`;
+    if (tabMasteryBtn) tabMasteryBtn.innerHTML = `<span class="tab-label">Mastery</span><span class="tab-pill">10</span>`;
   } else {
-    appTitleEl.textContent = "CCNA 200-301 (v2.0) & 35 Lab";
-    searchInputEl.placeholder = "🔍 Tìm học phần, Switch Aruba Web GUI, máy in LCD, scan SMB, bill POS, VoIP, Router...";
-    if (tabModulesBtn) tabModulesBtn.textContent = "📘 17 Học Phần Nền Tảng";
-    if (tabLabsBtn) tabLabsBtn.textContent = "🟦 35 Lab Packet Tracer";
-    if (tabMasteryBtn) tabMasteryBtn.textContent = "🏆 10 Chuyên Đề Thi CCNA v2.0, Thiết Bị Ngoại Vi & Đi Làm Thực Tế";
+    if (appTitleEl) appTitleEl.textContent = "Chương trình CCNA 200-301";
+    if (searchInputEl) searchInputEl.placeholder = "Lọc bài học, lệnh CLI, từ khóa...";
+    if (tabModulesBtn) tabModulesBtn.innerHTML = `<span class="tab-label">Lý thuyết</span><span class="tab-pill">17</span>`;
+    if (tabLabsBtn) tabLabsBtn.innerHTML = `<span class="tab-label">Bài Lab</span><span class="tab-pill">35</span>`;
+    if (tabMasteryBtn) tabMasteryBtn.innerHTML = `<span class="tab-label">Chuyên đề</span><span class="tab-pill">10</span>`;
   }
 }
 
@@ -296,6 +296,14 @@ function renderSinglePacketTracerLabCard(lab) {
 function renderSidebar(items) {
   moduleListEl.innerHTML = "";
 
+  const checkSvg = `
+    <span class="module-check-icon" title="Đã hoàn thành">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6 9 17l-5-5"/>
+      </svg>
+    </span>
+  `;
+
   if (currentMode === "mastery") {
     const allLi = document.createElement("li");
     const allBtn = document.createElement("button");
@@ -303,7 +311,10 @@ function renderSidebar(items) {
     allBtn.className = `module-item${activeMasteryId === 0 ? " active" : ""}`;
     allBtn.innerHTML = `
       <span class="module-num">ALL</span>
-      <span class="module-name">Trọn bộ 10 Chuyên Đề Thi CCNA v1.1 &amp; v2.0, Thiết Bị Đa Hãng, Ngoại Vi &amp; Đi Làm</span>
+      <span class="module-name">
+        Toàn bộ 10 Chuyên đề tổng hợp
+        <span class="module-name-sub">Chuẩn đề thi v1.1 &amp; v2.0 và Thực tế</span>
+      </span>
     `;
     allBtn.addEventListener("click", () => {
       activeMasteryId = 0;
@@ -322,11 +333,12 @@ function renderSidebar(items) {
       const isCompleted = !!completedItems["mastery-" + m.id];
       btn.className = `module-item${m.id === activeMasteryId ? " active" : ""}${isCompleted ? " completed" : ""}`;
       btn.innerHTML = `
-        <span class="module-num">CĐ${m.id}</span>
+        <span class="module-num">${String(m.id).padStart(2, "0")}</span>
         <span class="module-name">
           ${escapeHtml(m.title_vi)}
           <span class="module-name-sub">${escapeHtml(m.badge)}</span>
         </span>
+        ${isCompleted ? checkSvg : ""}
       `;
       btn.addEventListener("click", () => {
         activeMasteryId = m.id;
@@ -349,7 +361,10 @@ function renderSidebar(items) {
     allBtn.className = `module-item${activeLabId === 0 ? " active" : ""}`;
     allBtn.innerHTML = `
       <span class="module-num">ALL</span>
-      <span class="module-name">Tất cả 35 Bài Lab Packet Tracer (Lab 01 &rarr; Lab 35)</span>
+      <span class="module-name">
+        Tất cả 35 bài thực hành Lab
+        <span class="module-name-sub">Cisco Packet Tracer (Lab 01 &rarr; Lab 35)</span>
+      </span>
     `;
     allBtn.addEventListener("click", () => {
       activeLabId = 0;
@@ -368,11 +383,12 @@ function renderSidebar(items) {
       const isCompleted = !!completedItems["lab-" + lab.id];
       btn.className = `module-item${lab.id === activeLabId ? " active" : ""}${isCompleted ? " completed" : ""}`;
       btn.innerHTML = `
-        <span class="module-num">L${String(lab.id).padStart(2, "0")}</span>
+        <span class="module-num">${String(lab.id).padStart(2, "0")}</span>
         <span class="module-name">
           ${escapeHtml(lab.title_vi.replace(/^Lab \d+:\s*/, ""))}
           <span class="module-name-sub">Học phần ${lab.moduleId} • ${escapeHtml(lab.level)}</span>
         </span>
+        ${isCompleted ? checkSvg : ""}
       `;
       btn.addEventListener("click", () => {
         activeLabId = lab.id;
@@ -421,6 +437,9 @@ function renderSidebar(items) {
 
     btn.appendChild(numSpan);
     btn.appendChild(titleWrap);
+    if (isCompleted) {
+      btn.insertAdjacentHTML("beforeend", checkSvg);
+    }
 
     btn.addEventListener("click", () => {
       selectModule(mod.id);
@@ -1461,20 +1480,20 @@ function updateTopbarBreadcrumb() {
     const mod = modulesData.find((m) => m.id === activeModuleId);
     if (mod) {
       const title = currentLang === "en" ? mod.title : (mod.title_vi || mod.title);
-      topbarBreadcrumb.textContent = `📘 Học phần ${mod.id}: ${title}`;
+      topbarBreadcrumb.textContent = `Học phần ${String(mod.id).padStart(2, "0")}: ${title}`;
     }
   } else if (currentMode === "labs") {
     const allLabs = typeof PACKET_TRACER_LABS !== "undefined" ? PACKET_TRACER_LABS : [];
     const lab = allLabs.find((l) => l.id === activeLabId);
     topbarBreadcrumb.textContent = lab
-      ? `🟦 Lab ${lab.id}: ${lab.title_vi.replace(/^Lab \d+:\s*/, "")}`
-      : "🟦 Tất cả 35 Lab Packet Tracer";
+      ? `Bài Lab ${String(lab.id).padStart(2, "0")}: ${lab.title_vi.replace(/^Lab \d+:\s*/, "")}`
+      : "35 Bài thực hành Lab Packet Tracer";
   } else if (currentMode === "mastery") {
     const allMastery = typeof CCNA_EXAM_MASTERY !== "undefined" ? CCNA_EXAM_MASTERY : [];
     const m = allMastery.find((item) => item.id === activeMasteryId);
     topbarBreadcrumb.textContent = m
-      ? `🏆 CĐ${m.id}: ${m.title_vi}`
-      : "🏆 10 Chuyên Đề Thi & Đi Làm";
+      ? `Chuyên đề ${String(m.id).padStart(2, "0")}: ${m.title_vi}`
+      : "10 Chuyên đề tổng hợp CCNA";
   }
 }
 
