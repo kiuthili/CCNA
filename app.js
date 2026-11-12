@@ -22,6 +22,10 @@ try {
 }
 
 let cloudSyncKey = localStorage.getItem("ccna_cloud_sync_key") || "";
+if (!cloudSyncKey) {
+  cloudSyncKey = "ccna-" + Math.random().toString(36).substring(2, 8) + Date.now().toString(36).slice(-4);
+  localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
+}
 let currentTheme = localStorage.getItem("ccna_theme") || "light";
 let currentFontSize = parseFloat(localStorage.getItem("ccna_font_size") || "16.5");
 let isSidebarCollapsed = localStorage.getItem("ccna_sidebar_collapsed") === "true";
@@ -254,7 +258,7 @@ function renderSinglePacketTracerLabCard(lab) {
       ? `
       <div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.45rem;">
-          <strong style="font-size:0.9rem;color:#0f172a;">💻 Tập Lệnh Cấu Hình &amp; Kiểm Tra Trên Cisco Packet Tracer (CLI):</strong>
+          <strong style="font-size:0.88rem;color:#0f172a;">Tập lệnh cấu hình &amp; Kiểm tra (CLI):</strong>
         </div>
         <pre class="cli-block"><code>${formatCliCommands(lab.cli_commands)}</code></pre>
       </div>
@@ -265,27 +269,27 @@ function renderSinglePacketTracerLabCard(lab) {
     <article class="pt-lab-card" id="pt-lab-${lab.id}">
       <div class="pt-lab-header">
         <div class="pt-lab-badges">
-          <span class="pt-badge">BÀI LAB #${String(lab.id).padStart(2, "0")} / 35</span>
-          <span class="pt-badge">THUỘC HỌC PHẦN ${lab.moduleId}</span>
+          <span class="pt-badge">BÀI LAB ${String(lab.id).padStart(2, "0")} / 35</span>
+          <span class="pt-badge">HỌC PHẦN ${lab.moduleId}</span>
           <span class="pt-badge pt-badge-level">${escapeHtml(lab.level)}</span>
         </div>
         <h4 class="pt-lab-title">${escapeHtml(lab.title_vi)}</h4>
       </div>
       <div class="pt-lab-body">
         <div class="pt-lab-objective">
-          <strong>🎯 Yêu cầu &amp; Mục tiêu bài Lab:</strong> ${formatRichText(lab.objective_vi)}
+          <strong>Mục tiêu bài thực hành:</strong> ${formatRichText(lab.objective_vi)}
         </div>
         ${svgDiagram}
         ${ipTableHtml}
         <div>
-          <strong style="display:block;margin-bottom:0.55rem;font-size:0.95rem;color:#0369a1;">
-            🛠️ Hướng Dẫn Thực Hành Từng Bước Trên Phần Mềm Cisco Packet Tracer:
+          <strong style="display:block;margin-bottom:0.55rem;font-size:0.92rem;color:#0369a1;">
+            Hướng dẫn thực hành trên Cisco Packet Tracer:
           </strong>
           <ul class="pt-steps-list">${stepsHtml}</ul>
         </div>
         ${cliHtml}
         <div class="pt-verify-box">
-          <strong>✅ Tiêu chí nghiệm thu hoàn thành bài Lab:</strong> ${formatRichText(lab.verify_vi)}
+          <strong>Tiêu chí nghiệm thu hoàn thành:</strong> ${formatRichText(lab.verify_vi)}
         </div>
       </div>
     </article>
@@ -469,18 +473,22 @@ function renderLabsView(labId) {
           : ""
       }
       <button type="button" class="lesson-note-trigger-btn" id="lab-quick-note-btn">
-        📝 ${labId > 0 ? "Ghi chú bài Lab này" : "Mở sổ tay ghi chú"}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        ${labId > 0 ? "Ghi chú bài Lab này" : "Mở sổ tay ghi chú"}
       </button>
     </div>
   `;
 
   moduleDetailEl.innerHTML = `
     <header class="module-header">
-      <div class="module-kicker">THỰC HÀNH MẠNG CISCO PACKET TRACER • TRỌN BỘ 35 BÀI LAB TỪ CƠ BẢN ĐẾN NÂNG CAO</div>
+      <div class="module-kicker">THỰC HÀNH MẠNG CISCO PACKET TRACER • 35 BÀI LAB TOÀN DIỆN</div>
       <h2 class="module-heading">
         ${
           labId === 0
-            ? "🟦 Kho 35 Bài Lab Thực Hành Cisco Packet Tracer (Có Sơ Đồ, Giải Thích & Hướng Dẫn Tự Cấu Hình)"
+            ? "35 Bài Lab Thực Hành Cisco Packet Tracer (Kèm sơ đồ &amp; Hướng dẫn CLI)"
             : escapeHtml(labsToShow[0]?.title_vi || "")
         }
       </h2>
@@ -577,7 +585,7 @@ function renderMasteryView(masteryId) {
           </div>
           <div class="mastery-body">
             <div class="mastery-summary">
-              <strong>🎯 Trọng tâm thi CCNA 200-301 &amp; Đi làm:</strong> ${formatRichText(m.summary_vi)}
+              <strong>Trọng tâm thi CCNA &amp; Đi làm:</strong> ${formatRichText(m.summary_vi)}
             </div>
             ${photosHtml}
             ${svgHtml}
@@ -602,18 +610,22 @@ function renderMasteryView(masteryId) {
           : ""
       }
       <button type="button" class="lesson-note-trigger-btn" id="mastery-quick-note-btn">
-        📝 ${masteryId > 0 ? "Ghi chú chuyên đề này" : "Mở sổ tay ghi chú"}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        ${masteryId > 0 ? "Ghi chú chuyên đề này" : "Mở sổ tay ghi chú"}
       </button>
     </div>
   `;
 
   moduleDetailEl.innerHTML = `
     <header class="module-header">
-      <div class="module-kicker">HOÀN THIỆN 100% KHUNG ĐỀ THI QUỐC TẾ CISCO CCNA 200-301 • THIẾT BỊ ĐA HÃNG ARUBA / MIKROTIK • NGOẠI VI VĂN PHÒNG &amp; ĐI LÀM THỰC CHIẾN</div>
+      <div class="module-kicker">HOÀN THIỆN 100% KHUNG ĐỀ THI QUỐC TẾ CISCO CCNA 200-301 • THIẾT BỊ ĐA HÃNG • NGOẠI VI &amp; ĐI LÀM</div>
       <h2 class="module-heading">
         ${
           masteryId === 0
-            ? "🏆 10 Chuyên Đề Thi Đỗ CCNA 200-301 (v1.1 & v2.0), Thiết Bị Đa Hãng (Aruba Web GUI/MikroTik), Ngoại Vi Văn Phòng & Phỏng Vấn Đi Làm"
+            ? "10 Chuyên Đề Thi CCNA 200-301 (v1.1 & v2.0), Thiết Bị Đa Hãng &amp; Phỏng Vấn Đi Làm"
             : escapeHtml(itemsToShow[0]?.title_vi || "")
         }
       </h2>
@@ -795,8 +807,8 @@ function selectModule(id) {
         <h3 class="section-title" id="heading-beginner">
           <span>${
             currentLang === "en"
-              ? "🌱 Part 1: Step-by-Step Foundation for Complete Beginners"
-              : "🌱 Phần 1: Nhập Môn Từ Con Số 0 (Giải Thích Dễ Hiểu Cho Người Mới Bắt Đầu)"
+              ? "Part 1: Step-by-Step Foundation for Beginners"
+              : "Phần 1: Nền tảng nhập môn căn bản"
           }</span>
         </h3>
         <ul class="beginner-list">
@@ -852,10 +864,10 @@ function selectModule(id) {
                 <figure class="photo-card" data-fullsrc="${escapeHtml(p.url)}" data-title="${escapeHtml(pTitle)}" data-desc="${escapeHtml(pDesc)}">
                   <div class="photo-img-wrap">
                     <img src="${escapeHtml(p.url)}" alt="${escapeHtml(pTitle)}" loading="lazy" />
-                    <span class="photo-zoom-hint">🔍 Bấm phóng to cận cảnh</span>
+                    <span class="photo-zoom-hint">Phóng to ảnh</span>
                   </div>
                   <figcaption class="photo-caption">
-                    <strong>📸 ${escapeHtml(pTitle)}</strong>
+                    <strong>${escapeHtml(pTitle)}</strong>
                     <span>${escapeHtml(pDesc)}</span>
                     ${pEnSub}
                   </figcaption>
@@ -872,8 +884,8 @@ function selectModule(id) {
         <h3 class="section-title" id="heading-visual">
           <span>${
             currentLang === "en"
-              ? `📸 Part 2: Multi-Angle Hardware Photos, Close-Up Ports & Architecture Diagrams (${(visualData.photos || []).length} Photos)`
-              : `📸 Phần 2: Ảnh Thực Tế Thiết Bị Đa Góc Độ, Cận Cảnh Từng Cổng Port & Sơ Đồ Đấu Nối (${(visualData.photos || []).length} Ảnh Thực Tế — Bấm Vào Ảnh Để Phóng To)`
+              ? `Part 2: Hardware Photos, Ports & Architecture Diagrams (${(visualData.photos || []).length} Photos)`
+              : `Phần 2: Hình ảnh thực tế thiết bị & Cổng kết nối (${(visualData.photos || []).length} ảnh minh họa)`
           }</span>
         </h3>
         <div class="visual-container">
@@ -934,13 +946,13 @@ function selectModule(id) {
             <span>${escapeHtml(g.term)}</span>
           </div>
           <div class="glossary-simple">
-            🌱 <strong>Hiểu nhanh cho người mới:</strong> ${formatRichText(g.simple_vi)}
+            <strong>Khái niệm căn bản:</strong> ${formatRichText(g.simple_vi)}
           </div>
           <div class="glossary-detail">
-            🔍 <strong>Phân tích chuyên sâu &amp; Nguyên lý hoạt động:</strong> ${formatRichText(g.detail_vi)}
+            <strong>Phân tích chuyên sâu &amp; Nguyên lý:</strong> ${formatRichText(g.detail_vi)}
           </div>
           <div class="glossary-example">
-            💡 <strong>Ví dụ thực tế &amp; Lưu ý thi CCNA:</strong> ${formatRichText(g.example_vi)}
+            <strong>Ứng dụng &amp; Lưu ý thi CCNA:</strong> ${formatRichText(g.example_vi)}
           </div>
         </div>
       `
@@ -950,7 +962,7 @@ function selectModule(id) {
     glossarySectionHtml = `
       <section class="section-block" aria-labelledby="heading-glossary">
         <h3 class="section-title" id="heading-glossary">
-          <span>📚 Phần 4: Từ Điển Giải Thích Chi Tiết Toàn Bộ Thuật Ngữ &amp; Kiến Thức Trong Học Phần (${glossaryEntries.length} Chủ Đề Sâu)</span>
+          <span>Phần 4: Giải thích thuật ngữ &amp; Khái niệm chuyên sâu (${glossaryEntries.length} chủ đề)</span>
         </h3>
         <div class="glossary-grid">
           ${cardsHtml}
@@ -974,7 +986,7 @@ function selectModule(id) {
           currentLang === "both" && advListSecondary[idx]
             ? `<div class="concept-en-sub">🇬🇧 ${formatRichText(advListSecondary[idx])}</div>`
             : "";
-        return `<li class="advanced-item">🚀 ${formatRichText(item)}${enSub}</li>`;
+        return `<li class="advanced-item">${formatRichText(item)}${enSub}</li>`;
       })
       .join("");
 
@@ -983,8 +995,8 @@ function selectModule(id) {
         <h3 class="section-title" id="heading-advanced">
           <span>${
             currentLang === "en"
-              ? `🚀 Part 5: Intermediate-to-Advanced Deep Dive (${advList.length} Topics)`
-              : `🚀 Phần 5: Kiến Thức Mở Rộng Nâng Cao & Cơ Chế Chuyên Sâu (${advList.length} Chủ Đề)`
+              ? `Part 5: Advanced Deep Dive (${advList.length} Topics)`
+              : `Phần 5: Kiến thức mở rộng &amp; Cơ chế chuyên sâu (${advList.length} chủ đề)`
           }</span>
         </h3>
         <ul class="advanced-list">
@@ -1010,7 +1022,7 @@ function selectModule(id) {
     tableSectionHtml = `
       <section class="section-block" aria-labelledby="heading-table">
         <h3 class="section-title" id="heading-table">
-          <span>📋 Phần 6: ${escapeHtml(mod.comparisonTable.title_vi)}</span>
+          <span>Phần 6: ${escapeHtml(mod.comparisonTable.title_vi)}</span>
         </h3>
         <div class="table-responsive">
           <table class="tech-table">
@@ -1026,12 +1038,12 @@ function selectModule(id) {
   let jobSkillsHtml = "";
   if (currentLang !== "en" && mod.jobSkills_vi && mod.jobSkills_vi.length > 0) {
     const itemsHtml = mod.jobSkills_vi
-      .map((skill) => `<li class="job-skill-item">🛠️ ${formatRichText(skill)}</li>`)
+      .map((skill) => `<li class="job-skill-item">${formatRichText(skill)}</li>`)
       .join("");
     jobSkillsHtml = `
       <section class="section-block" aria-labelledby="heading-job">
         <h3 class="section-title" id="heading-job">
-          <span>🛠️ Phần 7: Kinh Nghiệm Thực Chiến Khi Đi Làm Kỹ Sư Mạng</span>
+          <span>Phần 7: Kinh nghiệm thực chiến khi đi làm kỹ sư mạng</span>
         </h3>
         <ul class="job-skills-list">
           ${itemsHtml}
@@ -1064,8 +1076,8 @@ function selectModule(id) {
         <h3 class="section-title" id="heading-example">
           <span>${
             currentLang === "en"
-              ? "🧪 Step-by-Step Practical Example & Walkthrough"
-              : "🧪 Phần 8: Ví Dụ Minh Họa Thực Tế & Giải Bài Tập Từng Bước"
+              ? "Part 8: Practical Example & Step-by-Step Walkthrough"
+              : "Phần 8: Ví dụ minh họa thực tế & Lời giải chi tiết"
           }</span>
         </h3>
         <div class="example-box">
@@ -1089,8 +1101,8 @@ function selectModule(id) {
     moduleLabsHtml = `
       <section class="section-block" aria-labelledby="heading-pt-labs">
         <h3 class="section-title" id="heading-pt-labs">
-          <span>🟦 Phần 9: Thực Hành Lab Trên Cisco Packet Tracer Cho Học Phần ${mod.id} (${moduleLabs.length} Bài Lab Có Sơ Đồ &amp; Hướng Dẫn Chi Tiết)</span>
-          <button type="button" class="copy-btn" id="view-all-30-labs-btn">Xem trọn bộ 35 Lab &rarr;</button>
+          <span>Phần 9: Bài thực hành Cisco Packet Tracer (${moduleLabs.length} bài Lab)</span>
+          <button type="button" class="copy-btn" id="view-all-30-labs-btn">Xem tất cả 35 Lab &rarr;</button>
         </h3>
         <div class="pt-labs-wrapper">
           ${labCards}
@@ -1118,7 +1130,7 @@ function selectModule(id) {
             <div class="quiz-question">${formatRichText(q.question_vi)}</div>
             <div class="quiz-options">${optsHtml}</div>
             <div class="quiz-explanation" id="quiz-exp-${qIdx}">
-              <strong>💡 Giải thích đáp án chi tiết:</strong> ${formatRichText(q.explanation_vi)}
+              <strong>Giải thích chi tiết:</strong> ${formatRichText(q.explanation_vi)}
             </div>
           </div>
         `;
@@ -1128,7 +1140,7 @@ function selectModule(id) {
     quizSectionHtml = `
       <section class="section-block" aria-labelledby="heading-quiz">
         <h3 class="section-title" id="heading-quiz">
-          <span>🏆 Phần 11: Luyện Đề Thi Thực Chiến CCNA 200-301 (${mod.quiz.length} Câu Hỏi Trọng Tâm)</span>
+          <span>Phần 11: Câu hỏi trắc nghiệm ôn thi CCNA (${mod.quiz.length} câu)</span>
         </h3>
         <div class="quiz-container">
           ${quizCardsHtml}
@@ -1145,19 +1157,29 @@ function selectModule(id) {
   document.title = `Học phần ${mod.id}: ${mainTitle} — CCNA 200-301 (v1.1 & v2.0) Toàn Diện`;
   closeMobileSidebar();
 
-  const quickJumpHtml = `
-    <nav class="quick-jump-bar" aria-label="Mục lục chuyển nhanh trong bài">
-      <span class="quick-jump-label">⚡ Chuyển nhanh:</span>
-      <a href="#heading-beginner" class="quick-jump-pill">🌱 Nhập môn</a>
-      <a href="#heading-visual" class="quick-jump-pill">📸 Ảnh Thiết Bị &amp; Cổng Port</a>
-      <a href="#heading-overview" class="quick-jump-pill">📖 Lý thuyết cốt lõi</a>
-      <a href="#heading-glossary" class="quick-jump-pill">📚 Từ điển sâu</a>
-      <a href="#heading-advanced" class="quick-jump-pill">🚀 Nâng cao</a>
-      <a href="#heading-pt-labs" class="quick-jump-pill">🟦 Lab Packet Tracer</a>
-      <a href="#heading-commands" class="quick-jump-pill">💻 Lệnh CLI</a>
-      <a href="#heading-quiz" class="quick-jump-pill">🏆 Trắc nghiệm thi</a>
-    </nav>
-  `;
+  const quickJumpItems = [];
+  if (beginnerSectionHtml) quickJumpItems.push({ id: "heading-beginner", label: "Nhập môn" });
+  if (visualSectionHtml) quickJumpItems.push({ id: "heading-visual", label: "Ảnh thiết bị & Cổng" });
+  quickJumpItems.push({ id: "heading-overview", label: "Lý thuyết cốt lõi" });
+  if (glossarySectionHtml) quickJumpItems.push({ id: "heading-glossary", label: "Thuật ngữ" });
+  if (advancedSectionHtml) quickJumpItems.push({ id: "heading-advanced", label: "Kiến thức mở rộng" });
+  if (tableSectionHtml) quickJumpItems.push({ id: "heading-table", label: "Bảng so sánh" });
+  if (jobSkillsHtml) quickJumpItems.push({ id: "heading-job", label: "Kinh nghiệm thực tế" });
+  if (exampleSectionHtml) quickJumpItems.push({ id: "heading-example", label: "Ví dụ giải mẫu" });
+  if (moduleLabsHtml) quickJumpItems.push({ id: "heading-pt-labs", label: "Bài Lab" });
+  if (mod.commands && mod.commands.length > 0) quickJumpItems.push({ id: "heading-commands", label: "Lệnh CLI" });
+  if (quizSectionHtml) quickJumpItems.push({ id: "heading-quiz", label: "Trắc nghiệm ôn thi" });
+
+  const quickJumpHtml = quickJumpItems.length > 0
+    ? `
+      <nav class="quick-jump-bar" aria-label="Mục lục bài học">
+        <span class="quick-jump-label">Mục lục nhanh:</span>
+        <div class="quick-jump-links">
+          ${quickJumpItems.map((item) => `<a href="#${item.id}" class="quick-jump-pill">${escapeHtml(item.label)}</a>`).join("")}
+        </div>
+      </nav>
+    `
+    : "";
 
   const isCompleted = !!completedItems["module-" + mod.id];
   const studyActionsHtml = `
@@ -1166,7 +1188,11 @@ function selectModule(id) {
         ${isCompleted ? "✓ Đã học xong học phần này" : "○ Đánh dấu đã học xong"}
       </button>
       <button type="button" class="lesson-note-trigger-btn" id="lesson-note-btn">
-        📝 Thêm ghi chú cho học phần này
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        Ghi chú học phần
       </button>
     </div>
   `;
@@ -1189,8 +1215,8 @@ function selectModule(id) {
       <h3 class="section-title" id="heading-overview">
         <span>${
           currentLang === "en"
-            ? `📖 Part 3: Core Theory & Key Technical Concepts (${primaryConcepts.length})`
-            : `📖 Phần 3: Lý Thuyết Cốt Lõi & Kiến Thức Trọng Tâm (${primaryConcepts.length} Mục Chi Tiết)`
+            ? `Part 3: Core Theory & Key Technical Concepts (${primaryConcepts.length})`
+            : `Phần 3: Lý thuyết cốt lõi & Nguyên lý kỹ thuật (${primaryConcepts.length} nội dung trọng tâm)`
         }</span>
       </h3>
       ${overviewHtml}
@@ -1217,8 +1243,8 @@ function selectModule(id) {
       <h3 class="section-title" id="heading-commands">
         <span>${
           currentLang === "en"
-            ? "💻 Cisco IOS CLI Commands & Technical Reference"
-            : "💻 Phần 10: Tập Lệnh Thực Hành Cisco IOS CLI & Công Thức Tra Cứu"
+            ? "Part 10: Cisco IOS CLI Commands & Reference"
+            : "Phần 10: Tập lệnh thực hành Cisco IOS CLI & Tra cứu"
         }</span>
         <button type="button" class="copy-btn" id="copy-cli-btn">
           ${currentLang === "en" ? "Copy Commands" : "Sao chép lệnh"}
@@ -1618,9 +1644,17 @@ function updateNotesCountBadges() {
   }
 }
 
+let currentNotesActivePanel = "current";
+
 function openNotesModal(targetPanel = "current") {
   if (!notesModal) return;
+  const isAlreadyOpen = !notesModal.hidden;
+  if (isAlreadyOpen && currentNotesActivePanel === targetPanel) {
+    closeNotesModal();
+    return;
+  }
   notesModal.hidden = false;
+  document.body.classList.add("notes-sidebar-open");
   switchNotesPanel(targetPanel);
   loadCurrentNoteIntoEditor();
   renderAllNotesList();
@@ -1630,9 +1664,11 @@ function openNotesModal(targetPanel = "current") {
 function closeNotesModal() {
   if (!notesModal) return;
   notesModal.hidden = true;
+  document.body.classList.remove("notes-sidebar-open");
 }
 
 function switchNotesPanel(panelName) {
+  currentNotesActivePanel = panelName;
   const panels = { current: panelCurrent, all: panelAll, sync: panelSync };
   const buttons = { current: noteTabCurrentBtn, all: noteTabAllBtn, sync: noteTabSyncBtn };
 
@@ -1668,7 +1704,7 @@ function loadCurrentNoteIntoEditor() {
   });
 
   if (noteSaveStatusText) {
-    noteSaveStatusText.textContent = "⚡ Tự động lưu tức thì";
+    noteSaveStatusText.textContent = "Tự động lưu & đẩy đám mây";
   }
 }
 
@@ -1705,7 +1741,7 @@ function saveCurrentNote(isManual = false) {
   updateNotesCountBadges();
 
   if (noteSaveStatusText) {
-    noteSaveStatusText.textContent = isManual ? "✅ Đã lưu thủ công!" : "⚡ Đã tự động lưu";
+    noteSaveStatusText.textContent = "Đang đồng bộ đám mây...";
   }
   if (noteSaveTimestamp) {
     const d = new Date();
@@ -1906,12 +1942,12 @@ function triggerAutoSync() {
   if (cloudSyncDebounceTimer) clearTimeout(cloudSyncDebounceTimer);
   cloudSyncDebounceTimer = setTimeout(() => {
     pushNotesToCloud();
-  }, 1200);
+  }, 700);
 }
 
 async function pushNotesToCloud() {
   if (!cloudSyncKey) return;
-  setCloudSyncStatus("syncing", "Đang lưu đám mây...");
+  setCloudSyncStatus("syncing", "Đang đồng bộ...");
 
   const payload = {
     name: "ccna-study-notes",
@@ -1950,9 +1986,15 @@ async function pushNotesToCloud() {
       }
     }
 
-    setCloudSyncStatus("synced", "Đã lưu đám mây");
+    setCloudSyncStatus("synced", "Đã đồng bộ");
+    if (noteSaveStatusText) {
+      noteSaveStatusText.textContent = "Đã lưu & đồng bộ cloud";
+    }
   } catch {
     setCloudSyncStatus("synced", "Đã lưu (Cục bộ)");
+    if (noteSaveStatusText) {
+      noteSaveStatusText.textContent = "Đã lưu (Cục bộ)";
+    }
   }
 }
 
@@ -2075,11 +2117,11 @@ function initNotesSystem() {
   if (notesBackdrop) notesBackdrop.addEventListener("click", closeNotesModal);
 
   const onNoteInputChange = () => {
-    if (noteSaveStatusText) noteSaveStatusText.textContent = "✍️ Đang nhập...";
+    if (noteSaveStatusText) noteSaveStatusText.textContent = "Đang lưu...";
     if (noteSaveDebounceTimer) clearTimeout(noteSaveDebounceTimer);
     noteSaveDebounceTimer = setTimeout(() => {
       saveCurrentNote();
-    }, 450);
+    }, 350);
   };
 
   if (noteTitleInput) noteTitleInput.addEventListener("input", onNoteInputChange);
