@@ -5,7 +5,6 @@
 
 // --------------------------------------------------------------------------
 // 1. DATA: BỘ TỪ ĐIỂN LỆNH CISCO IOS CHUYÊN SÂU (PRODUCTION & CCNA READY)
-// Mỗi lệnh bao gồm: Trường hợp dùng, Tại sao/Công dụng, Điều kiện, Ví dụ & Lệnh kiểm tra
 // --------------------------------------------------------------------------
 const CCNA_CHEAT_SHEET_DATA = [
   // ==================== A. CĂN BẢN & QUẢN TRỊ THIẾT BỊ ====================
@@ -121,7 +120,7 @@ const CCNA_CHEAT_SHEET_DATA = [
     categoryName: "VLAN & Trunking",
     title: "Cấu hình đường trung kế Trunk 802.1Q nối Switch-to-Switch",
     mode: "Switch(config-if)#",
-    cmd: "interface <UPLINK_INT>\n switchport trunk encapsulation dot1q (áp dụng Catalyst cũ)\n switchport mode trunk\n switchport trunk native vlan <NATIVE_VLAN_ID>",
+    cmd: "interface <UPLINK_INT>\n switchport trunk encapsulation dot1q\n switchport mode trunk\n switchport trunk native vlan <NATIVE_VLAN_ID>",
     scenario: "Đường dây cáp nối giữa Switch Access lên Switch Core hoặc nối Switch lên Router.",
     why: "Cho phép lưu lượng của hàng chục VLAN khác nhau cùng đi qua một sợi cáp vật lý duy nhất nhờ gắn nhãn thẻ 4-byte 802.1Q Tag. Đổi Native VLAN khác VLAN 1 để phòng chống tấn công VLAN Hopping (Double-Tagging).",
     prereq: "Cả hai đầu Switch nối với nhau phải đồng nhất Native VLAN và chuẩn encapsulation dot1Q.",
@@ -138,7 +137,7 @@ const CCNA_CHEAT_SHEET_DATA = [
     scenario: "Tối ưu hóa băng thông đường truyền giữa các Switch và tăng tính bảo mật cho hệ thống phân tán.",
     why: "Mặc định Cisco cho phép TẤT CẢ VLAN (1-4094) đi qua Trunk. Nếu một VLAN có bão Broadcast, nó sẽ tràn sang toàn bộ các Switch khác. Chỉ cho phép đúng các VLAN cần thiết đi qua.",
     prereq: "Cổng giao tiếp đã được cấu hình chế độ Trunk (`switchport mode trunk`).",
-    example: "Switch(config-if)# switchport trunk allowed vlan 10,20,99\n! Khi muốn thêm VLAN mới mà không ghi đè:\nSwitch(config-if)# switchport trunk allowed vlan add 30",
+    example: "Switch(config-if)# switchport trunk allowed vlan 10,20,99\nSwitch(config-if)# switchport trunk allowed vlan add 30",
     verify: "show interfaces trunk (Cột 'Vlans allowed on trunk' chỉ hiển thị 10,20,30,99)."
   },
   {
@@ -175,11 +174,11 @@ const CCNA_CHEAT_SHEET_DATA = [
     categoryName: "STP & EtherChannel",
     title: "Chỉ định Switch làm Root Bridge (Gốc cây Spanning Tree)",
     mode: "Switch(config)#",
-    cmd: "spanning-tree vlan <VLAN_ID> priority <4096_BOI_SO>\n(Hoặc: spanning-tree vlan <ID> root primary)",
+    cmd: "spanning-tree vlan <VLAN_ID> priority <4096_BOI_SO>",
     scenario: "Trong mô hình mạng phân tầng (Core - Distribution - Access), Switch Core mạnh nhất phải luôn là Root Bridge.",
     why: "Nếu không cấu hình, một Switch Access rẻ tiền có thể vô tình trở thành Root Bridge (do MAC nhỏ hơn), dẫn đến lưu lượng toàn công ty bị thắt cổ chai chạy vòng vèo qua switch yếu.",
     prereq: "Chỉ số Priority phải là bội số của 4096 (0, 4096, 8192, 12288, 16384, ...). Mặc định là 32768.",
-    example: "Core-SW01(config)# spanning-tree vlan 1-100 priority 4096\nDist-SW02(config)# spanning-tree vlan 1-100 priority 8192  ! (Làm Root phụ dự phòng)",
+    example: "Core-SW01(config)# spanning-tree vlan 1-100 priority 4096\nDist-SW02(config)# spanning-tree vlan 1-100 priority 8192",
     verify: "show spanning-tree vlan 10 (Hiển thị: 'This bridge is the root')."
   },
   {
@@ -188,12 +187,12 @@ const CCNA_CHEAT_SHEET_DATA = [
     categoryName: "STP & EtherChannel",
     title: "Cấu hình STP PortFast và BPDU Guard trên cổng cắm máy trạm",
     mode: "Switch(config-if)#",
-    cmd: "spanning-tree portfast\nspanning-tree bpduguard enable\n(Hoặc bật toàn cục: spanning-tree portfast default)",
+    cmd: "spanning-tree portfast\nspanning-tree bpduguard enable",
     scenario: "Bắt buộc trên mọi cổng Access nối tới End Devices (PC, Server, Printer, Camera).",
     why: "PortFast bỏ qua giai đoạn Listening & Learning, chuyển ngay sang Forwarding để máy trạm nhận IP DHCP ngay mà không bị timeout. BPDU Guard sẽ lập tức ngắt cổng (err-disable) nếu ai đó cắm lậu 1 con Switch lạ vào cổng này.",
     prereq: "TUYỆT ĐỐI KHÔNG bật PortFast trên cổng nối giữa Switch với Switch hoặc Router (sẽ gây loop sập mạng).",
     example: "Switch(config)# interface range FastEthernet 0/1 - 48\nSwitch(config-if-range)# switchport mode access\nSwitch(config-if-range)# spanning-tree portfast\nSwitch(config-if-range)# spanning-tree bpduguard enable",
-    verify: "show running-config interface f0/1\nshow interfaces status err-disabled (Kiểm tra cổng có bị khóa do vi phạm BPDU không)."
+    verify: "show running-config interface f0/1\nshow interfaces status err-disabled"
   },
   {
     id: "cli-stp-lacp-l2",
@@ -202,24 +201,11 @@ const CCNA_CHEAT_SHEET_DATA = [
     title: "Gom kênh băng thông Layer 2 EtherChannel qua chuẩn LACP (802.3ad)",
     mode: "Switch(config-if)#",
     cmd: "interface range <INT_RANGE>\n channel-group <ID> mode active\ninterface port-channel <ID>\n switchport mode trunk",
-    scenario: "Cần tăng băng thông uplink giữa Switch Access lên Switch Core (ví dụ gộp 2 hoặc 4 cổng 1Gbps thành 2Gbps/4Gbps) và tạo đường dự phòng không bị STP block.",
+    scenario: "Cần tăng băng thông uplink giữa Switch Access lên Switch Core và tạo đường dự phòng không bị STP block.",
     why: "Nếu nối 2 dây giữa 2 Switch, STP sẽ khóa 1 dây để chống loop. EtherChannel gom nhiều đường vật lý thành 1 đường logic duy nhất (Port-Channel), vừa nhân đôi băng thông vừa cân bằng tải.",
     prereq: "Tất cả các cổng tham gia nhóm phải giống hệt nhau về: Tốc độ (Speed), Duplex, VLAN, và trạng thái Trunk.",
-    example: "Switch-A(config)# interface range GigabitEthernet 0/1 - 2\nSwitch-A(config-if-range)# channel-group 1 mode active\nSwitch-A(config-if-range)# exit\nSwitch-A(config)# interface port-channel 1\nSwitch-A(config-if)# switchport mode trunk\nSwitch-A(config-if)# switchport trunk allowed vlan 10,20,30\n\n! Switch đối diện (Switch-B):\nSwitch-B(config)# interface range GigabitEthernet 0/1 - 2\nSwitch-B(config-if-range)# channel-group 1 mode active\nSwitch-B(config-if-range)# exit\nSwitch-B(config)# interface port-channel 1\nSwitch-B(config-if)# switchport mode trunk",
+    example: "Switch-A(config)# interface range GigabitEthernet 0/1 - 2\nSwitch-A(config-if-range)# channel-group 1 mode active\nSwitch-A(config-if-range)# exit\nSwitch-A(config)# interface port-channel 1\nSwitch-A(config-if)# switchport mode trunk",
     verify: "show etherchannel summary (Kiểm tra cờ 'SU' = Layer2 In Use, và các cổng có cờ 'P' = Bundled in port-channel)."
-  },
-  {
-    id: "cli-stp-lacp-l3",
-    category: "stp",
-    categoryName: "STP & EtherChannel",
-    title: "Cấu hình Routed Layer 3 EtherChannel (Gom kênh định tuyến có IP)",
-    mode: "Switch(config-if)#",
-    cmd: "interface range <INT_RANGE>\n no switchport\n channel-group <ID> mode active\ninterface port-channel <ID>\n no switchport\n ip address <IP> <MASK>",
-    scenario: "Kết nối băng thông lớn giữa 2 Switch Core Layer 3 trong mạng doanh nghiệp chạy OSPF.",
-    why: "Không chạy Spanning Tree ở Layer 2, biến đường gom thành cổng định tuyến Tầng 3 trực tiếp, hội tụ định tuyến siêu nhanh và ổn định.",
-    prereq: "Thiết bị là Multilayer Switch có hỗ trợ tính năng `ip routing` và lệnh `no switchport`.",
-    example: "Core1(config)# ip routing\nCore1(config)# interface range g0/1 - 2\nCore1(config-if-range)# no switchport\nCore1(config-if-range)# channel-group 10 mode active\nCore1(config-if-range)# exit\nCore1(config)# interface port-channel 10\nCore1(config-if)# no switchport\nCore1(config-if)# ip address 10.0.0.1 255.255.255.252",
-    verify: "show etherchannel summary (Kiểm tra cờ 'RU' = Layer3 In Use, và ping thông sang IP đầu bên kia)."
   },
 
   // ==================== D. ĐỊNH TUYẾN TẦNG 3 & OSPF ====================
@@ -233,8 +219,8 @@ const CCNA_CHEAT_SHEET_DATA = [
     scenario: "Triển khai định tuyến giữa các VLAN (Inter-VLAN Routing) tốc độ cao phần cứng (Wire-speed) trên Core Switch.",
     why: "Nhanh hơn gấp nhiều lần giải pháp Router-on-a-Stick truyền thống vì việc chuyển mạch và định tuyến gói tin được xử lý hoàn toàn bằng chip ASIC phần cứng.",
     prereq: "Bắt buộc phải gõ lệnh `ip routing` ở Global Config để Switch kích hoạt chức năng Router.",
-    example: "CoreSW(config)# ip routing\nCoreSW(config)# interface vlan 10\nCoreSW(config-if)# description Gateway-Phong-Ke-Toan\nCoreSW(config-if)# ip address 192.168.10.1 255.255.255.0\nCoreSW(config-if)# no shutdown\nCoreSW(config)# interface vlan 20\nCoreSW(config-if)# description Gateway-Phong-Ky-Thuat\nCoreSW(config-if)# ip address 192.168.20.1 255.255.255.0\nCoreSW(config-if)# no shutdown",
-    verify: "show ip interface brief (Kiểm tra Vlan10, Vlan20 trạng thái Status: Up, Protocol: Up)\nshow ip route (Xem các mạng directly connected C)."
+    example: "CoreSW(config)# ip routing\nCoreSW(config)# interface vlan 10\nCoreSW(config-if)# description Gateway-Phong-Ke-Toan\nCoreSW(config-if)# ip address 192.168.10.1 255.255.255.0\nCoreSW(config-if)# no shutdown",
+    verify: "show ip interface brief (Kiểm tra Vlan10 Status: Up, Protocol: Up)\nshow ip route (Xem các mạng directly connected C)."
   },
   {
     id: "cli-routing-roas",
@@ -246,8 +232,8 @@ const CCNA_CHEAT_SHEET_DATA = [
     scenario: "Khi công ty dùng Switch Layer 2 thuần túy (không hỗ trợ định tuyến) và có một Router trung tâm.",
     why: "Cho phép 1 cổng vật lý duy nhất của Router có thể đóng vai trò làm Default Gateway cho nhiều VLAN khác nhau thông qua các cổng phụ luận lý (Sub-interfaces).",
     prereq: "Cổng vật lý chính của Router phải bật (`no shutdown`) và cổng Switch nối lên Router phải là cổng Trunk.",
-    example: "Router(config)# interface GigabitEthernet 0/0/0\nRouter(config-if)# no shutdown\nRouter(config-if)# exit\nRouter(config)# interface GigabitEthernet 0/0/0.10\nRouter(config-subif)# encapsulation dot1Q 10\nRouter(config-subif)# ip address 192.168.10.1 255.255.255.0\nRouter(config-subif)# interface GigabitEthernet 0/0/0.20\nRouter(config-subif)# encapsulation dot1Q 20\nRouter(config-subif)# ip address 192.168.20.1 255.255.255.0",
-    verify: "show ip route (Thấy các mạng 192.168.10.0 và 20.0 xuất hiện dạng Connected trên cổng phụ g0/0/0.10 và g0/0/0.20)."
+    example: "Router(config)# interface GigabitEthernet 0/0/0\nRouter(config-if)# no shutdown\nRouter(config-if)# exit\nRouter(config)# interface GigabitEthernet 0/0/0.10\nRouter(config-subif)# encapsulation dot1Q 10\nRouter(config-subif)# ip address 192.168.10.1 255.255.255.0",
+    verify: "show ip route (Thấy các mạng 192.168.10.0 xuất hiện dạng Connected trên g0/0/0.10)."
   },
   {
     id: "cli-routing-static",
@@ -272,7 +258,7 @@ const CCNA_CHEAT_SHEET_DATA = [
     scenario: "Hạ tầng mạng từ vừa đến lớn gồm nhiều Router và Switch Layer 3 cần tự động trao đổi và cập nhật bảng định tuyến.",
     why: "OSPF là giao thức chuẩn mở (Link-State), hội tụ nhanh, không bị loop nhờ giải thuật Dijkstra SPF, chia Area giảm tải CPU. Đặt Router-ID thủ công để tránh tranh chấp; đặt passive-interface để không bắn gói tin Hello lãng phí ra mạng cắm máy tính người dùng.",
     prereq: "Tính toán đúng Wildcard Mask (Lấy 255.255.255.255 trừ Subnet Mask. Ví dụ /24 là 0.0.0.255).",
-    example: "R1(config)# router ospf 1\nR1(config-router)# router-id 1.1.1.1\nR1(config-router)# network 10.1.1.0 0.0.0.3 area 0\nR1(config-router)# network 192.168.10.0 0.0.0.255 area 0\nR1(config-router)# passive-interface GigabitEthernet 0/0/1\nR1(config-router)# auto-cost reference-bandwidth 1000",
+    example: "R1(config)# router ospf 1\nR1(config-router)# router-id 1.1.1.1\nR1(config-router)# network 10.1.1.0 0.0.0.3 area 0\nR1(config-router)# network 192.168.10.0 0.0.0.255 area 0\nR1(config-router)# passive-interface GigabitEthernet 0/0/1",
     verify: "show ip ospf neighbor (Trạng thái láng giềng phải đạt FULL/DR hoặc FULL/BDR)\nshow ip route ospf (Xem các route ký hiệu 'O')."
   },
   {
@@ -286,20 +272,7 @@ const CCNA_CHEAT_SHEET_DATA = [
     why: "Giúp các Router nhánh bên trong không cần phải cấu hình Default Route thủ công bằng tay. Mọi thay đổi ở Router biên sẽ được đồng bộ tự động qua OSPF Type-5 LSA (O*E2).",
     prereq: "Router biên phải có sẵn một Default Route đang hoạt động (trừ khi dùng thêm từ khóa `always`).",
     example: "Edge-Router(config)# ip route 0.0.0.0 0.0.0.0 203.0.113.1\nEdge-Router(config)# router ospf 1\nEdge-Router(config-router)# default-information originate",
-    verify: "Đứng trên Router nội bộ gõ: show ip route | include 0.0.0.0\n(Thấy tuyến: O*E2 0.0.0.0/0 [110/1] via Edge-Router-IP)."
-  },
-  {
-    id: "cli-routing-hsrp",
-    category: "routing",
-    categoryName: "Định Tuyến & OSPF",
-    title: "Cấu hình dự phòng Gateway FHRP bằng giao thức Cisco HSRP",
-    mode: "Router(config-if)#",
-    cmd: "standby <GROUP> ip <VIRTUAL_GW_IP>\nstandby <GROUP> priority <PRIORITY_VAL>\nstandby <GROUP> preempt",
-    scenario: "Hệ thống có 2 Router hoặc 2 Switch Core chạy song song làm Default Gateway cho người dùng.",
-    why: "Máy tính PC chỉ cấu hình được 1 IP Default Gateway duy nhất. HSRP tạo ra 1 IP và MAC ảo (Virtual Gateway). Khi Router chính chết, Router phụ lập tức tiếp quản địa chỉ ảo đó trong vòng mili-giây mà người dùng không bị mất mạng.",
-    prereq: "Cả 2 Router phải nằm chung phân đoạn mạng LAN và thống nhất cùng Virtual IP và Group ID.",
-    example: "! Router 1 (Active Gateway chính):\nR1(config)# interface g0/0/1\nR1(config-if)# ip address 192.168.1.2 255.255.255.0\nR1(config-if)# standby 1 ip 192.168.1.1\nR1(config-if)# standby 1 priority 110\nR1(config-if)# standby 1 preempt\n\n! Router 2 (Standby Gateway phụ):\nR2(config)# interface g0/0/1\nR2(config-if)# ip address 192.168.1.3 255.255.255.0\nR2(config-if)# standby 1 ip 192.168.1.1\nR2(config-if)# standby 1 priority 90",
-    verify: "show standby brief (Thấy R1 trạng thái 'Active', R2 trạng thái 'Standby', Virtual IP là 192.168.1.1)."
+    verify: "show ip route | include 0.0.0.0 (Thấy tuyến O*E2 trên các router bên trong)."
   },
 
   // ==================== E. DỊCH VỤ MẠNG & AN NINH IP ====================
@@ -309,12 +282,12 @@ const CCNA_CHEAT_SHEET_DATA = [
     categoryName: "Dịch Vụ IP (DHCP/NAT/NTP)",
     title: "Cấu hình dịch vụ DHCP Server cấp phát IP tự động",
     mode: "Router(config)#",
-    cmd: "ip dhcp excluded-address <LOW_IP> [HIGH_IP]\nip dhcp pool <POOL_NAME>\n network <NET_ID> <MASK>\n default-router <GW_IP>\n dns-server <DNS_IP>\n domain-name <DOMAIN>\n lease <DAYS> [HOURS]",
+    cmd: "ip dhcp excluded-address <LOW_IP> [HIGH_IP]\nip dhcp pool <POOL_NAME>\n network <NET_ID> <MASK>\n default-router <GW_IP>\n dns-server <DNS_IP>",
     scenario: "Cấp địa chỉ IP động cho hàng trăm máy tính, điện thoại, thiết bị IoT trong văn phòng.",
     why: "Tiết kiệm thời gian cấu hình thủ công từng máy, tránh xung đột IP. Cần loại trừ (excluded) dải IP tĩnh dùng cho Router Gateway, Switch, Máy chủ và Máy in.",
     prereq: "Xác định rõ dải IP mạng, IP Gateway và danh sách DNS Server (như 8.8.8.8, 1.1.1.1).",
-    example: "Router(config)# ip dhcp excluded-address 192.168.10.1 192.168.10.30\nRouter(config)# ip dhcp pool LAN_OFFICE\nRouter(dhcp-config)# network 192.168.10.0 255.255.255.0\nRouter(dhcp-config)# default-router 192.168.10.1\nRouter(dhcp-config)# dns-server 8.8.8.8 1.1.1.1\nRouter(dhcp-config)# domain-name cisco.com\nRouter(dhcp-config)# lease 7",
-    verify: "show ip dhcp binding (Xem danh sách các IP đã được cấp cho MAC nào)\nshow ip dhcp pool (Xem số lượng IP còn trống)."
+    example: "Router(config)# ip dhcp excluded-address 192.168.10.1 192.168.10.30\nRouter(config)# ip dhcp pool LAN_OFFICE\nRouter(dhcp-config)# network 192.168.10.0 255.255.255.0\nRouter(dhcp-config)# default-router 192.168.10.1\nRouter(dhcp-config)# dns-server 8.8.8.8 1.1.1.1",
+    verify: "show ip dhcp binding (Xem danh sách các IP đã được cấp cho MAC nào)."
   },
   {
     id: "cli-services-helper",
@@ -340,20 +313,7 @@ const CCNA_CHEAT_SHEET_DATA = [
     why: "Địa chỉ IPv4 công cộng cạn kiệt và đắt đỏ. PAT ánh xạ địa chỉ IP nguồn và số cổng Port Layer 4 (Port Number) để phân biệt các phiên kết nối của từng máy tính.",
     prereq: "Phải gắn chính xác nhãn `ip nat inside` trên cổng mạng nội bộ và `ip nat outside` trên cổng quay ra Internet.",
     example: "Router(config)# access-list 1 permit 192.168.0.0 0.0.255.255\nRouter(config)# ip nat inside source list 1 interface GigabitEthernet 0/0/0 overload\nRouter(config)# interface GigabitEthernet 0/0/1\nRouter(config-if)# ip nat inside\nRouter(config)# interface GigabitEthernet 0/0/0\nRouter(config-if)# ip nat outside",
-    verify: "show ip nat translations (Xem bảng chuyển dịch IP và Port)\nshow ip nat statistics (Xem tỷ lệ trúng/trượt NAT)."
-  },
-  {
-    id: "cli-services-static-nat",
-    category: "services",
-    categoryName: "Dịch Vụ IP (DHCP/NAT/NTP)",
-    title: "Cấu hình Static NAT 1-1 (Public máy chủ nội bộ ra ngoài Internet)",
-    mode: "Router(config)#",
-    cmd: "ip nat inside source static <PRIVATE_IP> <PUBLIC_IP>\ninterface <LAN_INT>\n ip nat inside\ninterface <WAN_INT>\n ip nat outside",
-    scenario: "Khi doanh nghiệp đặt Web Server, Mail Server hoặc VPN Gateway trong mạng nội bộ và cần người dùng toàn cầu truy cập được.",
-    why: "Tạo liên kết tĩnh vĩnh viễn 1-1 giữa địa chỉ IP Private và 1 địa chỉ IP Public cố định.",
-    prereq: "Phải sở hữu IP Public tĩnh từ nhà mạng ISP và khai báo đúng inside/outside interface.",
-    example: "Router(config)# ip nat inside source static 192.168.10.80 203.0.113.80\nRouter(config)# interface g0/0/1\nRouter(config-if)# ip nat inside\nRouter(config)# interface g0/0/0\nRouter(config-if)# ip nat outside",
-    verify: "show ip nat translations (Thấy dòng ánh xạ cố định Static giữa 192.168.10.80 và 203.0.113.80)."
+    verify: "show ip nat translations (Xem bảng chuyển dịch IP và Port)\nshow ip nat statistics."
   },
   {
     id: "cli-services-ntp",
@@ -363,10 +323,10 @@ const CCNA_CHEAT_SHEET_DATA = [
     mode: "Router(config)#",
     cmd: "ntp server <IP_OR_FQDN>\nclock timezone <ZONE_NAME> <OFFSET_HOURS>",
     scenario: "Cấu hình bắt buộc trên toàn bộ hệ thống mạng của mọi công ty.",
-    why: "Khi điều tra sự cố an ninh mạng hoặc đọc nhật ký Syslog, thời gian trên các thiết bị phải khớp đến từng mili-giây. Nếu lệch giờ, chứng chỉ số SSL/TLS sẽ báo lỗi và không thể đối chiếu log tấn công.",
+    why: "Khi điều tra sự cố an ninh mạng hoặc đối chiếu nhật ký Syslog, thời gian trên các thiết bị phải khớp đến từng mili-giây. Nếu lệch giờ, chứng chỉ số SSL/TLS sẽ báo lỗi và không thể đối chiếu log tấn công.",
     prereq: "Thiết bị có thể kết nối Internet tới NTP Server hoặc có máy chủ NTP nội bộ (UDP port 123).",
-    example: "Router(config)# clock timezone ICT 7 0\nRouter(config)# ntp server 216.239.35.0\nRouter(config)# ntp server pool.ntp.org",
-    verify: "show ntp status (Kiểm tra dòng 'Clock is synchronized', stratum level)\nshow clock (Kiểm tra giờ hiện tại đã đúng múi giờ chưa)."
+    example: "Router(config)# clock timezone ICT 7 0\nRouter(config)# ntp server pool.ntp.org",
+    verify: "show ntp status (Kiểm tra dòng 'Clock is synchronized', stratum level)\nshow clock."
   },
 
   // ==================== F. AN NINH MẠNG, ACL & BẢO MẬT CỔNG ====================
@@ -381,20 +341,7 @@ const CCNA_CHEAT_SHEET_DATA = [
     why: "Ngăn chặn kẻ gian rút dây mạng máy in/camera để cắm laptop lạ vào hack hệ thống. Tùy chọn `sticky` giúp Switch tự động học và lưu địa chỉ MAC của thiết bị hợp lệ; nếu phát hiện MAC lạ sẽ lập tức sập cổng (shutdown) đưa về trạng thái err-disabled.",
     prereq: "Cổng phải ở chế độ Access cố định (`switchport mode access`), không hỗ trợ trên cổng Dynamic Trunk.",
     example: "Switch(config)# interface FastEthernet 0/5\nSwitch(config-if)# switchport mode access\nSwitch(config-if)# switchport port-security\nSwitch(config-if)# switchport port-security maximum 1\nSwitch(config-if)# switchport port-security mac-address sticky\nSwitch(config-if)# switchport port-security violation shutdown",
-    verify: "show port-security interface f0/5 (Port Security: Enabled, Violation Mode: Shutdown)\nshow port-security address (Xem các địa chỉ MAC đã học sticky)."
-  },
-  {
-    id: "cli-sec-std-acl",
-    category: "security",
-    categoryName: "Bảo Mật & ACL",
-    title: "Cấu hình Standard ACL (Lọc lưu lượng theo địa chỉ IP nguồn)",
-    mode: "Router(config)#",
-    cmd: "access-list <1-99> [permit | deny] <SRC_IP> <WILDCARD>\ninterface <INT>\n ip access-group <1-99> [in | out]",
-    scenario: "Chặn toàn bộ một dải mạng phòng ban không được đi tới một phân vùng mạng khác.",
-    why: "Standard ACL là bộ lọc đơn giản, tiêu tốn cực ít tài nguyên CPU. Quy tắc vàng của Cisco: 'Đặt Standard ACL CÀNG GẦN ĐÍCH CÀNG TỐT' (vì chỉ lọc IP nguồn, đặt gần nguồn sẽ chặn nhầm cả các dịch vụ hợp lệ khác).",
-    prereq: "Cuối mỗi ACL luôn có luật ngầm định `deny ip any any` (chặn tất cả những gì không được phép).",
-    example: "! Chặn dải 192.168.10.0/24 truy cập phòng Server (10.0.0.0/24):\nRouter(config)# access-list 10 deny 192.168.10.0 0.0.0.255\nRouter(config)# access-list 10 permit any\nRouter(config)# interface GigabitEthernet 0/0/2\nRouter(config-if)# ip access-group 10 out",
-    verify: "show access-lists 10 (Kiểm tra các dòng lệnh và số đếm gói tin matches)."
+    verify: "show port-security interface f0/5 (Port Security: Enabled, Violation Mode: Shutdown)\nshow port-security address."
   },
   {
     id: "cli-sec-ext-acl",
@@ -404,23 +351,10 @@ const CCNA_CHEAT_SHEET_DATA = [
     mode: "Router(config)#",
     cmd: "ip access-list extended <TEN_ACL>\n [permit | deny] <PROTOCOL> <SRC_NET> <SRC_WILD> [eq <PORT>] <DST_NET> <DST_WILD> [eq <PORT>]\ninterface <INT>\n ip access-group <TEN_ACL> [in | out]",
     scenario: "Kiểm soát chi tiết: Cho phép nhân viên lướt Web (HTTP/HTTPS) và DNS nhưng cấm tuyệt đối SSH/Telnet và Ping (ICMP) vào máy chủ.",
-    why: "Extended ACL cho phép kiểm tra cả Layer 3 (IP nguồn/đích) và Layer 4 (TCP/UDP Port). Quy tắc vàng của Cisco: 'Đặt Extended ACL CÀNG GẦN NGUỒN CÀNG TỐT' để loại bỏ gói tin rác ngay lập tức trước khi nó chiếm băng thông đường truyền.",
+    why: "Extended ACL cho phép kiểm tra cả Layer 3 (IP nguồn/đích) và Layer 4 (TCP/UDP Port). Đặt Extended ACL càng gần nguồn càng tốt để loại bỏ gói tin rác ngay lập tức trước khi nó chiếm băng thông đường truyền.",
     prereq: "Nắm vững danh sách Well-Known Ports: TCP 80 (HTTP), TCP 443 (HTTPS), TCP 22 (SSH), TCP 23 (Telnet), UDP 53 (DNS).",
-    example: "Router(config)# ip access-list extended SECURE_FIREWALL\nRouter(config-ext-nacl)# remark Cho phep truy cap Web va DNS\nRouter(config-ext-nacl)# permit tcp 192.168.1.0 0.0.0.255 any eq 80\nRouter(config-ext-nacl)# permit tcp 192.168.1.0 0.0.0.255 any eq 443\nRouter(config-ext-nacl)# permit udp 192.168.1.0 0.0.0.255 any eq 53\nRouter(config-ext-nacl)# remark Chan toan bo ket noi Telnet va SSH ra ngoai\nRouter(config-ext-nacl)# deny tcp any any eq 23\nRouter(config-ext-nacl)# deny tcp any any eq 22\nRouter(config-ext-nacl)# permit ip any any\nRouter(config-ext-nacl)# exit\nRouter(config)# interface GigabitEthernet 0/0/1\nRouter(config-if)# ip access-group SECURE_FIREWALL in",
-    verify: "show ip access-lists SECURE_FIREWALL (Xem số lượng gói tin bị chặn và cho phép)."
-  },
-  {
-    id: "cli-sec-dhcp-snoop",
-    category: "security",
-    categoryName: "Bảo Mật & ACL",
-    title: "Cấu hình DHCP Snooping chống máy chủ DHCP giả mạo (Rogue DHCP)",
-    mode: "Switch(config)#",
-    cmd: "ip dhcp snooping\nip dhcp snooping vlan <VLAN_LIST>\ninterface <UPLINK_INT>\n ip dhcp snooping trust",
-    scenario: "Phòng chống kẻ tấn công cắm 1 cục phát Wi-Fi hoặc máy tính giả làm DHCP Server để cấp Gateway giả, thực hiện tấn công Man-in-the-Middle (MITM).",
-    why: "DHCP Snooping phân loại các cổng của Switch thành Trust (Tin cậy) và Untrust (Không tin cậy). Chỉ cổng Uplink nối lên Server/Router mới được gán 'Trust', mọi gói tin DHCP Offer/ACK từ cổng Untrust của người dùng sẽ bị Switch drop ngay lập tức.",
-    prereq: "Bật tính năng toàn cục trước, sau đó bật trên từng VLAN cụ thể.",
-    example: "Switch(config)# ip dhcp snooping\nSwitch(config)# ip dhcp snooping vlan 10,20\nSwitch(config)# interface GigabitEthernet 0/1\nSwitch(config-if)# ip dhcp snooping trust",
-    verify: "show ip dhcp snooping (Xem danh sách VLAN kích hoạt và cổng Trusted)\nshow ip dhcp snooping binding (Xem bảng ánh xạ MAC-IP hợp lệ)."
+    example: "Router(config)# ip access-list extended SECURE_FW\nRouter(config-ext-nacl)# permit tcp 192.168.1.0 0.0.0.255 any eq 80\nRouter(config-ext-nacl)# permit tcp 192.168.1.0 0.0.0.255 any eq 443\nRouter(config-ext-nacl)# deny tcp any any eq 23\nRouter(config-ext-nacl)# permit ip any any\nRouter(config)# interface GigabitEthernet 0/0/1\nRouter(config-if)# ip access-group SECURE_FW in",
+    verify: "show ip access-lists SECURE_FW (Xem số lượng gói tin matches)."
   },
 
   // ==================== G. CẤU HÌNH IPV6 ====================
@@ -435,20 +369,7 @@ const CCNA_CHEAT_SHEET_DATA = [
     why: "Mặc định Router Cisco TẮT chức năng chuyển tiếp gói tin IPv6. Phải gõ `ipv6 unicast-routing`. Việc gán Link-Local tĩnh dễ nhớ (như fe80::1) giúp cấu hình Next-hop và OSPFv3 gọn gàng, trực quan.",
     prereq: "Nắm vững quy tắc rút gọn địa chỉ IPv6 (bỏ số 0 đứng đầu, thay dãy số 0 liên tiếp bằng dấu hai chấm kép `::`).",
     example: "Router(config)# ipv6 unicast-routing\nRouter(config)# interface GigabitEthernet 0/0/0\nRouter(config-if)# ipv6 address 2001:db8:acad:1::1/64\nRouter(config-if)# ipv6 address fe80::1 link-local\nRouter(config-if)# no shutdown",
-    verify: "show ipv6 interface brief (Kiểm tra địa chỉ Global và Link-Local của cổng)\nshow ipv6 route (Xem bảng định tuyến IPv6)."
-  },
-  {
-    id: "cli-ipv6-ospfv3",
-    category: "ipv6",
-    categoryName: "IPv6 Toàn Diện",
-    title: "Cấu hình giao thức định tuyến OSPFv3 cho mạng IPv6",
-    mode: "Router(config)#",
-    cmd: "ipv6 router ospf <PROCESS_ID>\n router-id <IPV4_FORMAT_ID>\ninterface <INT>\n ipv6 ospf <PROCESS_ID> area <AREA_ID>",
-    scenario: "Định tuyến động các mạng IPv6 nội bộ thay thế OSPFv2.",
-    why: "Khác với OSPFv2 khai báo bằng câu lệnh `network` ở chế độ Router, OSPFv3 được bật TRỰC TIẾP trên từng Interface cụ thể. OSPFv3 bắt buộc phải cấu hình Router-ID theo định dạng 32-bit (dạng giống IPv4 A.B.C.D).",
-    prereq: "Lệnh `ipv6 unicast-routing` đã được bật toàn cục.",
-    example: "Router(config)# ipv6 router ospf 10\nRouter(config-rtr)# router-id 2.2.2.2\nRouter(config-rtr)# exit\nRouter(config)# interface GigabitEthernet 0/0/0\nRouter(config-if)# ipv6 ospf 10 area 0",
-    verify: "show ipv6 ospf neighbor\nshow ipv6 route ospf"
+    verify: "show ipv6 interface brief\nshow ipv6 route."
   },
 
   // ==================== H. KIỂM TRA & XỬ LÝ SỰ CỐ (TROUBLESHOOTING) ====================
@@ -462,8 +383,8 @@ const CCNA_CHEAT_SHEET_DATA = [
     scenario: "Câu lệnh đầu tiên luôn luôn phải gõ khi thiết bị mạng gặp sự cố mất kết nối hoặc khi vừa thi công cắm dây xong.",
     why: "Cung cấp cái nhìn tổng quan tức thì về: Địa chỉ IP của cổng, Trạng thái vật lý Layer 1 (Status: Up/Down/Administratively Down) và Trạng thái liên kết dữ liệu Layer 2 (Protocol: Up/Down).",
     prereq: "Chạy ở chế độ Privileged EXEC (dấu #) hoặc thêm tiền tố `do` nếu đang ở trong config mode.",
-    example: "Router# show ip interface brief\nInterface              IP-Address      OK? Method Status                Protocol\nGigabitEthernet0/0/0   203.0.113.2     YES manual up                    up\nGigabitEthernet0/0/1   192.168.1.1     YES manual up                    up\nGigabitEthernet0/0/2   unassigned      YES unset  administratively down down",
-    verify: "Nếu Status là `administratively down`, nguyên nhân là chưa gõ `no shutdown`. Nếu Status Up nhưng Protocol Down, nguyên nhân là lỗi cáp, bấm sai đầu dây hoặc sai encapsulation."
+    example: "Router# show ip interface brief\nInterface              IP-Address      OK? Method Status                Protocol\nGigabitEthernet0/0/0   203.0.113.2     YES manual up                    up\nGigabitEthernet0/0/1   192.168.1.1     YES manual up                    up",
+    verify: "Nếu Status là `administratively down`, nguyên nhân là chưa gõ `no shutdown`."
   },
   {
     id: "cli-show-ip-route",
@@ -475,8 +396,8 @@ const CCNA_CHEAT_SHEET_DATA = [
     scenario: "Khi máy trạm báo không thể kết nối tới một máy chủ hoặc chi nhánh khác.",
     why: "Kiểm tra xem Router có biết đường đi tới mạng đích hay không. Hiển thị mã nguồn định tuyến: `C` (Connected), `S` (Static), `O` (OSPF), `D` (EIGRP), `*` (Tuyến mặc định Default Route).",
     prereq: "Giao thức định tuyến đã được cấu hình và các interface tương ứng đang Up.",
-    example: "Router# show ip route\nGateway of last resort is 203.0.113.1 to network 0.0.0.0\nS*    0.0.0.0/0 [1/0] via 203.0.113.1\nC     192.168.1.0/24 is directly connected, GigabitEthernet0/0/1\nO     10.10.20.0/24 [110/2] via 10.0.0.2, 00:15:42, GigabitEthernet0/0/0",
-    verify: "Nếu không thấy dải mạng đích trong bảng định tuyến, gói tin chắc chắn sẽ bị drop (Destination Host Unreachable)."
+    example: "Router# show ip route\nGateway of last resort is 203.0.113.1 to network 0.0.0.0\nS*    0.0.0.0/0 [1/0] via 203.0.113.1\nC     192.168.1.0/24 is directly connected, GigabitEthernet0/0/1",
+    verify: "Nếu không thấy dải mạng đích trong bảng định tuyến, gói tin chắc chắn sẽ bị drop."
   },
   {
     id: "cli-show-vlan-trunk",
@@ -486,10 +407,10 @@ const CCNA_CHEAT_SHEET_DATA = [
     mode: "Switch#",
     cmd: "show interfaces trunk\nshow vlan brief",
     scenario: "Khi 2 máy trạm cùng thuộc VLAN 10 nhưng cắm ở 2 Switch khác nhau không thể ping thông cho nhau.",
-    why: "90% lỗi trong mạng Layer 2 là do đường Trunk chưa hình thành, lệch Native VLAN (Native VLAN Mismatch cảnh báo bởi CDP), hoặc VLAN bị loại khỏi danh sách Allowed VLAN trên đường Trunk.",
+    why: "90% lỗi trong mạng Layer 2 là do đường Trunk chưa hình thành, lệch Native VLAN, hoặc VLAN bị loại khỏi danh sách Allowed VLAN trên đường Trunk.",
     prereq: "Đã cắm cáp liên kết giữa 2 Switch.",
-    example: "Switch# show interfaces trunk\nPort        Mode             Encapsulation  Status        Native vlan\nGi0/1       on               802.1q         trunking      1\n\nPort        Vlans allowed on trunk\nGi0/1       10,20,30",
-    verify: "Kiểm tra Native VLAN của 2 đầu Switch có khớp nhau không và VLAN cần truyền có nằm trong 'Vlans in spanning tree forwarding state and not pruned' không."
+    example: "Switch# show interfaces trunk\nPort        Mode             Encapsulation  Status        Native vlan\nGi0/1       on               802.1q         trunking      1",
+    verify: "Kiểm tra Native VLAN của 2 đầu Switch có khớp nhau không."
   },
   {
     id: "cli-show-cdp-lldp",
@@ -499,23 +420,10 @@ const CCNA_CHEAT_SHEET_DATA = [
     mode: "Router# / Switch#",
     cmd: "show cdp neighbors detail\nshow lldp neighbors detail",
     scenario: "Khi tiếp quản hệ thống mạng của một công ty mới mà không có sơ đồ tài liệu thiết kế mạng để lại.",
-    why: "CDP (Cisco Discovery Protocol) và LLDP (Link Layer Discovery Protocol) giúp 'nhìn xuyên dây cáp', cho biết đầu cáp bên kia đang cắm vào thiết bị hãng gì, dòng máy gì, chạy IP nào, và cắm vào đúng cổng nào.",
-    prereq: "CDP được bật mặc định trên thiết bị Cisco. Với thiết bị hãng khác hoặc muốn dùng LLDP, gõ `lldp run` ở global config.",
-    example: "Switch# show cdp neighbors\nDevice ID        Local Intrfce     Holdtme    Capability  Platform  Port ID\nDist-SW01        Gig 0/1           145              S I   WS-C2960+ Gig 0/24\nEdge-Router      Gig 0/24          162            R S I   ISR4321   Gig 0/0/0",
-    verify: "Dùng thông tin này để vẽ lại chính xác 100% sơ đồ đấu nối vật lý của cả hệ thống mạng."
-  },
-  {
-    id: "cli-show-nat",
-    category: "troubleshoot",
-    categoryName: "Kiểm Tra & Xử Lý Sự Cố",
-    title: "Kiểm tra phiên dịch địa chỉ NAT và xử lý nghẽn cổng",
-    mode: "Router#",
-    cmd: "show ip nat translations\nshow ip nat statistics\nclear ip nat translation *",
-    scenario: "Khi người dùng mạng nội bộ báo mất mạng Internet hoặc máy chủ Web bị quá tải kết nối NAT.",
-    why: "`show ip nat translations` cho biết phiên kết nối của IP Private nào đang đi ra ngoài qua IP Public và Port nào. Lệnh `clear ip nat translation *` dùng để giải phóng tức thì các bảng NAT bị treo hoặc rác bộ nhớ.",
-    prereq: "Router đã được cấu hình dịch vụ NAT.",
-    example: "Router# show ip nat translations\nPro Inside global      Inside local       Outside local      Outside global\ntcp 203.0.113.2:49152  192.168.1.50:49152 142.250.71.14:443 142.250.71.14:443",
-    verify: "Kiểm tra số lượng active translations trong lệnh `show ip nat statistics` xem có bị chạm trần bộ nhớ RAM của Router không."
+    why: "CDP và LLDP giúp khám phá thông tin thiết bị đầu cáp bên kia (Model, IP, port kết nối) mà không cần cấu hình trước.",
+    prereq: "CDP bật mặc định trên Cisco; LLDP cần lệnh `lldp run`.",
+    example: "Switch# show cdp neighbors",
+    verify: "Hiển thị Device ID, Local Interface, Port ID đối diện."
   }
 ];
 
@@ -567,13 +475,152 @@ const CCNA_CRAM_TABLES = {
     { ip: "224.0.0.6", usage: "OSPF: Dành riêng cho DR và BDR trao đổi" },
     { ip: "224.0.0.9", usage: "RIPv2 Multicast" },
     { ip: "224.0.0.10", usage: "EIGRP Multicast" },
-    { ip: "224.0.0.102", usage: "HSRP Version 2 (So với 224.0.0.2 của HSRP v1)" },
+    { ip: "224.0.0.102", usage: "HSRP Version 2" },
     { ip: "01:80:C2:00:00:00", usage: "Địa chỉ MAC Multicast chuẩn của gói tin STP BPDU" }
   ]
 };
 
 // --------------------------------------------------------------------------
-// 3. MOCK EXAM SYSTEM (MÔ PHỎNG THI THỬ THỜI GIAN THỰC PEARSON VUE)
+// 3. STANDALONE QUESTION BANK (ĐỀ THI THỬ CHUẨN PEARSON VUE CCNA 200-301)
+// Luôn sẵn sàng hoạt động ngay lập tức (kể cả offline hay đang tải dữ liệu)
+// --------------------------------------------------------------------------
+const CCNA_STANDALONE_EXAM_BANK = [
+  {
+    id: "q-stand-01",
+    domain: "1.0 Network Fundamentals",
+    question_vi: "Thiết bị mạng nào hoạt động chủ yếu ở Tầng 2 (Data Link) của mô hình OSI và chuyển tiếp khung dữ liệu (frame) dựa trên địa chỉ MAC đích?",
+    question_en: "Which network device operates primarily at Layer 2 of the OSI model and forwards frames based on the destination MAC address?",
+    options_vi: ["Router", "Layer 2 Switch", "Hub", "Firewall Tầng 3"],
+    options_en: ["Router", "Layer 2 Switch", "Hub", "Layer 3 Firewall"],
+    answerIndex: 1,
+    explanation_vi: "Switch Layer 2 duy trì bảng MAC Address Table và chuyển tiếp các Ethernet frame dựa trên địa chỉ MAC đích ở tầng liên kết dữ liệu.",
+    explanation_en: "A Layer 2 Switch maintains a MAC address table and forwards Ethernet frames based on the destination MAC address at the Data Link layer."
+  },
+  {
+    id: "q-stand-02",
+    domain: "1.0 Network Fundamentals",
+    question_vi: "Dải địa chỉ IPv4 nào dưới đây thuộc địa chỉ Private theo chuẩn RFC 1918?",
+    question_en: "Which of the following IPv4 address ranges is designated as Private IP space by RFC 1918?",
+    options_vi: ["172.32.0.0 - 172.64.255.255", "192.168.0.0 - 192.168.255.255", "169.254.0.0 - 169.254.255.255", "100.64.0.0 - 100.127.255.255"],
+    options_en: ["172.32.0.0 - 172.64.255.255", "192.168.0.0 - 192.168.255.255", "169.254.0.0 - 169.254.255.255", "100.64.0.0 - 100.127.255.255"],
+    answerIndex: 1,
+    explanation_vi: "RFC 1918 định nghĩa 3 dải Private IP: 10.0.0.0/8, 172.16.0.0/12 (172.16.0.0 - 172.31.255.255), và 192.168.0.0/16 (192.168.0.0 - 192.168.255.255).",
+    explanation_en: "RFC 1918 defines 3 private address spaces: 10.0.0.0/8, 172.16.0.0/12 (172.16.0.0 - 172.31.255.255), and 192.168.0.0/16."
+  },
+  {
+    id: "q-stand-03",
+    domain: "2.0 Network Access",
+    question_vi: "Kích thước thẻ nhãn 802.1Q (VLAN Tag) được chèn vào tiêu đề khung Ethernet là bao nhiêu byte?",
+    question_en: "What is the size of the IEEE 802.1Q VLAN tag inserted into the Ethernet frame header?",
+    options_vi: ["2 bytes", "4 bytes", "8 bytes", "32 bytes"],
+    options_en: ["2 bytes", "4 bytes", "8 bytes", "32 bytes"],
+    answerIndex: 1,
+    explanation_vi: "Thẻ IEEE 802.1Q Tag có kích thước đúng 4 bytes (gồm 2 bytes TPID 0x8100 và 2 bytes TCI chứa Priority, DEI, và 12-bit VLAN ID).",
+    explanation_en: "The IEEE 802.1Q header is exactly 4 bytes long, containing TPID and TCI (PCP, DEI, and 12-bit VLAN ID)."
+  },
+  {
+    id: "q-stand-04",
+    domain: "2.0 Network Access",
+    question_vi: "Lệnh nào kích hoạt tính năng chuyển ngay cổng Switch sang trạng thái Forwarding mà không cần trải qua Listening & Learning?",
+    question_en: "Which command immediately transitions a switch port to the Forwarding state, bypassing Listening and Learning states?",
+    options_vi: ["spanning-tree bpdufilter enable", "spanning-tree portfast", "spanning-tree guard root", "switchport mode trunk"],
+    options_en: ["spanning-tree bpdufilter enable", "spanning-tree portfast", "spanning-tree guard root", "switchport mode trunk"],
+    answerIndex: 1,
+    explanation_vi: "STP PortFast giúp cổng nối tới máy trạm client (PC, printer) chuyển thẳng sang Forwarding để nhận DHCP kịp thời mà không phải chờ 30 giây.",
+    explanation_en: "STP PortFast transitions an access port directly from Blocking to Forwarding, preventing DHCP timeouts for end stations."
+  },
+  {
+    id: "q-stand-05",
+    domain: "3.0 IP Connectivity",
+    question_vi: "Chỉ số độ tin cậy tuyến đường (Administrative Distance - AD) mặc định của giao thức OSPF là bao nhiêu?",
+    question_en: "What is the default Administrative Distance (AD) of the OSPF routing protocol?",
+    options_vi: ["90", "100", "110", "120"],
+    options_en: ["90", "100", "110", "120"],
+    answerIndex: 2,
+    explanation_vi: "Thứ tự AD mặc định: Connected = 0, Static = 1, eBGP = 20, EIGRP Internal = 90, OSPF = 110, RIP = 120, External EIGRP = 170, iBGP = 200.",
+    explanation_en: "Default AD values: Connected = 0, Static = 1, EIGRP Internal = 90, OSPF = 110, RIP = 120."
+  },
+  {
+    id: "q-stand-06",
+    domain: "3.0 IP Connectivity",
+    question_vi: "Khi Router có nhiều tuyến đường tới cùng một mạng đích, tiêu chí nào được Router xét ĐẦU TIÊN để chọn tuyến chuyển tiếp gói tin?",
+    question_en: "When a router has multiple paths to the same destination in its routing table, which rule is evaluated FIRST?",
+    options_vi: ["Administrative Distance thấp nhất", "Metric / Cost nhỏ nhất", "Longest Prefix Match (Độ dài Prefix dài nhất)", "Tốc độ băng thông của cổng cao nhất"],
+    options_en: ["Lowest Administrative Distance", "Lowest Metric / Cost", "Longest Prefix Match", "Highest Interface Bandwidth"],
+    answerIndex: 2,
+    explanation_vi: "Router luôn luôn so khớp tiền tố dài nhất (Longest Prefix Match) trước tiên. Chỉ khi độ dài prefix giống nhau thì mới so sánh AD và Metric.",
+    explanation_en: "The router always uses Longest Prefix Match first. If prefix lengths are identical, AD and metric are used."
+  },
+  {
+    id: "q-stand-07",
+    domain: "4.0 IP Services",
+    question_vi: "Giao thức NTP (Network Time Protocol) sử dụng số cổng và giao thức Tầng 4 nào?",
+    question_en: "Which transport protocol and port number does Network Time Protocol (NTP) use?",
+    options_vi: ["TCP port 123", "UDP port 123", "UDP port 69", "TCP port 514"],
+    options_en: ["TCP port 123", "UDP port 123", "UDP port 69", "TCP port 514"],
+    answerIndex: 1,
+    explanation_vi: "NTP sử dụng cổng UDP 123 để đồng bộ thời gian giữa các thiết bị mạng và máy chủ chuẩn đồng hồ nguyên tử.",
+    explanation_en: "NTP operates over UDP port 123 to synchronize clocks among computer systems."
+  },
+  {
+    id: "q-stand-08",
+    domain: "4.0 IP Services",
+    question_vi: "Khi mạng LAN sử dụng một máy chủ DHCP tập trung ở VLAN khác, lệnh nào cần được cấu hình trên cổng Gateway của Router?",
+    question_en: "When clients use a centralized DHCP server located in another subnet, which command must be configured on the router gateway interface?",
+    options_vi: ["ip dhcp snooping", "ip helper-address <DHCP_SERVER_IP>", "ip nat inside source", "default-information originate"],
+    options_en: ["ip dhcp snooping", "ip helper-address <DHCP_SERVER_IP>", "ip nat inside source", "default-information originate"],
+    answerIndex: 1,
+    explanation_vi: "`ip helper-address` biến gói tin DHCP Discover Broadcast (255.255.255.255) thành gói Unicast để chuyển tiếp qua Router tới DHCP Server.",
+    explanation_en: "The `ip helper-address` command forwards DHCP broadcast requests as unicast to the configured DHCP server IP."
+  },
+  {
+    id: "q-stand-09",
+    domain: "5.0 Security Fundamentals",
+    question_vi: "Trong cấu hình Port Security trên Switch, chế độ vi phạm (Violation Mode) nào sẽ TẮT NGAY LẬP TỨC cổng và đưa vào trạng thái err-disabled khi có MAC lạ?",
+    question_en: "In Cisco Port Security, which violation mode immediately shuts down the port and places it into the err-disabled state upon a violation?",
+    options_vi: ["protect", "restrict", "shutdown", "disable"],
+    options_en: ["protect", "restrict", "shutdown", "disable"],
+    answerIndex: 2,
+    explanation_vi: "Chế độ `shutdown` (mặc định) sẽ lập tức đưa cổng vào trạng thái err-disabled, gửi cảnh báo Syslog và tăng bộ đếm vi phạm.",
+    explanation_en: "The `shutdown` mode immediately places the port into an err-disabled state and generates a syslog message."
+  },
+  {
+    id: "q-stand-10",
+    domain: "5.0 Security Fundamentals",
+    question_vi: "Theo khuyến nghị thực hành tốt nhất của Cisco, vị trí tối ưu để đặt Extended ACL là ở đâu?",
+    question_en: "According to Cisco best practices, where is the optimal placement for an Extended Access Control List (ACL)?",
+    options_vi: ["Càng gần nguồn lưu lượng càng tốt", "Càng gần đích lưu lượng càng tốt", "Trên bất kỳ cổng nào của Core Switch", "Chỉ trên cổng kết nối ra ngoài Internet"],
+    options_en: ["As close to the traffic source as possible", "As close to the destination as possible", "On any Core switch port", "Exclusively on the Internet WAN interface"],
+    answerIndex: 0,
+    explanation_vi: "Extended ACL lọc được cả IP nguồn, IP đích và Port nên cần đặt CÀNG GẦN NGUỒN CÀNG TỐT để drop gói rác ngay từ đầu, tiết kiệm băng thông mạng.",
+    explanation_en: "Extended ACLs should be placed as close to the source as possible to drop unwanted packets early and save network bandwidth."
+  },
+  {
+    id: "q-stand-11",
+    domain: "6.0 Automation and Programmability",
+    question_vi: "Phương thức HTTP nào trong kiến trúc REST API tương ứng với thao tác TẠO MỚI (Create) trong mô hình CRUD?",
+    question_en: "Which HTTP method in a RESTful API corresponds to the CREATE operation in the CRUD model?",
+    options_vi: ["GET", "POST", "PUT", "DELETE"],
+    options_en: ["GET", "POST", "PUT", "DELETE"],
+    answerIndex: 1,
+    explanation_vi: "Ánh xạ CRUD sang HTTP: Create -> POST, Read -> GET, Update -> PUT/PATCH, Delete -> DELETE.",
+    explanation_en: "CRUD to HTTP mapping: Create = POST, Read = GET, Update = PUT/PATCH, Delete = DELETE."
+  },
+  {
+    id: "q-stand-12",
+    domain: "6.0 Automation and Programmability",
+    question_vi: "Công cụ quản lý cấu hình tự động (Configuration Management) nào dưới đây hoạt động theo mô hình Agentless (không cần cài phần mềm agent lên switch/router) và dùng kết nối SSH?",
+    question_en: "Which configuration management tool is AGENTLESS and operates primarily over SSH?",
+    options_vi: ["Puppet", "Chef", "Ansible", "SaltStack (chế độ mặc định)"],
+    options_en: ["Puppet", "Chef", "Ansible", "SaltStack (default mode)"],
+    answerIndex: 2,
+    explanation_vi: "Ansible là công cụ Agentless nổi tiếng nhất, sử dụng Playbook định dạng YAML và đẩy cấu hình tới thiết bị mạng qua giao thức SSH an toàn.",
+    explanation_en: "Ansible is agentless and uses SSH with YAML playbooks to manage network devices without installing custom software on the managed node."
+  }
+];
+
+// --------------------------------------------------------------------------
+// 4. MOCK EXAM SYSTEM (MÔ PHỎNG THI THỬ THỜI GIAN THỰC PEARSON VUE)
 // --------------------------------------------------------------------------
 let mockExamQuestions = [];
 let mockExamUserAnswers = {};
@@ -587,8 +634,20 @@ function buildMockExamPool() {
   const isEn = typeof currentLang !== "undefined" && currentLang === "en";
   const pool = [];
 
-  // Lấy câu hỏi từ 17 modules
-  if (typeof modulesData !== "undefined" && Array.isArray(modulesData)) {
+  // 1. Thêm câu hỏi từ ngân hàng đề độc lập (luôn sẵn sàng)
+  CCNA_STANDALONE_EXAM_BANK.forEach((q, idx) => {
+    pool.push({
+      id: q.id || `stand-q-${idx}`,
+      domain: q.domain,
+      question: isEn ? q.question_en : q.question_vi,
+      options: isEn ? q.options_en : q.options_vi,
+      answerIndex: q.answerIndex,
+      explanation: isEn ? q.explanation_en : q.explanation_vi
+    });
+  });
+
+  // 2. Bổ sung từ modulesData nếu đã nạp
+  if (typeof modulesData !== "undefined" && Array.isArray(modulesData) && modulesData.length > 0) {
     modulesData.forEach((mod) => {
       const qList = (isEn && typeof CCNA_QUIZ_EN !== "undefined" && CCNA_QUIZ_EN[mod.id])
         ? CCNA_QUIZ_EN[mod.id]
@@ -598,7 +657,6 @@ function buildMockExamPool() {
         pool.push({
           id: `mod-${mod.id}-q-${idx}`,
           domain: getDomainForModule(mod.id),
-          modId: mod.id,
           question: isEn ? (q.question_en || q.question_vi) : q.question_vi,
           options: isEn ? (q.options_en || q.options_vi) : q.options_vi,
           answerIndex: q.answerIndex,
@@ -640,14 +698,19 @@ function startMockExam(questionCount = 30) {
   mockExamCurrentIndex = 0;
   mockExamIsRunning = true;
 
-  // Thời gian: 45 phút cho bài thi thử
+  // Thời gian: 45 phút cho 30 câu
   mockExamSecondsLeft = Math.round((mockExamQuestions.length / 30) * 45 * 60);
 
   const modal = document.getElementById("mock-exam-modal");
-  if (modal) modal.classList.add("active");
+  if (modal) {
+    modal.hidden = false;
+    modal.removeAttribute("hidden");
+    modal.classList.add("active");
+    modal.classList.remove("in-result");
+  }
 
-  const resultsView = document.getElementById("exam-results-view");
-  const activeView = document.getElementById("exam-active-view");
+  const resultsView = document.getElementById("mock-exam-result-view") || document.getElementById("exam-results-view");
+  const activeView = document.querySelector(".mock-exam-body") || document.getElementById("exam-active-view");
   if (resultsView) resultsView.style.display = "none";
   if (activeView) activeView.style.display = "flex";
 
@@ -691,23 +754,23 @@ function renderMockExamQuestion() {
   const q = mockExamQuestions[mockExamCurrentIndex];
   if (!q) return;
 
-  const qNumEl = document.getElementById("exam-question-num");
-  const qDomainEl = document.getElementById("exam-question-domain");
-  const qTextEl = document.getElementById("exam-question-text");
-  const qOptionsEl = document.getElementById("exam-options-container");
+  const qNumEl = document.getElementById("exam-q-num") || document.getElementById("exam-question-num");
+  const qDomainEl = document.getElementById("exam-q-domain") || document.getElementById("exam-question-domain");
+  const qTextEl = document.getElementById("exam-q-text") || document.getElementById("exam-question-text");
+  const qOptionsEl = document.getElementById("exam-q-options") || document.getElementById("exam-options-container");
   const flagBtn = document.getElementById("exam-flag-btn");
 
-  if (qNumEl) qNumEl.textContent = `Câu ${mockExamCurrentIndex + 1}/${mockExamQuestions.length}`;
+  if (qNumEl) qNumEl.textContent = `Câu ${mockExamCurrentIndex + 1} / ${mockExamQuestions.length}`;
   if (qDomainEl) qDomainEl.textContent = q.domain;
   if (qTextEl) qTextEl.innerHTML = formatExamRichText(q.question);
 
   if (flagBtn) {
     if (mockExamFlagged[mockExamCurrentIndex]) {
-      flagBtn.classList.add("active");
-      flagBtn.innerHTML = `★ Đã đánh dấu`;
+      flagBtn.classList.add("flagged");
+      flagBtn.innerHTML = `⚑ Đã gắn cờ`;
     } else {
-      flagBtn.classList.remove("active");
-      flagBtn.innerHTML = `☆ Đánh dấu xem lại`;
+      flagBtn.classList.remove("flagged");
+      flagBtn.innerHTML = `⚐ Gắn cờ xem lại`;
     }
   }
 
@@ -719,10 +782,10 @@ function renderMockExamQuestion() {
       .map((opt, idx) => {
         const isSelected = currentSelected === idx;
         return `
-          <label class="exam-option-card ${isSelected ? "selected" : ""}" onclick="selectExamOption(${idx})">
-            <span class="exam-opt-indicator">${letters[idx]}</span>
+          <div class="exam-opt-item ${isSelected ? "selected" : ""}" onclick="selectExamOption(${idx})">
+            <span class="exam-opt-letter">${letters[idx]}</span>
             <span class="exam-opt-text">${formatExamRichText(opt)}</span>
-          </label>
+          </div>
         `;
       })
       .join("");
@@ -735,10 +798,8 @@ function renderMockExamQuestion() {
   if (nextBtn) {
     if (mockExamCurrentIndex === mockExamQuestions.length - 1) {
       nextBtn.textContent = "Nộp bài thi";
-      nextBtn.classList.add("btn-finish");
     } else {
-      nextBtn.textContent = "Câu tiếp theo →";
-      nextBtn.classList.remove("btn-finish");
+      nextBtn.textContent = "Câu tiếp →";
     }
   }
 }
@@ -750,7 +811,7 @@ window.selectExamOption = function(idx) {
 };
 
 function renderMockExamNavigator() {
-  const navContainer = document.getElementById("exam-navigator-grid");
+  const navContainer = document.getElementById("exam-nav-grid") || document.getElementById("exam-navigator-grid");
   if (!navContainer) return;
 
   navContainer.innerHTML = mockExamQuestions
@@ -759,7 +820,7 @@ function renderMockExamNavigator() {
       const isCurrent = idx === mockExamCurrentIndex;
       const isFlagged = !!mockExamFlagged[idx];
 
-      let classes = ["exam-nav-pill"];
+      let classes = ["exam-nav-dot"];
       if (isCurrent) classes.push("current");
       if (isAnswered) classes.push("answered");
       if (isFlagged) classes.push("flagged");
@@ -807,84 +868,92 @@ function finishMockExam(isTimeout = false) {
   const scaledScore = Math.round(300 + percentage * 700);
   const isPassed = scaledScore >= 825;
 
-  const activeView = document.getElementById("exam-active-view");
-  const resultsView = document.getElementById("exam-results-view");
-  if (activeView) activeView.style.display = "none";
-  if (resultsView) resultsView.style.display = "block";
+  const modal = document.getElementById("mock-exam-modal");
+  if (modal) modal.classList.add("in-result");
 
-  // Hiển thị kết quả tổng quan
-  const scoreBanner = document.getElementById("exam-score-banner");
-  if (scoreBanner) {
-    scoreBanner.className = `exam-score-banner ${isPassed ? "pass" : "fail"}`;
-    scoreBanner.innerHTML = `
-      <div class="banner-badge">${isPassed ? "PASS — ĐẠT CHUẨN CCNA" : "FAIL — CẦN ÔN TẬP THÊM"}</div>
-      <div class="banner-score">${scaledScore} <span class="score-max">/ 1000</span></div>
-      <div class="banner-desc">
-        ${isPassed 
-          ? `Chúc mừng bạn! Bạn đã đạt ${Math.round(percentage * 100)}% (${correctCount}/${totalQuestions} câu đúng), vượt qua điểm sàn 825 của kỳ thi Pearson VUE CCNA 200-301.`
-          : `Bạn đạt ${Math.round(percentage * 100)}% (${correctCount}/${totalQuestions} câu đúng). Điểm chuẩn yêu cầu của Cisco là 825/1000. Hãy xem phân tích yếu kém bên dưới để củng cố lại kiến thức!`}
-      </div>
-    `;
-  }
+  const activeBody = document.querySelector(".mock-exam-body") || document.getElementById("exam-active-view");
+  const resultsView = document.getElementById("mock-exam-result-view") || document.getElementById("exam-results-view");
+  if (activeBody) activeBody.style.display = "none";
+  if (resultsView) {
+    resultsView.style.display = "block";
 
-  // Phân tích chi tiết từng Domain Cisco CCNA
-  const domainBreakdown = document.getElementById("exam-domain-breakdown");
-  if (domainBreakdown) {
-    domainBreakdown.innerHTML = Object.keys(domainStats)
+    const letters = ["A", "B", "C", "D", "E", "F"];
+
+    // Render report card
+    const domainRows = Object.keys(domainStats)
       .map((dName) => {
         const d = domainStats[dName];
         const dPct = d.total > 0 ? Math.round((d.correct / d.total) * 100) : 0;
-        const isGood = dPct >= 80;
+        const color = dPct >= 80 ? "#10b981" : "#f59e0b";
         return `
-          <div class="domain-stat-row">
-            <div class="domain-header">
-              <span class="domain-name">${dName}</span>
-              <span class="domain-pct ${isGood ? "good" : "weak"}">${dPct}% (${d.correct}/${d.total})</span>
+          <div class="exam-domain-row">
+            <div class="exam-domain-meta">
+              <span>${escapeHtml(dName)}</span>
+              <strong style="color: ${color}">${dPct}% (${d.correct}/${d.total})</strong>
             </div>
-            <div class="domain-bar">
-              <div class="domain-bar-fill ${isGood ? "good" : "weak"}" style="width: ${dPct}%"></div>
+            <div class="exam-domain-bar-bg">
+              <div class="exam-domain-bar-fill" style="width: ${dPct}%; background: ${color};"></div>
             </div>
           </div>
         `;
       })
       .join("");
-  }
 
-  // Danh sách lời giải chi tiết
-  const reviewContainer = document.getElementById("exam-solution-review");
-  if (reviewContainer) {
-    const letters = ["A", "B", "C", "D", "E", "F"];
-    reviewContainer.innerHTML = mockExamQuestions
+    const reviewCards = mockExamQuestions
       .map((q, idx) => {
         const userAns = mockExamUserAnswers[idx];
         const isCorrect = userAns === q.answerIndex;
-        const userAnsText = typeof userAns !== "undefined" ? `${letters[userAns]}. ${q.options[userAns]}` : "Chưa trả lời";
+        const userAnsText = typeof userAns !== "undefined" ? `${letters[userAns]}. ${q.options[userAns]}` : "Chưa chọn đáp án";
         const correctAnsText = `${letters[q.answerIndex]}. ${q.options[q.answerIndex]}`;
 
         return `
-          <div class="solution-card ${isCorrect ? "correct" : "incorrect"}">
-            <div class="sol-header">
-              <span class="sol-tag">${isCorrect ? "✓ Đúng" : "✗ Sai"}</span>
-              <span class="sol-qnum">Câu ${idx + 1} (${q.domain})</span>
+          <div class="exam-review-card ${isCorrect ? "correct" : "wrong"}">
+            <div class="exam-review-header">
+              <span class="exam-review-badge ${isCorrect ? "pass" : "fail"}">${isCorrect ? "✓ ĐÚNG" : "✗ SAI"}</span>
+              <span class="exam-review-domain">Câu ${idx + 1} • ${escapeHtml(q.domain)}</span>
             </div>
-            <div class="sol-qtext">${formatExamRichText(q.question)}</div>
-            <div class="sol-answers-grid">
-              <div class="sol-ans-box user">
-                <span class="sol-label">Lựa chọn của bạn:</span>
-                <span class="sol-val ${isCorrect ? "text-success" : "text-danger"}">${formatExamRichText(userAnsText)}</span>
-              </div>
-              <div class="sol-ans-box correct">
-                <span class="sol-label">Đáp án chuẩn Cisco:</span>
-                <span class="sol-val text-success">${formatExamRichText(correctAnsText)}</span>
-              </div>
+            <div class="exam-review-q">${formatExamRichText(q.question)}</div>
+            <div class="exam-review-answers">
+              <div><strong>Lựa chọn của bạn:</strong> <span style="color: ${isCorrect ? "#15803d" : "#b91c1c"}">${formatExamRichText(userAnsText)}</span></div>
+              <div><strong>Đáp án chuẩn Cisco:</strong> <span style="color: #15803d; font-weight: 700;">${formatExamRichText(correctAnsText)}</span></div>
             </div>
-            <div class="sol-explanation">
+            <div class="exam-review-exp">
               <strong>💡 Giải thích chi tiết:</strong> ${formatExamRichText(q.explanation)}
             </div>
           </div>
         `;
       })
       .join("");
+
+    resultsView.innerHTML = `
+      <div class="exam-report-card">
+        <div class="exam-result-badge-top">CISCO CCNA 200-301 PEARSON VUE RESULT</div>
+        <div class="exam-score-title">${scaledScore} <span class="exam-score-max">/ 1000</span></div>
+        <div class="exam-status-banner ${isPassed ? "pass" : "fail"}">
+          ${isPassed ? "PASS — ĐẠT CHUẨN CCNA" : "FAIL — CHƯA ĐẠT ĐIỂM CHUẨN"}
+        </div>
+        <p class="exam-summary-text">
+          ${isPassed
+            ? `Chúc mừng bạn! Bạn đã đạt ${Math.round(percentage * 100)}% (${correctCount}/${totalQuestions} câu đúng), vượt qua điểm chuẩn sàn 825/1000 của kỳ thi Pearson VUE CCNA 200-301.`
+            : `Bạn đạt ${Math.round(percentage * 100)}% (${correctCount}/${totalQuestions} câu đúng). Điểm chuẩn yêu cầu của Cisco là 825/1000. Hãy xem phân tích từng phần bên dưới để ôn tập củng cố thêm!`}
+        </p>
+
+        <div class="exam-domains-breakdown">
+          <h3 class="exam-domains-title">Phân Tích Năng Lực Theo Từng Domain Cisco</h3>
+          ${domainRows}
+        </div>
+
+        <div class="exam-result-actions">
+          <button type="button" class="exam-btn-primary" onclick="startMockExam(30)">Thi lại đề khác</button>
+          <button type="button" class="exam-btn-secondary" onclick="closeMockExamModal()">Đóng phòng thi</button>
+        </div>
+
+        <div class="exam-review-list">
+          <h3 class="exam-domains-title" style="margin-bottom: 1rem;">Chi Tiết Lời Giải & Đáp Án Toàn Bộ Đề Thi</h3>
+          ${reviewCards}
+        </div>
+      </div>
+    `;
   }
 }
 
@@ -897,15 +966,21 @@ function closeMockExamModal() {
   clearInterval(mockExamTimerInterval);
   mockExamIsRunning = false;
   const modal = document.getElementById("mock-exam-modal");
-  if (modal) modal.classList.remove("active");
+  if (modal) {
+    modal.hidden = true;
+    modal.setAttribute("hidden", "");
+    modal.classList.remove("active");
+  }
 }
 
 // --------------------------------------------------------------------------
-// 4. CHEAT SHEET & CRAM TABLES UI RENDERER
+// 5. CHEAT SHEET & CRAM TABLES UI RENDERER
 // --------------------------------------------------------------------------
 function openCheatSheetModal(defaultTab = "commands") {
   const modal = document.getElementById("cheatsheet-modal");
   if (modal) {
+    modal.hidden = false;
+    modal.removeAttribute("hidden");
     modal.classList.add("active");
     renderCheatSheetTab(defaultTab);
   }
@@ -913,52 +988,58 @@ function openCheatSheetModal(defaultTab = "commands") {
 
 function closeCheatSheetModal() {
   const modal = document.getElementById("cheatsheet-modal");
-  if (modal) modal.classList.remove("active");
+  if (modal) {
+    modal.hidden = true;
+    modal.setAttribute("hidden", "");
+    modal.classList.remove("active");
+  }
 }
 
 function renderCheatSheetTab(tabKey) {
-  // Update active tab buttons
+  // Normalize tabKey
+  let normalizedTab = tabKey;
+  if (tabKey === "ad") normalizedTab = "cram-ad";
+  if (tabKey === "ports") normalizedTab = "cram-ports";
+  if (tabKey === "syslog") normalizedTab = "cram-syslog";
+  if (tabKey === "multicast") normalizedTab = "cram-multicast";
+
   const tabBtns = document.querySelectorAll(".cs-tab-btn");
   tabBtns.forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.tab === tabKey);
+    const bTab = btn.dataset.tab;
+    const isMatch = bTab === tabKey || bTab === normalizedTab || (bTab === "ad" && normalizedTab === "cram-ad") || (bTab === "ports" && normalizedTab === "cram-ports") || (bTab === "syslog" && normalizedTab === "cram-syslog") || (bTab === "multicast" && normalizedTab === "cram-multicast");
+    btn.classList.toggle("active", isMatch);
   });
 
-  const contentArea = document.getElementById("cheatsheet-tab-content");
+  const contentArea = document.getElementById("cheatsheet-content") || document.getElementById("cheatsheet-tab-content");
   if (!contentArea) return;
 
-  if (tabKey === "commands") {
+  if (normalizedTab === "commands") {
     renderCheatSheetCommands(contentArea);
-  } else if (tabKey === "cram-ad") {
+  } else if (normalizedTab === "cram-ad" || normalizedTab === "ad") {
     renderCramTableAD(contentArea);
-  } else if (tabKey === "cram-ports") {
+  } else if (normalizedTab === "cram-ports" || normalizedTab === "ports") {
     renderCramTablePorts(contentArea);
-  } else if (tabKey === "cram-syslog") {
+  } else if (normalizedTab === "cram-syslog" || normalizedTab === "syslog") {
     renderCramTableSyslog(contentArea);
-  } else if (tabKey === "cram-multicast") {
+  } else if (normalizedTab === "cram-multicast" || normalizedTab === "multicast") {
     renderCramTableMulticast(contentArea);
   }
 }
 
 function renderCheatSheetCommands(container) {
   container.innerHTML = `
-    <div class="cs-controls-bar">
-      <div class="cs-search-wrap">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="m21 21-4.35-4.35"/>
-        </svg>
-        <input type="text" id="cs-search-input" placeholder="Tìm lệnh nhanh (ví dụ: ospf, trunk, nat, vlan, portfast, show)..." autocomplete="off" />
-      </div>
-      <div class="cs-category-filter" id="cs-category-filter">
-        <button type="button" class="cs-filter-pill active" data-cat="all">Tất cả (${CCNA_CHEAT_SHEET_DATA.length})</button>
-        <button type="button" class="cs-filter-pill" data-cat="basic">Căn bản</button>
-        <button type="button" class="cs-filter-pill" data-cat="vlan">VLAN & Trunk</button>
-        <button type="button" class="cs-filter-pill" data-cat="stp">STP & EtherChannel</button>
-        <button type="button" class="cs-filter-pill" data-cat="routing">Định tuyến L3</button>
-        <button type="button" class="cs-filter-pill" data-cat="services">Dịch vụ IP</button>
-        <button type="button" class="cs-filter-pill" data-cat="security">Bảo mật & ACL</button>
-        <button type="button" class="cs-filter-pill" data-cat="ipv6">IPv6</button>
-        <button type="button" class="cs-filter-pill" data-cat="troubleshoot">Show & Khắc phục lỗi</button>
+    <div class="cs-toolbar">
+      <input type="text" class="cs-search-input" id="cs-search-input" placeholder="Tìm kiếm nhanh lệnh Cisco IOS (ví dụ: ospf, trunk, nat, vlan, portfast, show)..." autocomplete="off" />
+      <div class="cs-category-pills" id="cs-category-filter">
+        <button type="button" class="cs-cat-pill active" data-cat="all">Tất cả (${CCNA_CHEAT_SHEET_DATA.length})</button>
+        <button type="button" class="cs-cat-pill" data-cat="basic">Căn bản</button>
+        <button type="button" class="cs-cat-pill" data-cat="vlan">VLAN & Trunk</button>
+        <button type="button" class="cs-cat-pill" data-cat="stp">STP & EtherChannel</button>
+        <button type="button" class="cs-cat-pill" data-cat="routing">Định tuyến L3</button>
+        <button type="button" class="cs-cat-pill" data-cat="services">Dịch vụ IP</button>
+        <button type="button" class="cs-cat-pill" data-cat="security">Bảo mật & ACL</button>
+        <button type="button" class="cs-cat-pill" data-cat="ipv6">IPv6</button>
+        <button type="button" class="cs-cat-pill" data-cat="troubleshoot">Show & Kiểm tra</button>
       </div>
     </div>
     <div class="cs-commands-list" id="cs-commands-list"></div>
@@ -966,7 +1047,7 @@ function renderCheatSheetCommands(container) {
 
   const searchInput = document.getElementById("cs-search-input");
   const listEl = document.getElementById("cs-commands-list");
-  const catPills = container.querySelectorAll(".cs-filter-pill");
+  const catPills = container.querySelectorAll(".cs-cat-pill");
 
   let currentCat = "all";
   let currentSearch = "";
@@ -987,7 +1068,7 @@ function renderCheatSheetCommands(container) {
     });
 
     if (filtered.length === 0) {
-      listEl.innerHTML = `<div class="cs-empty">Không tìm thấy lệnh nào khớp với từ khóa "<strong>${escapeHtml(currentSearch)}</strong>".</div>`;
+      listEl.innerHTML = `<div class="cs-empty" style="text-align:center;padding:2.5rem;color:var(--text-muted);">Không tìm thấy lệnh nào khớp với từ khóa "<strong>${escapeHtml(currentSearch)}</strong>".</div>`;
       return;
     }
 
@@ -1007,7 +1088,7 @@ function renderCheatSheetCommands(container) {
 
           <div class="cs-details-grid">
             <div class="cs-detail-box">
-              <span class="cs-detail-label">🎯 Trường hợp sử dụng (Khi nào dùng):</span>
+              <span class="cs-detail-label">🎯 Trường hợp sử dụng:</span>
               <span class="cs-detail-text">${formatExamRichText(item.scenario)}</span>
             </div>
             <div class="cs-detail-box">
@@ -1029,7 +1110,7 @@ function renderCheatSheetCommands(container) {
           </div>
 
           <div class="cs-verify-row">
-            <span class="cs-verify-label">🔍 Lệnh kiểm tra nghiệm thu (Verify):</span>
+            <span class="cs-verify-label">🔍 Kiểm tra nghiệm thu:</span>
             <span class="cs-verify-cmd">${formatExamRichText(item.verify)}</span>
           </div>
         </div>
@@ -1190,7 +1271,7 @@ function renderCramTableMulticast(container) {
 }
 
 // --------------------------------------------------------------------------
-// 5. HELPER FORMATTER
+// 6. HELPER FORMATTER
 // --------------------------------------------------------------------------
 function formatExamRichText(str) {
   if (!str) return "";
@@ -1203,47 +1284,43 @@ function formatExamRichText(str) {
 }
 
 // --------------------------------------------------------------------------
-// 6. INITIALIZATION & EVENT BINDINGS
+// 7. INITIALIZATION & EVENT BINDINGS
 // --------------------------------------------------------------------------
 function initExamAndCheatSheetUI() {
   const openExamBtn = document.getElementById("open-exam-btn");
   if (openExamBtn) {
-    openExamBtn.addEventListener("click", () => {
-      startMockExam(30);
-    });
+    openExamBtn.onclick = () => startMockExam(30);
   }
 
   const openCsBtn = document.getElementById("open-cheatsheet-btn");
   if (openCsBtn) {
-    openCsBtn.addEventListener("click", () => {
-      openCheatSheetModal("commands");
-    });
+    openCsBtn.onclick = () => openCheatSheetModal("commands");
   }
 
   // Mock Exam UI buttons
   const flagBtn = document.getElementById("exam-flag-btn");
   if (flagBtn) {
-    flagBtn.addEventListener("click", () => {
+    flagBtn.onclick = () => {
       mockExamFlagged[mockExamCurrentIndex] = !mockExamFlagged[mockExamCurrentIndex];
       renderMockExamQuestion();
       renderMockExamNavigator();
-    });
+    };
   }
 
   const prevBtn = document.getElementById("exam-prev-btn");
   if (prevBtn) {
-    prevBtn.addEventListener("click", () => {
+    prevBtn.onclick = () => {
       if (mockExamCurrentIndex > 0) {
         mockExamCurrentIndex--;
         renderMockExamQuestion();
         renderMockExamNavigator();
       }
-    });
+    };
   }
 
   const nextBtn = document.getElementById("exam-next-btn");
   if (nextBtn) {
-    nextBtn.addEventListener("click", () => {
+    nextBtn.onclick = () => {
       if (mockExamCurrentIndex < mockExamQuestions.length - 1) {
         mockExamCurrentIndex++;
         renderMockExamQuestion();
@@ -1255,43 +1332,54 @@ function initExamAndCheatSheetUI() {
           finishMockExam(false);
         }
       }
-    });
+    };
   }
 
   const submitDirectBtn = document.getElementById("exam-submit-now-btn");
   if (submitDirectBtn) {
-    submitDirectBtn.addEventListener("click", () => {
+    submitDirectBtn.onclick = () => {
       const answeredCount = Object.keys(mockExamUserAnswers).length;
       const total = mockExamQuestions.length;
       if (confirm(`Bạn đã làm ${answeredCount}/${total} câu hỏi. Bạn có chắc chắn muốn nộp bài thi không?`)) {
         finishMockExam(false);
       }
-    });
+    };
   }
 
   const examCloseBtn = document.getElementById("mock-exam-close-btn");
   if (examCloseBtn) {
-    examCloseBtn.addEventListener("click", closeMockExamModal);
+    examCloseBtn.onclick = closeMockExamModal;
   }
 
   const examBackdrop = document.getElementById("mock-exam-backdrop");
   if (examBackdrop) {
-    examBackdrop.addEventListener("click", closeMockExamModal);
+    examBackdrop.onclick = closeMockExamModal;
   }
 
   // Cheat Sheet UI buttons
   const csCloseBtn = document.getElementById("cheatsheet-close-btn");
-  if (csCloseBtn) csCloseBtn.addEventListener("click", closeCheatSheetModal);
+  if (csCloseBtn) csCloseBtn.onclick = closeCheatSheetModal;
 
   const csBackdrop = document.getElementById("cheatsheet-backdrop");
-  if (csBackdrop) csBackdrop.addEventListener("click", closeCheatSheetModal);
+  if (csBackdrop) csBackdrop.onclick = closeCheatSheetModal;
 
   const csTabBtns = document.querySelectorAll(".cs-tab-btn");
   csTabBtns.forEach((b) => {
-    b.addEventListener("click", () => {
+    b.onclick = () => {
       renderCheatSheetTab(b.dataset.tab);
-    });
+    };
   });
 }
 
-document.addEventListener("DOMContentLoaded", initExamAndCheatSheetUI);
+// Global Exports
+window.openMockExam = startMockExam;
+window.closeMockExam = closeMockExamModal;
+window.openCheatSheet = openCheatSheetModal;
+window.closeCheatSheet = closeCheatSheetModal;
+
+// Run safely on loading or interactive
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initExamAndCheatSheetUI);
+} else {
+  initExamAndCheatSheetUI();
+}

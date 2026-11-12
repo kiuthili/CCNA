@@ -339,8 +339,19 @@ function updateHeaderLabels() {
   if (notesBtnText) notesBtnText.textContent = isEn ? "Notes" : "Ghi chú";
   const flashcardBtnText = document.querySelector("#open-flashcards-btn .btn-text");
   if (flashcardBtnText) flashcardBtnText.textContent = isEn ? "Flashcards" : "Flashcard";
+  const examBtnText = document.querySelector("#open-exam-btn .btn-text");
+  if (examBtnText) examBtnText.textContent = isEn ? "Mock Exam" : "Thi thử";
+  const csBtnText = document.querySelector("#open-cheatsheet-btn .btn-text");
+  if (csBtnText) csBtnText.textContent = isEn ? "CLI Commands" : "Lệnh CLI";
   const zenBtnText = document.querySelector("#zen-mode-btn .btn-text");
   if (zenBtnText) zenBtnText.textContent = isEn ? "Zen Mode" : "Tập trung";
+  const logoutBtnText = document.querySelector("#topbar-logout-btn .btn-text");
+  if (logoutBtnText) logoutBtnText.textContent = isEn ? "Log out" : "Đăng xuất";
+
+  const langSelect = document.getElementById("lang-select");
+  if (langSelect && langSelect.value !== currentLang) {
+    langSelect.value = currentLang;
+  }
 
   // Flashcard modal controls translation
   const flashcardBadge = document.getElementById("flashcard-badge-label");
@@ -1677,9 +1688,21 @@ langButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     currentLang = btn.dataset.lang;
     langButtons.forEach((b) => b.classList.toggle("active", b.dataset.lang === currentLang));
+    const langSelect = document.getElementById("lang-select");
+    if (langSelect) langSelect.value = currentLang;
     renderAll();
   });
 });
+
+const topbarLangSelect = document.getElementById("lang-select");
+if (topbarLangSelect) {
+  topbarLangSelect.value = currentLang;
+  topbarLangSelect.addEventListener("change", (e) => {
+    currentLang = e.target.value;
+    langButtons.forEach((b) => b.classList.toggle("active", b.dataset.lang === currentLang));
+    renderAll();
+  });
+}
 
 searchInputEl.addEventListener("input", () => {
   if (searchClearBtn) {

@@ -121,8 +121,6 @@
         <a href="#" class="brand-link" id="brand-home-link" title="Về trang đầu CCNA">
           <span class="brand-badge">CCNA 200-301</span>
         </a>
-        <span class="brand-divider">/</span>
-        <span class="topbar-breadcrumb" id="topbar-breadcrumb">Học phần 01</span>
       </div>
 
       <!-- Course Completion Progress Pill cleanly located in left section -->
@@ -161,7 +159,7 @@
       </button>
 
       <!-- Pearson VUE Mock Exam Simulator Button -->
-      <button type="button" class="topbar-action-btn exam-btn" id="open-exam-btn" title="Thi thử trắc nghiệm CCNA 200-301 chuẩn Pearson VUE">
+      <button type="button" class="topbar-action-btn exam-btn" id="open-exam-btn" onclick="if(typeof openMockExam==='function')openMockExam();" title="Thi thử trắc nghiệm CCNA 200-301 chuẩn Pearson VUE">
         <svg class="action-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/>
           <path d="m9 12 2 2 4-4"/>
@@ -170,7 +168,7 @@
       </button>
 
       <!-- Cisco IOS CLI Cheat Sheet & Cram Tables Button -->
-      <button type="button" class="topbar-action-btn cheatsheet-btn" id="open-cheatsheet-btn" title="Tra cứu nhanh hơn 120+ câu lệnh Cisco IOS & Bảng công thức thi">
+      <button type="button" class="topbar-action-btn cheatsheet-btn" id="open-cheatsheet-btn" onclick="if(typeof openCheatSheet==='function')openCheatSheet();" title="Tra cứu hơn 120+ câu lệnh Cisco IOS & Bảng công thức thi">
         <svg class="action-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="4 17 10 11 4 5"/>
           <line x1="12" y1="19" x2="20" y2="19"/>
@@ -199,11 +197,21 @@
         <span id="theme-icon">Sáng</span>
       </button>
 
-      <!-- Language Switcher in Topbar -->
-      <div class="lang-switch topbar-lang" role="group" aria-label="Chuyển đổi ngôn ngữ">
-        <button type="button" class="lang-btn active" data-lang="vi" title="Tiếng Việt">VI</button>
-        <button type="button" class="lang-btn" data-lang="en" title="English">EN</button>
-        <button type="button" class="lang-btn" data-lang="both" title="Song ngữ Việt - Anh">VI+EN</button>
+      <!-- Language Selector Dropdown in Topbar (Gọn gàng, đồng bộ) -->
+      <div class="topbar-select-wrap lang-dropdown-wrap" title="Chọn ngôn ngữ hiển thị">
+        <svg class="select-prefix-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <select class="topbar-dropdown" id="lang-select" aria-label="Chọn ngôn ngữ hiển thị">
+          <option value="vi">Tiếng Việt</option>
+          <option value="en">English</option>
+          <option value="both">VI + EN</option>
+        </select>
+        <svg class="select-chevron-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
       </div>
 
       <!-- Secure Logout Button -->
