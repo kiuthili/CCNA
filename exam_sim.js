@@ -1068,30 +1068,51 @@ function renderCheatSheetCommands(container) {
   drawFilteredCommands();
 }
 
+function removeVietnameseTones(str) {
+  if (!str) return "";
+  let s = String(str);
+  s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  s = s.replace(/[đĐ]/g, (m) => (m === "đ" ? "d" : "D"));
+  return s.toLowerCase();
+}
+
 function drawFilteredCommands() {
   const listEl = document.getElementById("cs-commands-list");
   if (!listEl) return;
 
-  const q = csCurrentSearch.toLowerCase().trim();
+  const rawQ = csCurrentSearch.toLowerCase().trim();
+  const toneFreeQ = removeVietnameseTones(rawQ);
+
   const filtered = CCNA_CHEAT_SHEET_DATA.filter((item) => {
     const matchCat = csCurrentCat === "all" || item.category === csCurrentCat;
-    const matchSearch =
-      !q ||
-      (item.title && item.title.toLowerCase().includes(q)) ||
-      (item.cmd && item.cmd.toLowerCase().includes(q)) ||
-      (item.categoryName && item.categoryName.toLowerCase().includes(q)) ||
-      (item.scenario && item.scenario.toLowerCase().includes(q)) ||
-      (item.why && item.why.toLowerCase().includes(q)) ||
-      (item.prereq && item.prereq.toLowerCase().includes(q)) ||
-      (item.example && item.example.toLowerCase().includes(q)) ||
-      (item.verify && item.verify.toLowerCase().includes(q));
+    if (!rawQ) return matchCat;
+
+    const fields = [
+      item.title,
+      item.cmd,
+      item.categoryName,
+      item.scenario,
+      item.why,
+      item.prereq,
+      item.example,
+      item.verify,
+    ];
+
+    const matchSearch = fields.some((f) => {
+      if (!f) return false;
+      const lowerF = String(f).toLowerCase();
+      if (lowerF.includes(rawQ)) return true;
+      if (toneFreeQ && removeVietnameseTones(lowerF).includes(toneFreeQ)) return true;
+      return false;
+    });
+
     return matchCat && matchSearch;
   });
 
   // Update badge
   const countBadge = document.getElementById("cs-result-count-badge");
   if (countBadge) {
-    countBadge.textContent = q ? `Tìm thấy ${filtered.length} lệnh` : `Hiển thị ${filtered.length} / ${CCNA_CHEAT_SHEET_DATA.length} lệnh`;
+    countBadge.textContent = rawQ ? `Tìm thấy ${filtered.length} lệnh` : `Hiển thị ${filtered.length} / ${CCNA_CHEAT_SHEET_DATA.length} lệnh`;
   }
 
   if (filtered.length === 0) {

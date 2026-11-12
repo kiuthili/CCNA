@@ -130,9 +130,7 @@ body {
   justify-content: space-between;
   padding: 0 1rem;
   box-shadow: 0 2px 10px rgba(15, 23, 42, 0.035);
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
+  overflow: visible;
 }
 
 .app-topbar::-webkit-scrollbar {
@@ -501,8 +499,10 @@ body {
   display: inline-flex;
 }
 
-/* Language Selector Dropdown in Topbar (Compact & Harmonious) */
-.lang-dropdown-wrap {
+/* Topbar Select Dropdowns (Language & Study Tools Dropboxes) */
+.topbar-select-wrap,
+.lang-dropdown-wrap,
+.tools-dropdown-wrap {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -519,8 +519,12 @@ body {
   box-sizing: border-box;
 }
 
+.topbar-select-wrap:hover,
+.topbar-select-wrap:focus-within,
 .lang-dropdown-wrap:hover,
-.lang-dropdown-wrap:focus-within {
+.lang-dropdown-wrap:focus-within,
+.tools-dropdown-wrap:hover,
+.tools-dropdown-wrap:focus-within {
   border-color: var(--accent-color);
   box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.12);
 }
@@ -538,7 +542,9 @@ body {
   transition: transform 0.2s ease;
 }
 
-.lang-dropdown-wrap:focus-within .select-chevron-icon {
+.topbar-select-wrap:focus-within .select-chevron-icon,
+.lang-dropdown-wrap:focus-within .select-chevron-icon,
+.tools-dropdown-wrap:focus-within .select-chevron-icon {
   transform: rotate(180deg);
   color: var(--accent-color);
 }

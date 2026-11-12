@@ -299,38 +299,47 @@ async function initApp() {
   initZenMode();
   initTextSelectionHighlighter();
   initFlashcardsSystem();
-  initToolsDropdown();
+  initStudyToolsSelect();
   updateProgressSummary();
   updateNotesCountBadges();
 }
 
-function initToolsDropdown() {
-  const dropdownWrap = document.getElementById("tools-dropdown-wrap");
-  const menuBtn = document.getElementById("tools-menu-btn");
-  if (!dropdownWrap || !menuBtn) return;
+function initStudyToolsSelect() {
+  const select = document.getElementById("study-tools-select");
+  if (!select) return;
 
-  menuBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    dropdownWrap.classList.toggle("open");
-  });
+  select.addEventListener("change", (e) => {
+    const action = e.target.value;
+    if (!action) return;
 
-  document.addEventListener("click", (e) => {
-    if (!dropdownWrap.contains(e.target)) {
-      dropdownWrap.classList.remove("open");
+    if (action === "notes") {
+      if (typeof openNotesModal === "function") {
+        openNotesModal("current");
+      }
+    } else if (action === "flashcards") {
+      if (typeof openFlashcardsModal === "function") {
+        openFlashcardsModal();
+      }
+    } else if (action === "exam") {
+      if (typeof window.openMockExam === "function") {
+        window.openMockExam(30);
+      } else if (typeof startMockExam === "function") {
+        startMockExam(30);
+      }
+    } else if (action === "cheatsheet") {
+      if (typeof window.openCheatSheet === "function") {
+        window.openCheatSheet("commands");
+      } else if (typeof openCheatSheetModal === "function") {
+        openCheatSheetModal("commands");
+      }
+    } else if (action === "zen") {
+      if (typeof window.toggleZenMode === "function") {
+        window.toggleZenMode();
+      }
     }
-  });
 
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      dropdownWrap.classList.remove("open");
-    }
-  });
-
-  const menuItems = dropdownWrap.querySelectorAll(".dropdown-menu-item");
-  menuItems.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      dropdownWrap.classList.remove("open");
-    });
+    // Reset select to default placeholder so user can select any tool again
+    select.value = "";
   });
 }
 
@@ -366,8 +375,29 @@ function updateHeaderLabels() {
     if (tabMasteryBtn) tabMasteryBtn.innerHTML = `<span class="tab-label">Chuyên đề</span><span class="tab-pill">10</span>`;
   }
 
-  const toolsBtnLabel = document.getElementById("tools-btn-label");
-  if (toolsBtnLabel) toolsBtnLabel.textContent = isEn ? "Study Tools" : "Công cụ học tập";
+  const optDefault = document.getElementById("opt-tools-default");
+  const optNotes = document.getElementById("opt-tool-notes");
+  const optFlashcard = document.getElementById("opt-tool-flashcard");
+  const optExam = document.getElementById("opt-tool-exam");
+  const optCheatsheet = document.getElementById("opt-tool-cheatsheet");
+  const optZen = document.getElementById("opt-tool-zen");
+
+  if (isEn) {
+    if (optDefault) optDefault.textContent = "⚡ Study Tools";
+    if (optNotes) optNotes.textContent = "📝 Study Notebook (Alt+N)";
+    if (optFlashcard) optFlashcard.textContent = "🗂️ Flashcard Deck";
+    if (optExam) optExam.textContent = "🎯 CCNA Mock Exam (30Q)";
+    if (optCheatsheet) optCheatsheet.textContent = "⌨️ Cisco CLI Cheatsheet";
+    if (optZen) optZen.textContent = "👁️ Zen / Focus Mode";
+  } else {
+    if (optDefault) optDefault.textContent = "⚡ Công cụ học tập";
+    if (optNotes) optNotes.textContent = "📝 Sổ tay ghi chú (Alt+N)";
+    if (optFlashcard) optFlashcard.textContent = "🗂️ Thẻ nhớ Flashcard";
+    if (optExam) optExam.textContent = "🎯 Phòng thi thử CCNA (30 câu)";
+    if (optCheatsheet) optCheatsheet.textContent = "⌨️ Tra cứu lệnh CLI Cisco";
+    if (optZen) optZen.textContent = "👁️ Chế độ tập trung (Zen Mode)";
+  }
+
   const notesBtnText = document.querySelector("#open-notes-btn .btn-text");
   if (notesBtnText) notesBtnText.textContent = isEn ? "Notes" : "Ghi chú";
   const flashcardBtnText = document.querySelector("#open-flashcards-btn .btn-text");
@@ -2639,21 +2669,28 @@ function initNotesResizer() {
 // --------------------------------------------------------------------------
 // Zen / Focus Mode
 // --------------------------------------------------------------------------
+function toggleZenMode() {
+  const isZen = document.body.classList.toggle("zen-mode");
+  const zenBtn = document.getElementById("zen-mode-btn");
+  if (zenBtn) zenBtn.classList.toggle("active", isZen);
+  localStorage.setItem("ccna_zen_mode", isZen ? "true" : "false");
+  return isZen;
+}
+window.toggleZenMode = toggleZenMode;
+
 function initZenMode() {
   const zenBtn = document.getElementById("zen-mode-btn");
-  if (!zenBtn) return;
-
   const savedZen = localStorage.getItem("ccna_zen_mode") === "true";
   if (savedZen) {
     document.body.classList.add("zen-mode");
-    zenBtn.classList.add("active");
+    if (zenBtn) zenBtn.classList.add("active");
   }
 
-  zenBtn.addEventListener("click", () => {
-    const isZen = document.body.classList.toggle("zen-mode");
-    zenBtn.classList.toggle("active", isZen);
-    localStorage.setItem("ccna_zen_mode", isZen ? "true" : "false");
-  });
+  if (zenBtn) {
+    zenBtn.addEventListener("click", () => {
+      toggleZenMode();
+    });
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -3110,6 +3147,12 @@ function initFlashcardsSystem() {
     }
   });
 }
+
+// Global Exports for Modals & Tools
+window.openNotesModal = openNotesModal;
+window.closeNotesModal = closeNotesModal;
+window.openFlashcardsModal = openFlashcardsModal;
+window.closeFlashcardsModal = closeFlashcardsModal;
 
 // Responsive Mobile Sidebar Drawer & Photo Lightbox & Back-to-Top Logic
 const appSidebarEl = document.getElementById("app-sidebar");
