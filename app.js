@@ -643,10 +643,21 @@ function escapeHtml(str) {
 }
 
 function formatRichText(str) {
-  let html = escapeHtml(str);
+  if (str === null || typeof str === "undefined") return "";
+  // Preserve intentional <br> / <br/> tags before HTML-escaping
+  const BR_TOKEN = "___CCNA_BR_TOKEN___";
+  let raw = String(str).replace(/<br\s*\/?>/gi, BR_TOKEN);
+  let html = escapeHtml(raw);
+  // Restore line breaks
+  html = html.replace(new RegExp(BR_TOKEN, "g"), "<br/>").replace(/\n/g, "<br/>");
+  // Convert ASCII arrows to crisp Unicode arrows
+  html = html.replace(/\s--?&gt;\s/g, " &rarr; ");
+  // Inline code (`...`)
   html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
-  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  // Bold (**...**) — supports nested <code class="inline-code">
+  html = html.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
+  // Italic (*...*) — avoid matching stray multiplication or list markers
+  html = html.replace(/(^|[\s(])\*([^*\n]+?)\*(?=[\s.,;:!?)]|$)/g, "$1<em>$2</em>");
   return html;
 }
 

@@ -5,15 +5,15 @@
 // - Network-First for /api/* requests (AI Tutor, Cloud Sync, Auth)
 // ============================================================================
 
-const CACHE_VERSION = "ccna-academy-v2026-11-23-v7";
+const CACHE_VERSION = "ccna-academy-v2026-11-23-v8";
 
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
   "./favicon.svg",
-  "./style.css?v=20261123_v7",
-  "./theme_executive.css?v=20261123_v7",
+  "./style.css?v=20261123_v8",
+  "./theme_executive.css?v=20261123_v8",
   "./ccna_data.json",
   "./diagrams.js?v=20261123_v4",
   "./glossary.js?v=20261123_v4",

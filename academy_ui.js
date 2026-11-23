@@ -376,8 +376,8 @@
               .map(
                 (bw) => `
                 <div class="std-verify-card">
-                  <div style="font-weight:800;color:var(--accent-dark);margin-bottom:0.3rem;">❓ ${escapeHtml(bw.q)}</div>
-                  <div style="font-size:0.86rem;line-height:1.6;">${bw.a}</div>
+                  <div style="font-weight:700;color:var(--text-primary);margin-bottom:0.4rem;font-size:0.9rem;">❓ ${formatRichText(bw.q)}</div>
+                  <div class="walkthrough-answer-body">${formatRichText(bw.a)}</div>
                 </div>
               `
               )
@@ -922,7 +922,7 @@
           <div class="dash-action-card">
             <span class="pt-badge">📘 CONTINUE LEARNING (BÀI HỌC TIẾP THEO)</span>
             <h3 class="dash-card-title">Học phần ${nextMod.id}: ${escapeHtml(nextMod.title_vi || nextMod.title)}</h3>
-            <p class="dash-card-desc">${escapeHtml((nextMod.overview_vi || "").substring(0, 175))}...</p>
+            <p class="dash-card-desc">${formatRichText((nextMod.overview_vi || "").substring(0, 175))}...</p>
             <div class="dash-card-btns">
               <button type="button" class="ws-btn primary" id="dash-continue-mod-btn" data-id="${nextMod.id}">🚀 Học tiếp Học phần ${nextMod.id}</button>
               <button type="button" class="ws-btn" id="dash-open-roadmap-btn">🗺️ Xem Lộ trình 8 Level</button>
@@ -932,7 +932,7 @@
           <div class="dash-action-card">
             <span class="pt-badge">🧪 UPCOMING HANDS-ON LAB (BÀI LAB ĐỀ XUẤT)</span>
             <h3 class="dash-card-title">${escapeHtml(nextLab.title_vi)}</h3>
-            <p class="dash-card-desc">${escapeHtml((nextLab.objective_vi || "").substring(0, 175))}...</p>
+            <p class="dash-card-desc">${formatRichText((nextLab.objective_vi || "").substring(0, 175))}...</p>
             <div class="dash-card-btns">
               <button type="button" class="ws-btn primary" id="dash-continue-lab-btn" data-id="${nextLab.id}">🛠️ Thực hành Bài Lab ${nextLab.id}</button>
               <button type="button" class="ws-btn" id="dash-open-exam-btn">🎯 Vào Phòng Thi Thử CCNA</button>
