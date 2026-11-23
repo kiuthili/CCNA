@@ -207,35 +207,115 @@
     }
   }
 
-  // Keep legacy studyNotes & studyHighlights in sync so existing Cloud Sync & badges work seamlessly
+  // Keep legacy studyNotes & studyHighlights in sync so existing Cloud Sync, Right-hand Drawer & badges work seamlessly
   function syncWorkspaceBackToLegacyGlobals() {
     try {
       if (typeof studyHighlights !== "undefined") {
         const groupedHl = {};
-        workspaceDB.highlights.forEach((h) => {
-          if (!groupedHl[h.lessonKey]) groupedHl[h.lessonKey] = [];
-          groupedHl[h.lessonKey].push({
-            id: h.id,
-            text: h.exactText,
-            color: h.color,
-            prefix: h.prefix,
-            suffix: h.suffix,
-            blockId: h.blockId,
-            startOffset: h.startOffset,
-            noteId: h.noteId,
-            createdAt: h.createdAt,
-            updatedAt: h.updatedAt
+        workspaceDB.highlights
+          .filter((h) => !h.userId || h.userId === currentUserId)
+          .forEach((h) => {
+            if (!groupedHl[h.lessonKey]) groupedHl[h.lessonKey] = [];
+            groupedHl[h.lessonKey].push({
+              id: h.id,
+              text: h.exactText,
+              color: h.color,
+              prefix: h.prefix,
+              suffix: h.suffix,
+              blockId: h.blockId,
+              startOffset: h.startOffset,
+              noteId: h.noteId,
+              createdAt: h.createdAt,
+              updatedAt: h.updatedAt
+            });
           });
-        });
         studyHighlights = groupedHl;
+        localStorage.setItem(`ccna_study_highlights_${currentUserId}`, JSON.stringify(studyHighlights));
         if (currentUserId === "default_user" || currentUserId.startsWith("user_04e7ca8d")) {
           localStorage.setItem("ccna_study_highlights", JSON.stringify(studyHighlights));
         }
       }
+
+      if (typeof studyNotes !== "undefined") {
+        const groupedNotes = {};
+        // Sort oldest to newest so the primary/latest lesson note or combined view populates studyNotes[lessonKey]
+        const userNotes = workspaceDB.notes
+          .filter((n) => !n.userId || n.userId === currentUserId)
+          .sort((a, b) => (a.updatedAt || 0) - (b.updatedAt || 0));
+
+        userNotes.forEach((n) => {
+          // Prefer standalone lesson note for the primary drawer editor, or latest note if none
+          const isStandalone = !n.highlightId;
+          if (!groupedNotes[n.lessonKey] || isStandalone) {
+            groupedNotes[n.lessonKey] = {
+              id: n.id,
+              key: n.lessonKey,
+              title: n.title || resolveLessonTitleFromKey(n.lessonKey),
+              content: n.content || "",
+              tag: n.tag || "exam",
+              isPinned: !!n.isPinned,
+              lessonTitle: n.lessonTitle || resolveLessonTitleFromKey(n.lessonKey),
+              lessonMode: n.lessonKey.startsWith("lab-") ? "labs" : n.lessonKey.startsWith("mastery-") ? "mastery" : "modules",
+              moduleId: n.moduleId || extractModuleIdFromKey(n.lessonKey),
+              labId: n.lessonKey.startsWith("lab-") ? Number(n.lessonKey.replace("lab-", "")) : 0,
+              masteryId: n.lessonKey.startsWith("mastery-") ? Number(n.lessonKey.replace("mastery-", "")) : 0,
+              updatedAt: n.updatedAt || Date.now()
+            };
+          }
+        });
+        studyNotes = groupedNotes;
+        localStorage.setItem(`ccna_study_notes_${currentUserId}`, JSON.stringify(studyNotes));
+        if (currentUserId === "default_user" || currentUserId.startsWith("user_04e7ca8d")) {
+          localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+        }
+      }
+
       if (typeof updateNotesCountBadges === "function") {
         updateNotesCountBadges();
       }
     } catch (e) {}
+  }
+
+  // Upsert or delete a lesson note from the right-hand Quick Notes Drawer (app.js) into workspaceDB
+  function upsertLessonNoteFromDrawer(noteObj) {
+    if (!noteObj || !noteObj.key) return;
+    let existing = workspaceDB.notes.find(
+      (n) => n.lessonKey === noteObj.key && (!n.userId || n.userId === currentUserId) && !n.highlightId
+    );
+    if (existing) {
+      existing.title = noteObj.title || existing.title;
+      existing.content = noteObj.content || "";
+      existing.tag = noteObj.tag || existing.tag || "exam";
+      existing.lessonTitle = noteObj.lessonTitle || existing.lessonTitle;
+      existing.updatedAt = noteObj.updatedAt || Date.now();
+    } else {
+      workspaceDB.notes.push({
+        id: noteObj.id || ("note_" + Math.random().toString(36).substring(2, 10) + Date.now().toString(36).slice(-4)),
+        userId: currentUserId,
+        lessonKey: noteObj.key,
+        moduleId: noteObj.moduleId || extractModuleIdFromKey(noteObj.key),
+        lessonTitle: noteObj.lessonTitle || resolveLessonTitleFromKey(noteObj.key),
+        highlightId: null,
+        quoteText: "",
+        title: noteObj.title || resolveLessonTitleFromKey(noteObj.key),
+        content: noteObj.content || "",
+        tag: noteObj.tag || "exam",
+        isPinned: !!noteObj.isPinned,
+        createdAt: noteObj.updatedAt || Date.now(),
+        updatedAt: noteObj.updatedAt || Date.now()
+      });
+    }
+    saveWorkspaceDB(true);
+    renderFloatingQuickNotesList();
+  }
+
+  function deleteLessonNoteFromDrawer(lessonKey) {
+    if (!lessonKey) return;
+    workspaceDB.notes = workspaceDB.notes.filter(
+      (n) => !(n.lessonKey === lessonKey && (!n.userId || n.userId === currentUserId) && !n.highlightId)
+    );
+    saveWorkspaceDB(true);
+    renderFloatingQuickNotesList();
   }
 
   function extractModuleIdFromKey(key) {
@@ -1942,6 +2022,9 @@
     updateLessonBookmarkButtonUI,
     openFlashcardCreatorFromText,
     upgradeSelectionToolbar,
+    upsertLessonNoteFromDrawer,
+    deleteLessonNoteFromDrawer,
+    getActiveUserId,
     getWorkspaceDB: () => workspaceDB
   };
 })();

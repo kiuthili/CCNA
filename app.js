@@ -11,30 +11,70 @@ const AUTH_HASH_TARGET = "04e7ca8de21d616b80eaa340a06f7ffceb6a3ca22425cbf813b0fb
 const AUTH_SALT = "ccna_auth_v1_2026";
 const ACCOUNT_SYNC_VAULT_KEY = "ccna_acc_" + AUTH_HASH_TARGET.substring(0, 24);
 
-// State Management for Study Tools, Themes, Sidebar, Progress & Notes
-let completedItems = {};
-try {
-  completedItems = JSON.parse(localStorage.getItem("ccna_completed_items") || "{}");
-} catch {
-  completedItems = {};
+// State Management for Study Tools, Themes, Sidebar, Progress & Notes (Multi-User Isolated)
+function getActiveUserProfileId() {
+  const savedUser = sessionStorage.getItem("ccna_active_username") || localStorage.getItem("ccna_active_username");
+  if (savedUser && savedUser.trim()) {
+    return savedUser.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "_");
+  }
+  const authHash = sessionStorage.getItem("ccna_auth_session") || localStorage.getItem("ccna_auth_session");
+  if (authHash) {
+    return "user_" + authHash.substring(0, 12);
+  }
+  return "default_user";
 }
+
+function getCompletedStorageKey(uid) {
+  return `ccna_completed_items_${uid || getActiveUserProfileId()}`;
+}
+
+function getUserCloudSyncKey(uid) {
+  const profileId = uid || getActiveUserProfileId();
+  if (profileId === "default_user" || profileId === "admin" || profileId.startsWith("user_04e7ca8d")) {
+    return ACCOUNT_SYNC_VAULT_KEY;
+  }
+  return `${ACCOUNT_SYNC_VAULT_KEY}_${profileId}`;
+}
+
+let completedItems = {};
+function loadCompletedItemsForActiveUser() {
+  const uid = getActiveUserProfileId();
+  const scopedKey = getCompletedStorageKey(uid);
+  try {
+    const rawScoped = localStorage.getItem(scopedKey);
+    if (rawScoped) {
+      completedItems = JSON.parse(rawScoped);
+    } else if (uid === "default_user" || uid === "admin" || uid.startsWith("user_04e7ca8d")) {
+      completedItems = JSON.parse(localStorage.getItem("ccna_completed_items") || "{}");
+      localStorage.setItem(scopedKey, JSON.stringify(completedItems));
+    } else {
+      completedItems = {};
+    }
+  } catch {
+    completedItems = {};
+  }
+  return completedItems;
+}
+loadCompletedItemsForActiveUser();
 
 let studyNotes = {};
 try {
-  studyNotes = JSON.parse(localStorage.getItem("ccna_study_notes") || "{}");
+  const uid = getActiveUserProfileId();
+  studyNotes = JSON.parse(localStorage.getItem(`ccna_study_notes_${uid}`) || localStorage.getItem("ccna_study_notes") || "{}");
 } catch {
   studyNotes = {};
 }
 
 let studyHighlights = {};
 try {
-  studyHighlights = JSON.parse(localStorage.getItem("ccna_study_highlights") || "{}");
+  const uid = getActiveUserProfileId();
+  studyHighlights = JSON.parse(localStorage.getItem(`ccna_study_highlights_${uid}`) || localStorage.getItem("ccna_study_highlights") || "{}");
 } catch {
   studyHighlights = {};
 }
 
-// Account-bound deterministic Cloud Sync Key
-let cloudSyncKey = ACCOUNT_SYNC_VAULT_KEY;
+// Account-bound deterministic Cloud Sync Key (scoped per user profile)
+let cloudSyncKey = getUserCloudSyncKey();
 localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
 let currentTheme = localStorage.getItem("ccna_theme") || "light";
 let currentFontSize = parseFloat(localStorage.getItem("ccna_font_size") || "16.5");
@@ -274,7 +314,7 @@ function initSecurityAndAuth() {
     const isCtrlOrMeta = e.ctrlKey || e.metaKey;
     if (isCtrlOrMeta) {
       const k = e.key.toLowerCase();
-      if (k === "s" || k === "u" || k === "p") {
+      if (k === "s" || k === "u") {
         e.preventDefault();
       }
     }
@@ -1898,7 +1938,11 @@ function toggleItemCompleted(key) {
   } else {
     completedItems[key] = true;
   }
-  localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
+  const uid = getActiveUserProfileId();
+  localStorage.setItem(getCompletedStorageKey(uid), JSON.stringify(completedItems));
+  if (uid === "default_user" || uid === "admin" || uid.startsWith("user_04e7ca8d")) {
+    localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
+  }
   updateProgressSummary();
   filterAndRenderSidebar();
   updateLessonCompletionButtons();
@@ -1911,25 +1955,56 @@ function updateLessonCompletionButtons() {
   const isEn = currentLang === "en";
   const btns = document.querySelectorAll(".lesson-complete-toggle-btn");
   btns.forEach((btn) => {
+    if (btn.id === "ws-add-standalone-note-btn") return;
     btn.classList.toggle("completed", isDone);
-    btn.innerHTML = isDone
-      ? (isEn ? "✓ Completed this module" : "✓ Đã học xong học phần này")
-      : (isEn ? "○ Mark as completed" : "○ Đánh dấu đã học xong");
+    if (currentMode === "labs") {
+      btn.innerHTML = isDone
+        ? (isEn ? "✓ Completed this Lab" : "✓ Đã làm xong bài Lab này")
+        : (isEn ? "○ Mark Lab as completed" : "○ Đánh dấu đã làm xong bài Lab");
+    } else if (currentMode === "mastery") {
+      btn.innerHTML = isDone
+        ? (isEn ? "✓ Domain Completed" : "✓ Đã học xong chuyên đề này")
+        : (isEn ? "○ Mark Domain Completed" : "○ Đánh dấu đã học xong chuyên đề");
+    } else {
+      btn.innerHTML = isDone
+        ? (isEn ? "✓ Completed this module" : "✓ Đã học xong học phần này")
+        : (isEn ? "○ Mark as completed" : "○ Đánh dấu đã học xong");
+    }
   });
 }
 
 function updateProgressSummary() {
   const isEn = currentLang === "en";
   const totalModules = (modulesData && modulesData.length) || 17;
+  const totalLabs = (typeof PACKET_TRACER_LABS !== "undefined" && PACKET_TRACER_LABS.length) || 35;
+  const totalMastery = (typeof CCNA_EXAM_MASTERY !== "undefined" && CCNA_EXAM_MASTERY.length) || 10;
+
   let completedModulesCount = 0;
+  let completedLabsCount = 0;
+  let completedMasteryCount = 0;
   for (let i = 1; i <= totalModules; i++) {
     if (completedItems["module-" + i]) completedModulesCount++;
   }
-  const pct = Math.round((completedModulesCount / totalModules) * 100);
+  for (let i = 1; i <= totalLabs; i++) {
+    if (completedItems["lab-" + i]) completedLabsCount++;
+  }
+  for (let i = 1; i <= totalMastery; i++) {
+    if (completedItems["mastery-" + i]) completedMasteryCount++;
+  }
+
+  const totalAll = totalModules + totalLabs + totalMastery;
+  const doneAll = completedModulesCount + completedLabsCount + completedMasteryCount;
+  const pct = Math.round((doneAll / totalAll) * 100);
+
   if (progressPillText) {
     progressPillText.textContent = isEn
-      ? `${completedModulesCount}/${totalModules} completed (${pct}%)`
-      : `${completedModulesCount}/${totalModules} bài (${pct}%)`;
+      ? `${completedModulesCount}/17 Mod • ${completedLabsCount}/35 Lab (${pct}%)`
+      : `${completedModulesCount}/17 Bài • ${completedLabsCount}/35 Lab (${pct}%)`;
+  }
+  if (studyProgressPill) {
+    studyProgressPill.title = isEn
+      ? `Overall Progress: ${doneAll}/${totalAll} (${completedModulesCount}/17 Modules, ${completedMasteryCount}/10 Mastery Topics, ${completedLabsCount}/35 Labs)`
+      : `Tiến độ tổng thể: ${doneAll}/${totalAll} (${completedModulesCount}/17 Học phần, ${completedMasteryCount}/10 Chuyên đề, ${completedLabsCount}/35 Bài Lab)`;
   }
   if (progressMiniFill) {
     progressMiniFill.style.width = `${pct}%`;
@@ -2076,7 +2151,15 @@ function getCurrentLessonTitle() {
 }
 
 function updateNotesCountBadges() {
-  const count = Object.keys(studyNotes).length;
+  let count = Object.keys(studyNotes).length;
+  if (window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.getWorkspaceDB === "function") {
+    const db = window.CCNA_WORKSPACE.getWorkspaceDB();
+    const uid = window.CCNA_WORKSPACE.getActiveUserId ? window.CCNA_WORKSPACE.getActiveUserId() : getActiveUserProfileId();
+    const wsNotesCount = Array.isArray(db.notes)
+      ? db.notes.filter((n) => !n.userId || n.userId === uid).length
+      : 0;
+    count = Math.max(count, wsNotesCount);
+  }
   if (notesCountBadge) {
     notesCountBadge.textContent = count;
     notesCountBadge.style.display = count > 0 ? "inline-block" : "none";
@@ -2162,11 +2245,18 @@ function saveCurrentNote(isManual = false) {
   const key = getCurrentLessonNoteKey();
   const title = noteTitleInput ? noteTitleInput.value.trim() : "";
   const content = noteContentInput ? noteContentInput.value.trim() : "";
+  const uid = getActiveUserProfileId();
 
   if (!title && !content) {
     if (studyNotes[key]) {
       delete studyNotes[key];
-      localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+      localStorage.setItem(`ccna_study_notes_${uid}`, JSON.stringify(studyNotes));
+      if (uid === "default_user" || uid === "admin" || uid.startsWith("user_04e7ca8d")) {
+        localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+      }
+      if (window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.deleteLessonNoteFromDrawer === "function") {
+        window.CCNA_WORKSPACE.deleteLessonNoteFromDrawer(key);
+      }
       updateNotesCountBadges();
       renderAllNotesList();
       triggerAutoSync();
@@ -2174,7 +2264,7 @@ function saveCurrentNote(isManual = false) {
     return;
   }
 
-  studyNotes[key] = {
+  const noteObj = {
     key: key,
     title: title || getCurrentLessonTitle(),
     content: content,
@@ -2187,7 +2277,17 @@ function saveCurrentNote(isManual = false) {
     updatedAt: Date.now()
   };
 
-  localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+  studyNotes[key] = noteObj;
+  localStorage.setItem(`ccna_study_notes_${uid}`, JSON.stringify(studyNotes));
+  if (uid === "default_user" || uid === "admin" || uid.startsWith("user_04e7ca8d")) {
+    localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+  }
+
+  // Synchronize directly into Workspace v2 so My Notes & AI Network Tutor immediately see this note
+  if (window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.upsertLessonNoteFromDrawer === "function") {
+    window.CCNA_WORKSPACE.upsertLessonNoteFromDrawer(noteObj);
+  }
+
   updateNotesCountBadges();
 
   if (noteSaveStatusText) {
@@ -2204,10 +2304,17 @@ function saveCurrentNote(isManual = false) {
 
 function deleteCurrentNote() {
   const key = getCurrentLessonNoteKey();
+  const uid = getActiveUserProfileId();
   if (studyNotes[key]) {
     if (confirm("Bạn có chắc chắn muốn xóa ghi chú của bài học này không?")) {
       delete studyNotes[key];
-      localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+      localStorage.setItem(`ccna_study_notes_${uid}`, JSON.stringify(studyNotes));
+      if (uid === "default_user" || uid === "admin" || uid.startsWith("user_04e7ca8d")) {
+        localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+      }
+      if (window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.deleteLessonNoteFromDrawer === "function") {
+        window.CCNA_WORKSPACE.deleteLessonNoteFromDrawer(key);
+      }
       loadCurrentNoteIntoEditor();
       renderAllNotesList();
       updateNotesCountBadges();
@@ -2334,9 +2441,16 @@ function renderAllNotesList() {
   allNotesList.querySelectorAll(".delete-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const k = btn.dataset.key;
+      const uid = getActiveUserProfileId();
       if (confirm("Bạn có chắc chắn muốn xóa ghi chú này?")) {
         delete studyNotes[k];
-        localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+        localStorage.setItem(`ccna_study_notes_${uid}`, JSON.stringify(studyNotes));
+        if (uid === "default_user" || uid === "admin" || uid.startsWith("user_04e7ca8d")) {
+          localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+        }
+        if (window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.deleteLessonNoteFromDrawer === "function") {
+          window.CCNA_WORKSPACE.deleteLessonNoteFromDrawer(k);
+        }
         updateNotesCountBadges();
         renderAllNotesList();
         loadCurrentNoteIntoEditor();
@@ -2391,7 +2505,7 @@ function updateCloudSyncTabUI() {
 }
 
 function initSyncKey() {
-  cloudSyncKey = ACCOUNT_SYNC_VAULT_KEY;
+  cloudSyncKey = getUserCloudSyncKey();
   localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
   if (cloudSyncKeyDisplay) {
     cloudSyncKeyDisplay.value = cloudSyncKey;
@@ -2496,11 +2610,17 @@ async function pushNotesToCloud() {
   const isEn = typeof currentLang !== "undefined" && currentLang === "en";
   setCloudSyncStatus("syncing", isEn ? "Syncing..." : "Đang đồng bộ...");
 
+  const wsDB = window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.getWorkspaceDB === "function"
+    ? window.CCNA_WORKSPACE.getWorkspaceDB()
+    : null;
+
   const payload = {
     syncKey: cloudSyncKey,
+    userId: getActiveUserProfileId(),
     notes: studyNotes,
     highlights: studyHighlights,
     completedItems: completedItems,
+    workspaceDB: wsDB,
     updatedAt: Date.now()
   };
 
@@ -2603,15 +2723,49 @@ async function pullNotesFromCloud(key, silent = false) {
 function mergeIncomingSyncPayload(cloudData, silent = false) {
   if (!cloudData) return;
   const isEn = typeof currentLang !== "undefined" && currentLang === "en";
+  const uid = getActiveUserProfileId();
+
+  // If payload belongs to a different explicit userId, ignore to preserve multi-user isolation
+  if (cloudData.userId && cloudData.userId !== uid) {
+    return;
+  }
+
+  // 0. Merge Workspace v2 entities (notes, highlights, bookmarks, flashcards)
+  if (cloudData.workspaceDB && window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.getWorkspaceDB === "function") {
+    const localDB = window.CCNA_WORKSPACE.getWorkspaceDB();
+    const mergeById = (localArr, remoteArr) => {
+      const map = new Map();
+      (localArr || []).forEach((it) => { if (it && it.id) map.set(it.id, it); });
+      (remoteArr || []).forEach((it) => {
+        if (!it || !it.id) return;
+        const ex = map.get(it.id);
+        if (!ex || (it.updatedAt || it.createdAt || 0) >= (ex.updatedAt || ex.createdAt || 0)) {
+          map.set(it.id, { ...it, userId: uid });
+        }
+      });
+      return Array.from(map.values());
+    };
+    localDB.notes = mergeById(localDB.notes, cloudData.workspaceDB.notes);
+    localDB.highlights = mergeById(localDB.highlights, cloudData.workspaceDB.highlights);
+    localDB.bookmarks = mergeById(localDB.bookmarks, cloudData.workspaceDB.bookmarks);
+    localDB.flashcards = mergeById(localDB.flashcards, cloudData.workspaceDB.flashcards);
+    window.CCNA_WORKSPACE.saveWorkspaceDB(true);
+  }
 
   // 1. Merge Notes
   if (cloudData.notes) {
     Object.keys(cloudData.notes).forEach((k) => {
       if (!studyNotes[k] || (cloudData.notes[k].updatedAt || 0) >= (studyNotes[k].updatedAt || 0)) {
         studyNotes[k] = cloudData.notes[k];
+        if (window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.upsertLessonNoteFromDrawer === "function") {
+          window.CCNA_WORKSPACE.upsertLessonNoteFromDrawer(cloudData.notes[k]);
+        }
       }
     });
-    localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+    localStorage.setItem(`ccna_study_notes_${uid}`, JSON.stringify(studyNotes));
+    if (uid === "default_user" || uid === "admin" || uid.startsWith("user_04e7ca8d")) {
+      localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
+    }
   }
 
   // 2. Merge Highlights
@@ -2630,14 +2784,20 @@ function mergeIncomingSyncPayload(cloudData, silent = false) {
         });
       }
     });
-    localStorage.setItem("ccna_study_highlights", JSON.stringify(studyHighlights));
+    localStorage.setItem(`ccna_study_highlights_${uid}`, JSON.stringify(studyHighlights));
+    if (uid === "default_user" || uid === "admin" || uid.startsWith("user_04e7ca8d")) {
+      localStorage.setItem("ccna_study_highlights", JSON.stringify(studyHighlights));
+    }
     applySavedHighlights(getCurrentLessonNoteKey());
   }
 
   // 3. Merge Course Completion Progress
   if (cloudData.completedItems) {
     completedItems = { ...completedItems, ...cloudData.completedItems };
-    localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
+    localStorage.setItem(getCompletedStorageKey(uid), JSON.stringify(completedItems));
+    if (uid === "default_user" || uid === "admin" || uid.startsWith("user_04e7ca8d")) {
+      localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
+    }
   }
 
   updateNotesCountBadges();
@@ -2659,16 +2819,21 @@ function setCloudSyncStatus(status, text) {
 }
 
 function exportNotesJson() {
+  const wsDB = window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.getWorkspaceDB === "function"
+    ? window.CCNA_WORKSPACE.getWorkspaceDB()
+    : null;
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
     syncKey: cloudSyncKey,
+    userId: getActiveUserProfileId(),
     notes: studyNotes,
     highlights: studyHighlights,
     completedItems: completedItems,
+    workspaceDB: wsDB,
     exportedAt: new Date().toISOString()
   }, null, 2));
   const dlAnchor = document.createElement("a");
   dlAnchor.setAttribute("href", dataStr);
-  dlAnchor.setAttribute("download", `ccna_study_notes_${new Date().toISOString().slice(0, 10)}.json`);
+  dlAnchor.setAttribute("download", `ccna_study_notes_${getActiveUserProfileId()}_${new Date().toISOString().slice(0, 10)}.json`);
   document.body.appendChild(dlAnchor);
   dlAnchor.click();
   dlAnchor.remove();
@@ -2679,29 +2844,7 @@ function importNotesJson(file) {
   reader.onload = (e) => {
     try {
       const parsed = JSON.parse(e.target.result);
-      if (parsed.notes) {
-        studyNotes = { ...studyNotes, ...parsed.notes };
-        localStorage.setItem("ccna_study_notes", JSON.stringify(studyNotes));
-      }
-      if (parsed.highlights) {
-        studyHighlights = { ...studyHighlights, ...parsed.highlights };
-        localStorage.setItem("ccna_study_highlights", JSON.stringify(studyHighlights));
-        applySavedHighlights(getCurrentLessonNoteKey());
-      }
-      if (parsed.completedItems) {
-        completedItems = { ...completedItems, ...parsed.completedItems };
-        localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
-      }
-      if (parsed.syncKey) {
-        cloudSyncKey = parsed.syncKey;
-        localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
-        if (cloudSyncKeyDisplay) cloudSyncKeyDisplay.value = cloudSyncKey;
-      }
-      updateNotesCountBadges();
-      loadCurrentNoteIntoEditor();
-      renderAllNotesList();
-      updateProgressSummary();
-      filterAndRenderSidebar();
+      mergeIncomingSyncPayload({ ...parsed, userId: getActiveUserProfileId() }, true);
       triggerAutoSync();
       alert("Đã nhập dữ liệu sao lưu thành công!");
     } catch {
@@ -3114,9 +3257,12 @@ function initTextSelectionHighlighter() {
     const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
     const scrollY = window.pageYOffset || document.documentElement.scrollTop;
 
-    tooltip.style.left = `${Math.max(10, rect.left + scrollX + (rect.width / 2) - 135)}px`;
-    tooltip.style.top = `${Math.max(10, rect.top + scrollY - 48)}px`;
     tooltip.hidden = false;
+    const tipWidth = tooltip.offsetWidth || 380;
+    const maxLeft = Math.max(10, window.innerWidth - tipWidth - 12) + scrollX;
+    const rawLeft = rect.left + scrollX + (rect.width / 2) - (tipWidth / 2);
+    tooltip.style.left = `${Math.min(maxLeft, Math.max(10 + scrollX, rawLeft))}px`;
+    tooltip.style.top = `${Math.max(10 + scrollY, rect.top + scrollY - 50)}px`;
   };
 
   document.addEventListener("mouseup", (e) => {

@@ -236,6 +236,9 @@
 
     mods.forEach((m) => {
       const e = enrichMap[m.id] || {};
+      const tblContent = m.comparisonTable && m.comparisonTable.rows
+        ? m.comparisonTable.rows.map((r) => r.join(" | ")).join("\n")
+        : "";
       knowledgeIndex.push({
         id: `doc-mod-${m.id}-overview`,
         type: "lesson",
@@ -249,8 +252,12 @@
         content: [
           m.overview_vi || m.overview || "",
           m.analogy_vi || "",
-          ...(m.keyConcepts_vi || []).slice(0, 6)
-        ].join("\n")
+          ...(m.keyConcepts_vi || []),
+          ...(m.advancedTopics_vi || []),
+          ...(m.jobSkills_vi || []),
+          m.realWorldExample_vi || "",
+          tblContent
+        ].filter(Boolean).join("\n")
       });
 
       if (m.commands && m.commands.length > 0) {
@@ -360,6 +367,23 @@
       });
     });
 
+    // 5. Index 120+ Cisco IOS CLI Cheat Sheet Entries (from exam_sim.js)
+    const cliCheatList = typeof CCNA_CHEAT_SHEET_DATA !== "undefined" && Array.isArray(CCNA_CHEAT_SHEET_DATA) ? CCNA_CHEAT_SHEET_DATA : [];
+    cliCheatList.forEach((cs) => {
+      knowledgeIndex.push({
+        id: `doc-cs-${cs.id}`,
+        type: "cli_cheatsheet",
+        contextKey: "cli-cheatsheet",
+        moduleId: 2,
+        title: `Lệnh Cisco IOS (${cs.categoryName}): ${cs.title}`,
+        navLabel: `CLI Cheat Sheet → ${cs.title}`,
+        jumpType: "module",
+        jumpId: 2,
+        keywords: `${cs.title} ${cs.cmd} ${cs.categoryName}`.toLowerCase(),
+        content: `Chế độ: ${cs.mode}\nCú pháp: ${cs.cmd}\nTrường hợp dùng: ${cs.scenario}\nÝ nghĩa: ${cs.why}\nVí dụ:\n${cs.example}\nKiểm tra: ${cs.verify}`
+      });
+    });
+
     isIndexBuilt = true;
   }
 
@@ -369,7 +393,7 @@
 
     const rawTokens = (userQuery || "")
       .toLowerCase()
-      .replace(/[?.,!;:()"']/g, " ")
+      .replace(/[?.,!;:()"'\/\-]/g, " ")
       .split(/\s+/)
       .filter((w) => w.length >= 2 && !["tại", "sao", "như", "thế", "nào", "là", "gì", "của", "cho", "tôi", "hãy", "giải", "thích", "trong", "với", "các", "một", "được", "không", "cần", "khi"].includes(w));
 
@@ -2038,10 +2062,21 @@
     loadUserConversations();
     switchOrEnsureContextConversation();
 
+    // Close Notes sidebar if open so right-side panels don't overlap
+    if (typeof window.closeNotesModal === "function") {
+      window.closeNotesModal();
+    }
+
     const modal = document.getElementById("ai-tutor-modal");
     if (!modal) return;
     modal.hidden = false;
-    document.body.classList.add("modal-open");
+    document.body.classList.add("ai-sidebar-open");
+    // Only lock body scroll on mobile viewports where AI Tutor is a full-screen sheet
+    if (window.innerWidth <= 980) {
+      document.body.classList.add("modal-open");
+    } else {
+      document.body.classList.remove("modal-open");
+    }
 
     updateContextDisplay();
     renderChatMessages();
@@ -2056,6 +2091,7 @@
   function closeAiTutorModal() {
     const modal = document.getElementById("ai-tutor-modal");
     if (modal) modal.hidden = true;
+    document.body.classList.remove("ai-sidebar-open");
     document.body.classList.remove("modal-open");
   }
 
@@ -2153,6 +2189,36 @@
       }
     });
     document.getElementById("ai-clear-all-attachments-btn")?.addEventListener("click", clearAttachments);
+
+    // Draggable AI Sidebar Resizer
+    const resizer = document.getElementById("ai-resizer");
+    if (resizer) {
+      const savedWidth = localStorage.getItem("ccna_ai_sidebar_width");
+      if (savedWidth) {
+        document.documentElement.style.setProperty("--ai-sidebar-width", savedWidth);
+      }
+      let isResizing = false;
+      resizer.addEventListener("mousedown", (e) => {
+        if (window.innerWidth <= 980) return;
+        isResizing = true;
+        document.body.style.userSelect = "none";
+        document.body.style.cursor = "col-resize";
+        e.preventDefault();
+      });
+      window.addEventListener("mousemove", (e) => {
+        if (!isResizing) return;
+        const w = Math.min(Math.max(window.innerWidth - e.clientX, 340), Math.min(window.innerWidth * 0.72, 820));
+        document.documentElement.style.setProperty("--ai-sidebar-width", `${w}px`);
+      });
+      window.addEventListener("mouseup", () => {
+        if (!isResizing) return;
+        isResizing = false;
+        document.body.style.userSelect = "";
+        document.body.style.cursor = "";
+        const cur = getComputedStyle(document.documentElement).getPropertyValue("--ai-sidebar-width");
+        if (cur) localStorage.setItem("ccna_ai_sidebar_width", cur.trim());
+      });
+    }
   }
 
   // Watch for Lesson / Lab / Section changes so AI Context updates automatically in real time (Test 6)
@@ -2169,8 +2235,27 @@
       }
     };
 
-    // Hook into moduleList clicks and primary nav clicks
+    // Hook into moduleList clicks, primary nav clicks, and interactive Lab steps
     document.addEventListener("click", (e) => {
+      const stepEl = e.target.closest(".pt-step-item[data-step-idx]");
+      if (stepEl) {
+        const idx = Number(stepEl.dataset.stepIdx);
+        const labId = Number(stepEl.dataset.labId);
+        if (!isNaN(idx)) {
+          activeLabStepIndex = idx;
+          if (!isNaN(labId) && labId > 0 && typeof activeLabId !== "undefined" && activeLabId === 0) {
+            window.activeLabId = labId;
+          }
+          document.querySelectorAll(".pt-step-item.active-ai-step").forEach((el) => el.classList.remove("active-ai-step"));
+          stepEl.classList.add("active-ai-step");
+          const modal = document.getElementById("ai-tutor-modal");
+          if (modal && !modal.hidden) {
+            updateContextDisplay();
+          }
+        }
+        return;
+      }
+
       if (
         e.target.closest(".module-item") ||
         e.target.closest(".acad-nav-btn") ||

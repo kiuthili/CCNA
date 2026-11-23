@@ -881,6 +881,8 @@ function getCableNameVi(type) {
       return "Cáp Console xanh ngọc (Rollover Cable)";
     case "crossover":
       return "Cáp đồng chéo (Copper Cross-Over - Nét đứt)";
+    case "wireless":
+      return "Sóng vô tuyến Wi-Fi (IEEE 802.11 Wireless RF - Không dùng cáp)";
     case "fiber":
       return "Cáp quang học (Fiber-Optic Cable - Màu cam)";
     case "serial":
@@ -893,6 +895,9 @@ function getCableNameVi(type) {
 function getCableReasonVi(n1, n2, type) {
   if (type === "console") {
     return "Quản trị ngoài băng tần (Out-of-Band) nối từ cổng Serial RS-232 của Laptop vào cổng Console của Switch/Router.";
+  }
+  if (type === "wireless") {
+    return `Kết nối không dây qua sóng vô tuyến Wi-Fi (WPA2/WPA3) giữa ${n1?.name || "Access Point"} và ${n2?.name || "Thiết bị thu Wi-Fi"}.`;
   }
   if (type === "fiber") {
     return "Kết nối trục xương sống tốc độ cao, khoảng cách xa và chống nhiễu điện từ giữa các tòa nhà / Core Switch.";
@@ -1066,15 +1071,22 @@ Gi0/1       1-1005`,
     });
   }
   if (allCmdStr.includes("ip address") || allCmdStr.includes("interface")) {
+    const firstDevName = (nodes.find((n) => n.type === "router" || n.type === "switch" || n.type === "l3switch")?.name || "R1").split(" ")[0];
+    const ipSummaryLines = (lab.ipTable || [])
+      .slice(0, 4)
+      .map((row) => {
+        const iface = (row[1] || "GigabitEthernet0/0/0").split("(")[0].trim().padEnd(22, " ");
+        const ip = ((row[2] || "192.168.1.1").split("/")[0].split("&")[0].trim()).padEnd(15, " ");
+        return `${iface} ${ip} YES manual up                    up`;
+      })
+      .join("\n");
     verificationCommands.push({
       cmd: "show ip interface brief   (hoặc  show ipv6 interface brief)",
       goodOutput: "Toàn bộ các cổng giao tiếp (vật lý, SVI `Vlan1`, hoặc Subinterface `.10`, `.20`) đều hiển thị đúng địa chỉ IP theo bảng quy hoạch, cột `Status: up` và cột `Protocol: up`.",
       sampleCliOutput:
-`R1# show ip interface brief
+`${firstDevName}# show ip interface brief
 Interface              IP-Address      OK? Method Status                Protocol
-GigabitEthernet0/0/0   192.168.1.1     YES manual up                    up
-GigabitEthernet0/0/1   192.168.2.1     YES manual up                    up
-Vlan1                  unassigned      YES unset  administratively down down`,
+${ipSummaryLines || "GigabitEthernet0/0/0   192.168.1.1     YES manual up                    up"}`,
       badSign: "Nếu hiện `administratively down` là quên gõ lệnh `no shutdown`. Nếu hiện `Status: down / Protocol: down` là chưa cắm cáp, chọn sai loại cáp thẳng/chéo, hoặc cổng thiết bị đầu bên kia chưa bật."
     });
   }
@@ -1152,9 +1164,18 @@ Ping statistics for 192.168.1.100:
   // J. Real-world Enterprise Extension
   const extension_vi = buildLabRealWorldExtension(lab, allCmdStr);
 
+  const hasPktFile = lab.id === 1;
+  const pktFileUrl = hasPktFile ? "lab/lab01.pkt" : null;
+  const ptCompatibilityNote_vi = hasPktFile
+    ? "✅ Đã đính kèm file mô phỏng gốc `lab/lab01.pkt` (Tương thích Cisco Packet Tracer 8.0+). Các lệnh CLI và sơ đồ đã được kiểm chứng."
+    : "🛠️ Tương thích Cisco Packet Tracer 8.2+ (Cần học viên tự dựng topology & nạp CLI để kiểm chứng trực tiếp trên phần mềm mô phỏng — Manual Simulation Verification Required). Lưu ý giới hạn mô phỏng: Packet Tracer hỗ trợ tập lệnh CCNA cốt lõi, một số tham số IOS-XE nâng cao ngoài phạm vi CCNA được ghi chú rõ.";
+
   return {
     tierInfo,
     modTitle,
+    hasPktFile,
+    pktFileUrl,
+    ptCompatibilityNote_vi,
     prerequisites_vi: `Nắm vững lý thuyết tại **${modTitle}** và đã cài đặt phần mềm **Cisco Packet Tracer (phiên bản 8.x trở lên)**.`,
     tools_vi: "Cisco Packet Tracer 8.2+ (Logical & Physical Workspace, Simulation Mode, CLI Terminal, Command Prompt).",
     scenario_vi,

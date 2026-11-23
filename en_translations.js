@@ -678,48 +678,48 @@ const CCNA_ANALOGY_EN = {
 };
 
 // ==============================================================================
-// CCNA English Exam Mastery Topics (10 Domains)
+// CCNA English Exam Mastery Topics (10 Domains — Aligned 1:1 with exam_mastery.js)
 // ==============================================================================
 const CCNA_EXAM_MASTERY_EN = {
   1: {
     title_en: "Mastery Topic 1: Enterprise Switching Deep Dive — VLANs, 802.1Q Trunking, DTP, Spanning Tree (STP/RSTP) & EtherChannel",
-    summary_en: "Master all core Layer 2 enterprise switching concepts tested on the CCNA 200-301 exam: Specialized VLAN architectures (Data, Voice, Management, Native), Dynamic Trunking Protocol (DTP) negotiation, Spanning Tree Root Bridge election criteria (802.1D / 802.1w), and EtherChannel link aggregation (LACP vs. PAgP vs. Static)."
+    summary_en: "Master all core Layer 2 enterprise switching concepts tested on the CCNA 200-301 exam (Domain 2.0 - 20%): Specialized VLAN types (Data, Voice, Management, Native), Dynamic Trunking Protocol (DTP) negotiation modes, Spanning Tree Root Bridge election criteria (802.1D / 802.1w Rapid-PVST+), and EtherChannel link aggregation (LACP 802.3ad vs. Cisco PAgP)."
   },
   2: {
-    title_en: "Mastery Topic 2: Enterprise Routing Protocols — OSPFv2, OSPFv3 & Dynamic Routing Mechanics",
-    summary_en: "Comprehensive mastery of Link-State routing: OSPF 7-state neighbor adjacency progression, DR/BDR election in multiaccess broadcast networks, OSPF cost calculations, LSA types, and Area 0 backbone hierarchy."
+    title_en: "Mastery Topic 2: Enterprise Wireless LAN Architecture — Cisco WLC, Lightweight APs, CAPWAP Tunneling & WPA2/WPA3 Security",
+    summary_en: "Master enterprise Wi-Fi architectures tested in CCNA Domain 2.0 & 5.0: Autonomous APs vs. Controller-based Lightweight APs (Split-MAC architecture), CAPWAP tunnels (Control UDP 5246 & Data UDP 5247), Cisco WLC ports and interfaces (Management, Dynamic VLAN, Virtual), 2.4GHz/5GHz/6GHz channel planning, and WPA2/WPA3 (Personal SAE vs. Enterprise 802.1X/RADIUS)."
   },
   3: {
-    title_en: "Mastery Topic 3: IP Services & High Availability — FHRP (HSRP/VRRP), DHCP Snooping & NTP",
-    summary_en: "First-Hop Redundancy Protocols (HSRP active/standby virtual gateway failover, preemption), Network Time Protocol (NTP stratum hierarchy for synchronized logging), and DHCP relay agents."
+    title_en: "Mastery Topic 3: Advanced IP Routing — 3 Golden Path Selection Rules (LPM, AD, Metric), OSPFv2 Deep Dive & FHRP (HSRP/VRRP/GLBP)",
+    summary_en: "Covers 25% of the CCNA 200-301 exam (Domain 3.0 IP Connectivity): How to read any Cisco routing table using Longest Prefix Match, Administrative Distance (AD), and Metric; OSPFv2 neighbor adjacency states, Router-ID election, DR/BDR election on broadcast multiaccess networks; and First Hop Redundancy Protocols (HSRP, VRRP, GLBP)."
   },
   4: {
-    title_en: "Mastery Topic 4: Network Security Fundamentals — Standard & Extended ACLs, Port Security & DAI",
-    summary_en: "Securing access switches and routed boundaries: Port Security (Violation modes: protect, restrict, shutdown), Dynamic ARP Inspection (DAI), DHCP Snooping untrusted port filtering, and IPv4/IPv6 Access Control Lists."
+    title_en: "Mastery Topic 4: Enterprise IP Services — NAT/PAT 4 Address Types, NTP Stratum, Syslog 8 Severity Levels, SNMPv3 & QoS",
+    summary_en: "Master CCNA Domain 4.0 (10%): Differentiate Inside Local, Inside Global, Outside Local, and Outside Global in Static/Dynamic NAT and PAT Overload; Network Time Protocol (NTP Stratum 0–15); Syslog 8 severity levels (0 Emergency down to 7 Debugging); SNMPv2c vs. SNMPv3 (authPriv); and Quality of Service (Classification, CoS 5 / DSCP EF 46 Marking, LLQ Priority Queuing, Policing vs. Shaping)."
   },
   5: {
-    title_en: "Mastery Topic 5: Network Address Translation (NAT) & Private Addressing (RFC 1918)",
-    summary_en: "Static NAT (1-to-1 hosting), Dynamic NAT (pool allocation), and Port Address Translation (PAT / NAT Overload) using ephemeral port multiplexing to preserve public IPv4 addresses."
+    title_en: "Mastery Topic 5: Network Automation, SDN Architecture, Cisco Catalyst (DNA) Center, REST APIs, JSON & Ansible / Puppet / Chef",
+    summary_en: "Master CCNA Domain 6.0 (10%): Control Plane vs. Data Plane vs. Management Plane separation; SDN Controllers, Northbound REST APIs vs. Southbound APIs (NETCONF/RESTCONF/OpenFlow); Cisco DNA/Catalyst Center (Underlay/Overlay, LISP, VXLAN); reading JSON syntax; CRUD HTTP verbs; and comparing Ansible (Agentless/Push/YAML), Puppet (Agent/Pull), and Chef."
   },
   6: {
-    title_en: "Mastery Topic 6: Enterprise Wireless LANs (WLAN) — Architectures, WLC, CAPWAP & 802.11 Standards",
-    summary_en: "Autonomous APs vs. Lightweight APs (Split-MAC architecture), CAPWAP tunnel encapsulation (Control UDP 5246, Data UDP 5247), Cisco Wireless LAN Controllers (WLC), WPA2/WPA3 Personal vs. Enterprise 802.1X."
+    title_en: "Mastery Topic 6: Real-World Network Engineer Field Playbook, Change Management & 12 Classic Technical Interview Scenarios",
+    summary_en: "Track B (Real-World Network Engineer): Production survival skills including 5-step Change Management (`reload in 10` safeguard, TFTP backups), end-to-end packet flow walkthroughs (what happens when typing https://google.com), APIPA 169.254.x.x troubleshooting, and 12 classic Network Engineer technical interview questions."
   },
   7: {
-    title_en: "Mastery Topic 7: Network Automation, Programmability & Software-Defined Networking (SDN)",
-    summary_en: "Cisco DNA Center / Catalyst Center, Software-Defined Access (SDA) Fabric (Underlay vs. Overlay, LISP, VXLAN), REST APIs (GET, POST, PUT, DELETE), JSON / XML / YAML data serialization, and Ansible / Puppet / Chef / Terraform configuration management."
+    title_en: "Mastery Topic 7: Official CCNA 200-301 v1.1 Exam Updates & Modern AIOps — Generative/Predictive AI, Terraform IaC, STP Root/Loop Guards & REST Auth",
+    summary_en: "Complete coverage of official Cisco CCNA 200-301 v1.1 blueprint additions and modern AIOps: Generative AI vs. Predictive AI/Machine Learning in network operations, configuration data sanitization before prompting AI, Infrastructure as Code (IaC) with HashiCorp Terraform (Declarative HCL & .tfstate), the 4 STP Guards (BPDU Guard, Root Guard, Loop Guard, BPDU Filter), and REST API authentication (Basic, API Key, Bearer Token/OAuth2)."
   },
   8: {
-    title_en: "Mastery Topic 8: Quality of Service (QoS) & Traffic Management",
-    summary_en: "Classification and Marking (CoS Layer 2, ToS/DSCP Layer 3: EF, AF, CS, Best Effort), Queuing mechanisms (FIFO, WFQ, CBWFQ, LLQ Strict Priority for Voice), Traffic Policing (drop) vs. Traffic Shaping (buffer/smooth)."
+    title_en: "Mastery Topic 8: Multi-Angle Physical Hardware Anatomy (Front Panel, Rear Panel, Port Close-Ups) & 19-Inch Server Rack Cabling",
+    summary_en: "Track B (Real-World Hardware Deployment): Visual multi-angle inspection of enterprise switches and routers—identifying Console (RJ-45/USB), RJ-45 Copper, SFP/SFP+ Fiber transceivers, LC/SC optical connectors, Switch LED status codes, and wiring horizontal solid-core cables through 110 IDC Patch Panels inside a 19-inch server rack."
   },
   9: {
-    title_en: "Mastery Topic 9: WAN Technologies & Modern Cloud Connectivity",
-    summary_en: "Leased lines, Metro Ethernet, MPLS VPNs, Site-to-Site IPsec VPNs, Generic Routing Encapsulation (GRE), SD-WAN architectures (vManage, vSmart, vBond, vEdge), and Public Cloud on-ramps (AWS Direct Connect, Azure ExpressRoute)."
+    title_en: "Mastery Topic 9: Multi-Vendor Network Administration — HPE Aruba Switches (Web GUI Untagged/Tagged Matrix), MikroTik, DrayTek & FortiGate",
+    summary_en: "Track B (Multi-Vendor Enterprise Operations): Move beyond Cisco CLI to configure HPE Aruba, TP-Link Omada, and UniFi switches via HTTPS Web GUI and Cloud portals. Master the critical terminology translation between Cisco (Access/Trunk/EtherChannel) and HPE Aruba (Untagged 'U', Tagged 'T', PVID, and LACP Trunk Trk1), plus PPPoE and Dual-WAN load balancing on MikroTik/DrayTek/FortiGate routers."
   },
   10: {
-    title_en: "Mastery Topic 10: Network Operations, Monitoring & Production Troubleshooting Toolkit",
-    summary_en: "Syslog severity levels 0–7 (Emergency down to Debugging), SNMPv2c vs. SNMPv3 (AuthNoPriv, AuthPriv encryption), Cisco Discovery Protocol (CDP) vs. Link Layer Discovery Protocol (LLDP), and Cisco IOS system baseline recovery."
+    title_en: "Mastery Topic 10: Enterprise Office Peripherals & Endpoint Operations — LCD MFP Printers (RAW 9100), SMB Scanners, POS Printers, VoIP Phones, PoE CCTV & RMM",
+    summary_en: "Track B (Enterprise IT & Peripheral Integration): Deploy and troubleshoot office endpoints—eliminating fake printer offline errors by replacing Windows WSD with Standard TCP/IP RAW Port 9100, configuring Scan-to-SMB Folder (TCP 445), printing Self-Test IP slips on thermal POS receipt printers, daisy-chaining PoE VoIP phones to PCs (Voice VLAN + Data VLAN), isolating PoE IP Cameras (RTSP 554), and managing PCs via RDP, RMM, and Wake-on-LAN (Magic Packet)."
   }
 };
 

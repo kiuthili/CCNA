@@ -30,6 +30,10 @@ function renderPacketTracerTopologySvg(lab) {
       } else if (lk.type === "crossover") {
         stroke = "#0f172a";
         dash = "6,4";
+      } else if (lk.type === "wireless") {
+        stroke = "#0284c7";
+        dash = "3,4";
+        width = "2.5";
       } else if (lk.type === "fiber") {
         stroke = "#f97316";
         width = "3";
@@ -37,20 +41,25 @@ function renderPacketTracerTopologySvg(lab) {
         stroke = "#dc2626";
         width = "2.5";
       }
-      const mx = (n1.x + n2.x) / 2;
-      const my = (n1.y + n2.y) / 2;
-      const dx = n2.x - n1.x;
-      const dy = n2.y - n1.y;
-      const p1x = Math.round(n1.x + dx * 0.26);
-      const p1y = Math.round(n1.y + dy * 0.26);
-      const p2x = Math.round(n1.x + dx * 0.74);
-      const p2y = Math.round(n1.y + dy * 0.74);
+      const yOff = lk.offsetY || 0;
+      const x1 = n1.x;
+      const y1 = n1.y + yOff;
+      const x2 = n2.x;
+      const y2 = n2.y + yOff;
+      const mx = (x1 + x2) / 2;
+      const my = (y1 + y2) / 2;
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const p1x = Math.round(x1 + dx * 0.26);
+      const p1y = Math.round(y1 + dy * 0.26);
+      const p2x = Math.round(x1 + dx * 0.74);
+      const p2y = Math.round(y1 + dy * 0.74);
 
       const dotColor1 = lk.down ? "#ef4444" : lk.stpBlock ? "#f59e0b" : "#16a34a";
       const dotColor2 = lk.down ? "#ef4444" : "#16a34a";
 
       return `
-        <line x1="${n1.x}" y1="${n1.y}" x2="${n2.x}" y2="${n2.y}" stroke="${stroke}" stroke-width="${width}" ${dash ? `stroke-dasharray="${dash}"` : ""}/>
+        <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${stroke}" stroke-width="${width}" ${dash ? `stroke-dasharray="${dash}"` : ""}/>
         <circle cx="${p1x}" cy="${p1y}" r="5" fill="${dotColor1}" stroke="#fff" stroke-width="1"/>
         <circle cx="${p2x}" cy="${p2y}" r="5" fill="${dotColor2}" stroke="#fff" stroke-width="1"/>
         ${
@@ -1280,11 +1289,13 @@ const PACKET_TRACER_LABS_PART2 = [
       { x: 55, y: 20, w: 690, h: 195, label: "ĐỊNH TUYẾN INTER-VLAN SIÊU TỐC BẰNG GIAO DIỆN SVI TRÊN SWITCH LAYER 3" }
     ],
     ipTable: [
-      ["MLS-3560", "interface vlan 10", "192.168.10.1", "255.255.255.0", "Default Gateway cho VLAN 10"],
-      ["MLS-3560", "interface vlan 20", "192.168.20.1", "255.255.255.0", "Default Gateway cho VLAN 20"]
+      ["MLS-3560", "interface vlan 10 (SVI)", "192.168.10.1", "255.255.255.0 (/24)", "Default Gateway cho VLAN 10"],
+      ["MLS-3560", "interface vlan 20 (SVI)", "192.168.20.1", "255.255.255.0 (/24)", "Default Gateway cho VLAN 20"],
+      ["PC1 (VLAN 10)", "FastEthernet0 (Cắm vào Fa0/1)", "192.168.10.10", "255.255.255.0 (/24)", "Default Gateway: 192.168.10.1"],
+      ["PC2 (VLAN 20)", "FastEthernet0 (Cắm vào Fa0/2)", "192.168.20.10", "255.255.255.0 (/24)", "Default Gateway: 192.168.20.1"]
     ],
     steps_vi: [
-      "Bước 1: Trong Packet Tracer, vào mục **Switches** và kéo thiết bị **3560-24PS** hoặc **3650-24PS** (Multilayer Switch) ra màn hình.",
+      "Bước 1: Trong Packet Tracer, vào mục **Switches** và kéo thiết bị **3560-24PS** hoặc **3650-24PS** (Multilayer Switch) ra màn hình. Kéo 2 máy tính `PC1` (cắm vào `Fa0/1`) và `PC2` (cắm vào `Fa0/2`). Đặt IP cho `PC1` là `192.168.10.10/24` (Default Gateway `192.168.10.1`) và `PC2` là `192.168.20.10/24` (Default Gateway `192.168.20.1`).",
       "Bước 2: Tạo `vlan 10` và `vlan 20`, gán cổng `Fa0/1` vào `vlan 10` và `Fa0/2` vào `vlan 20`.",
       "Bước 3 (Câu lệnh kích hoạt chức năng Router trên Switch L3): Mặc định Switch Layer 3 tắt tính năng định tuyến! Bạn phải gõ lệnh **`ip routing`** ở chế độ Global Config.",
       "Bước 4: Tạo 2 cổng ảo SVI: `interface vlan 10` (đặt IP `192.168.10.1/24`, `no shutdown`) và `interface vlan 20` (đặt IP `192.168.20.1/24`, `no shutdown`)."
@@ -1378,6 +1389,7 @@ const PACKET_TRACER_LABS_PART2 = [
     cli_commands: [
       "! === CẤU HÌNH GIỐNG NHAU TRÊN CẢ SW1 VÀ SW2 ===",
       "SW1(config)# interface range fastEthernet 0/23 - 24          # Chọn đồng thời cả 2 cổng vật lý",
+      "SW1(config-if-range)# switchport mode trunk                  # Đồng bộ chế độ Trunk trên các cổng thành viên trước khi bó",
       "SW1(config-if-range)# channel-group 1 mode active            # Bó vào nhóm số 1 chạy giao thức chuẩn LACP (Active)",
       "SW1(config-if-range)# exit",
       "SW1(config)# interface port-channel 1                        # Vào cổng đại diện sau khi đã bó",
@@ -1674,26 +1686,27 @@ const PACKET_TRACER_LABS_PART2 = [
     title_vi: "Lab 30: Đồ Án Tổng Hợp Cuối Khóa — Thiết Kế, Cấu Hình & Bắt Bệnh Mạng Doanh Nghiệp Nhỏ Từ A Đến Z",
     objective_vi: "Kết hợp toàn bộ kiến thức của 17 Module CCNA 1 vào một mạng doanh nghiệp hoàn chỉnh: Chia mạng con VLSM, cấu hình VLAN & Router-on-a-Stick, cấp IP tự động DHCP, bật bảo mật SSH v2, Port Security, NAT ra Internet và xử lý 5 lỗi mạng kinh điển.",
     nodes: [
-      { name: "PC-PhongBan", type: "pc", x: 100, y: 70, ip: "VLAN 10: .10.x/26" },
-      { name: "IP-Phone-VoIP", type: "pc", x: 100, y: 175, ip: "VLAN 20: .64.x/27" },
+      { name: "PC-PhongBan", type: "pc", x: 100, y: 70, ip: "VLAN 10: 192.168.1.11/26" },
+      { name: "IP-Phone-VoIP", type: "pc", x: 100, y: 175, ip: "VLAN 20: 192.168.1.70/27" },
       { name: "SW-Access (2960)", type: "switch", x: 295, y: 120, ip: "Port-Sec + Trunk" },
       { name: "R1-Edge (ISR4321)", type: "router", x: 515, y: 120, ip: "ROAS + DHCP + NAT + SSH" },
-      { name: "ISP-Internet", type: "server", x: 740, y: 120, ip: "Web/DNS: 8.8.8.8" }
+      { name: "ISP-Internet", type: "server", x: 740, y: 120, ip: "Web/DNS: 203.0.113.1/30" }
     ],
     links: [
       { from: 0, to: 2, type: "straight", p1: "Fa0", p2: "Fa0/1" },
       { from: 1, to: 2, type: "straight", p1: "Fa0", p2: "Fa0/2" },
       { from: 2, to: 3, type: "straight", p1: "Gi0/1", p2: "Gi0/0/0", label: "Trunk 802.1Q" },
-      { from: 3, to: 4, type: "crossover", p1: "Gi0/0/1", p2: "Fa0", label: "WAN NAT Public" }
+      { from: 3, to: 4, type: "crossover", p1: "Gi0/0/1", p2: "Fa0", label: "WAN 203.0.113.0/30" }
     ],
     zones: [
       { x: 30, y: 20, w: 575, h: 195, label: "MẠNG NỘI BỘ DOANH NGHIỆP (VLAN 10 + VLAN 20 + DHCP + SSH + PORT-SEC)" },
-      { x: 630, y: 20, w: 185, h: 195, label: "INTERNET (8.8.8.8)" }
+      { x: 630, y: 20, w: 185, h: 195, label: "INTERNET (203.0.113.1)" }
     ],
     ipTable: [
       ["VLAN 10 (Nhân viên - 50 máy)", "R1 Gi0/0/0.10", "192.168.1.1/26", "255.255.255.192", "DHCP Pool cấp từ .1.11 -> .1.62"],
       ["VLAN 20 (VoIP/IT - 20 máy)", "R1 Gi0/0/0.20", "192.168.1.65/27", "255.255.255.224", "DHCP Pool cấp từ .1.70 -> .1.94"],
-      ["Đường WAN Internet", "R1 Gi0/0/1", "203.0.113.2/30", "255.255.255.252", "Chạy NAT Overload ra 8.8.8.8"]
+      ["Đường WAN Internet", "R1 Gi0/0/1", "203.0.113.2/30", "255.255.255.252", "Default Route -> 203.0.113.1 (ISP-Internet)"],
+      ["ISP-Internet (Web/DNS Server)", "FastEthernet0", "203.0.113.1/30", "255.255.255.252", "Default Gateway: 203.0.113.2"]
     ],
     steps_vi: [
       "Bước 1 (Tầng 1 & Tầng 2 trên SW-Access): Đặt hostname, mật khẩu bảo mật; tạo VLAN 10 và VLAN 20; gán cổng Access kèm `spanning-tree portfast` và `switchport port-security`; cấu hình cổng `Gi0/1` lên Router là `switchport mode trunk`.",
@@ -1758,18 +1771,19 @@ const PACKET_TRACER_LABS_PART2 = [
       "R1-Edge(config)# ip dhcp pool VLAN10_POOL",
       "R1-Edge(dhcp-config)# network 192.168.1.0 255.255.255.192",
       "R1-Edge(dhcp-config)# default-router 192.168.1.1",
-      "R1-Edge(dhcp-config)# dns-server 8.8.8.8",
+      "R1-Edge(dhcp-config)# dns-server 203.0.113.1",
       "R1-Edge(dhcp-config)# ip dhcp pool VLAN20_POOL",
       "R1-Edge(dhcp-config)# network 192.168.1.64 255.255.255.224",
       "R1-Edge(dhcp-config)# default-router 192.168.1.65",
-      "R1-Edge(dhcp-config)# dns-server 8.8.8.8",
+      "R1-Edge(dhcp-config)# dns-server 203.0.113.1",
       "R1-Edge(dhcp-config)# exit",
-      "! --- Cấu hình Cổng WAN & NAT Overload (PAT) ---",
+      "! --- Cấu hình Cổng WAN, Default Route & NAT Overload (PAT) ---",
       "R1-Edge(config)# interface gigabitEthernet 0/0/1",
-      "R1-Edge(config-if)# ip address 8.8.8.1 255.255.255.0         # Nối trực tiếp tới Server ISP-Internet (8.8.8.8/24)",
+      "R1-Edge(config-if)# ip address 203.0.113.2 255.255.255.252   # Khớp 100% với Bảng Quy Hoạch IP (203.0.113.0/30)",
       "R1-Edge(config-if)# ip nat outside",
       "R1-Edge(config-if)# no shutdown",
       "R1-Edge(config-if)# exit",
+      "R1-Edge(config)# ip route 0.0.0.0 0.0.0.0 203.0.113.1        # Tuyến mặc định đẩy lưu lượng ra ISP-Internet (203.0.113.1)",
       "R1-Edge(config)# access-list 1 permit 192.168.1.0 0.0.0.255",
       "R1-Edge(config)# ip nat inside source list 1 interface gigabitEthernet 0/0/1 overload",
       "R1-Edge(config)# end",
@@ -1800,9 +1814,9 @@ const PACKET_TRACER_LABS_PART3 = [
     nodes: [
       { name: "PC-NhanVien", type: "pc", x: 110, y: 120, ip: "192.168.1.10 (GW: .1.1)" },
       { name: "SW1 (2960)", type: "switch", x: 270, y: 120, ip: "Virtual GW: 192.168.1.1" },
-      { name: "R1 (HSRP Active)", type: "router", x: 455, y: 55, ip: "LAN: .1.2 | WAN: 203.0.113.1" },
-      { name: "R2 (HSRP Standby)", type: "router", x: 455, y: 185, ip: "LAN: .1.3 | WAN: 203.0.113.5" },
-      { name: "SW-WAN", type: "switch", x: 615, y: 120, ip: "ISP Switch" },
+      { name: "R1 (HSRP Active)", type: "router", x: 455, y: 55, ip: "LAN: .1.2 | WAN: 203.0.113.2" },
+      { name: "R2 (HSRP Standby)", type: "router", x: 455, y: 185, ip: "LAN: .1.3 | WAN: 203.0.113.3" },
+      { name: "SW-WAN", type: "switch", x: 615, y: 120, ip: "WAN VIP: 203.0.113.1" },
       { name: "ISP-Internet", type: "server", x: 745, y: 120, ip: "203.0.113.100 (GW: .1)" }
     ],
     links: [
@@ -1928,25 +1942,26 @@ const PACKET_TRACER_LABS_PART3 = [
       { name: "Laptop-WiFi", type: "pc", x: 730, y: 175, ip: "Bắt sóng: CongTy-WiFi" }
     ],
     links: [
-      { from: 0, to: 2, type: "straight", p1: "Port1", p2: "Fa0/1", label: "WLC Management" },
+      { from: 0, to: 2, type: "straight", p1: "Gig1", p2: "Fa0/1", label: "WLC Management" },
       { from: 1, to: 2, type: "straight", p1: "Fa0", p2: "Fa0/2" },
       { from: 2, to: 3, type: "straight", p1: "Fa0/3 (PoE)", p2: "Gi0", label: "CAPWAP (UDP 5246/5247)" },
-      { from: 3, to: 4, type: "crossover", p1: "Radio", p2: "WLAN0", label: "Sóng WPA2-AES" }
+      { from: 3, to: 4, type: "wireless", p1: "IEEE 802.11", p2: "WLAN0", label: "Sóng Wi-Fi WPA2-AES" }
     ],
     zones: [
       { x: 40, y: 15, w: 765, h: 205, label: "KIẾN TRÚC WIRELESS DOANH NGHIỆP: CISCO WLC-2504 + LIGHTWEIGHT AP (ĐƯỜNG HẦM CAPWAP)" }
     ],
     ipTable: [
-      ["WLC-2504", "Management Interface", "192.168.1.250", "255.255.255.0", "Truy cập giao diện Web qua https://192.168.1.250"],
-      ["LAP-1 (3702i)", "GigabitEthernet0", "Nhận IP tự động qua DHCP", "255.255.255.0", "Tự động tìm WLC qua CAPWAP UDP 5246"],
-      ["Laptop-WiFi", "Card mạng WPC300N", "Nhận IP tự động qua DHCP", "255.255.255.0", "Kết nối vào SSID: CongTy-WiFi (Pass: Cisco12345)"]
+      ["WLC-2504", "Management Interface (Gig1)", "192.168.1.250", "255.255.255.0", "Bật Internal DHCP Scope (.1.50 -> .1.150)"],
+      ["PC-Admin (Web GUI)", "FastEthernet0", "192.168.1.10", "255.255.255.0", "Mở Web Browser -> https://192.168.1.250"],
+      ["LAP-1 (3702i)", "GigabitEthernet0", "Nhận IP qua DHCP (.1.50)", "255.255.255.0", "Tự động tìm WLC qua CAPWAP UDP 5246"],
+      ["Laptop-WiFi", "Card mạng WPC300N", "Nhận IP qua DHCP (.1.51)", "255.255.255.0", "Kết nối vào SSID: CongTy-WiFi (Pass: Cisco12345)"]
     ],
     steps_vi: [
-      "Bước 1 (Kéo thiết bị WLC và Lightweight AP trong Packet Tracer): Chọn mục **[Network Devices] -> [Wireless Devices]** -> kéo bộ điều khiển **2504 (WLC)** và bộ phát **3702i (Lightweight AP)** ra màn hình. Lưu ý: Bộ phát `3702i` mặc định chưa cắm cục nguồn điện — bạn phải bấm vào nó, ở thẻ **Physical** kéo cục gạch nguồn **Power Brick** ở góc dưới cắm vào ổ điện của AP (hoặc cắm vào Switch cấp nguồn PoE)!",
-      "Bước 2 (Truy cập giao diện đồ họa Web GUI của WLC): Mở `PC-Admin -> Desktop -> Web Browser`, nhập địa chỉ **`https://192.168.1.250`** (nhớ có chữ **`s`** trong `https`!). Đăng nhập tài khoản Admin của WLC.",
-      "Bước 3 (Tạo mạng Wi-Fi mới trên WLC): Trên thanh menu ngang của WLC, bấm vào thẻ **WLANs** -> chọn **Create New -> Go**. Nhập `Profile Name = LAN-NhanVien`, `SSID = CongTy-WiFi` -> bấm **Apply**. Tích chọn ô **Status = Enabled**.",
+      "Bước 1 (Kéo thiết bị WLC và Lightweight AP trong Packet Tracer): Chọn mục **[Network Devices] -> [Wireless Devices]** -> kéo bộ điều khiển **2504 (WLC)** và bộ phát **3702i (Lightweight AP)** ra màn hình. Lưu ý: Bộ phát `3702i` mặc định chưa cắm cục nguồn điện — bạn phải bấm vào nó, ở thẻ **Physical** kéo cục gạch nguồn **Power Brick** ở góc dưới cắm vào ổ điện của AP!",
+      "Bước 2 (Đặt IP cho WLC & Tạo DHCP Scope cấp IP cho AP và Laptop): Bấm vào `WLC-2504` -> chọn thẻ **Config**: 1) Tại mục **Management**, đặt IPv4 Address là `192.168.1.250`, Subnet Mask `255.255.255.0`, Default Gateway `192.168.1.1`; 2) Tại mục **DHCP**, tạo Pool `WLAN_POOL` với Start IP `192.168.1.50`, Mask `255.255.255.0`, Default Router `192.168.1.1` và **WLC Address: `192.168.1.250`** (Option 43 giúp `LAP-1` biết địa chỉ của WLC để tạo đường hầm CAPWAP!).",
+      "Bước 3 (Truy cập giao diện đồ họa Web GUI của WLC & Tạo mạng Wi-Fi): Mở `PC-Admin` (`192.168.1.10`) -> **Desktop -> Web Browser**, nhập **`https://192.168.1.250`** (nhớ dùng `https://`). Trên thanh menu ngang của WLC, bấm vào thẻ **WLANs** -> chọn **Create New -> Go**. Nhập `Profile Name = LAN-NhanVien`, `SSID = CongTy-WiFi` -> bấm **Apply**. Tích chọn ô **Status = Enabled**.",
       "Bước 4 (Bật bảo mật WPA2-PSK AES): Chuyển sang thẻ con **Security -> Layer 2**, chọn `Layer 2 Security = WPA+WPA2`, tích chọn `WPA2 Policy = AES`, tích chọn `Auth Key Mgmt = PSK` và nhập mật khẩu Wi-Fi là **`Cisco12345`** -> bấm **Apply**. Ngay lập tức WLC đẩy cấu hình qua đường hầm CAPWAP xuống `LAP-1`!",
-      "Bước 5 (Lắp card Wi-Fi cho Laptop và kết nối): Bấm vào `Laptop-WiFi`, tắt nút nguồn vật lý, tháo card mạng dây RJ-45 ra và kéo card thu sóng không dây **`WPC300N`** lắp vào rồi bật lại nguồn. Vào **Desktop -> PC Wireless -> Connect**, chọn sóng `CongTy-WiFi` và nhập mật khẩu `Cisco12345`!"
+      "Bước 5 (Lắp card Wi-Fi cho Laptop và kết nối không dây): Bấm vào `Laptop-WiFi`, tắt nút nguồn vật lý, tháo card mạng dây RJ-45 ra và kéo card thu sóng không dây **`WPC300N`** lắp vào rồi bật lại nguồn. Vào **Desktop -> PC Wireless -> Connect**, chọn sóng `CongTy-WiFi` và nhập mật khẩu `Cisco12345`!"
     ],
     cli_commands: [
       "# Các thông số quan trọng trên giao diện Web GUI của Cisco WLC (Hay hỏi trong đề thi CCNA 200-301):",
@@ -1964,16 +1979,12 @@ const PACKET_TRACER_LABS_PART3 = [
     title_vi: "Lab 34: Cấu Hình Tuyến Đường Tĩnh Dự Phòng (Floating Static Route) Tự Động Chuyển Mạch Khi Đứt Cáp OSPF",
     objective_vi: "Ứng dụng chỉ số **Administrative Distance (AD)** để thiết lập cơ chế tự động chuyển đường truyền dự phòng (**Floating Static Route**): Bình thường chạy đường cáp quang chính qua **OSPF (`AD = 110`)**, khi cáp quang chính đứt thì đường dự phòng 4G/Leased Line (`AD = 150`) tự động nổi lên cứu mạng!",
     nodes: [
-      { name: "R1 (Chi nhánh)", type: "router", x: 180, y: 120, ip: "Lo0: 192.168.1.1/24" },
-      { name: "Đường Chính (Gi0/0/0)", type: "cloud", x: 420, y: 55, ip: "10.1.1.0/30 — OSPF (AD 110)" },
-      { name: "Đường Phụ (Gi0/0/1)", type: "cloud", x: 420, y: 185, ip: "10.2.2.0/30 — Static (AD 150)" },
-      { name: "R2 (Trụ sở HQ)", type: "router", x: 660, y: 120, ip: "Lo0: 192.168.2.1/24" }
+      { name: "R1 (Chi nhánh)", type: "router", x: 190, y: 120, ip: "Lo0: 192.168.1.1/24" },
+      { name: "R2 (Trụ sở HQ)", type: "router", x: 650, y: 120, ip: "Lo0: 192.168.2.1/24" }
     ],
     links: [
-      { from: 0, to: 1, type: "crossover", p1: "Gi0/0/0", p2: "Chính", label: "10.1.1.1/30 (AD 110)" },
-      { from: 1, to: 3, type: "crossover", p1: "Chính", p2: "Gi0/0/0", label: "10.1.1.2/30" },
-      { from: 0, to: 2, type: "crossover", p1: "Gi0/0/1", p2: "Phụ", label: "10.2.2.1/30 (AD 150)" },
-      { from: 2, to: 3, type: "crossover", p1: "Phụ", p2: "Gi0/0/1", label: "10.2.2.2/30" }
+      { from: 0, to: 1, type: "crossover", offsetY: -22, p1: "Gi0/0/0", p2: "Gi0/0/0", label: "Đường Chính: 10.1.1.0/30 (OSPF AD 110)" },
+      { from: 0, to: 1, type: "crossover", offsetY: 22, p1: "Gi0/0/1", p2: "Gi0/0/1", label: "Đường Phụ: 10.2.2.0/30 (Static AD 150)" }
     ],
     zones: [
       { x: 60, y: 15, w: 720, h: 205, label: "CƠ CHẾ FLOATING STATIC ROUTE: ĐẶT CHỈ SỐ AD (150) LỚN HƠN OSPF (110)" }

@@ -15,15 +15,45 @@
   window.currentAcademySection = "modules";
   let activeLabTierFilter = "ALL"; // "ALL" | "BEGINNER" | "INTERMEDIATE" | "ADVANCED"
   let recentlyStudied = [];
+  let isApplyingHashRoute = false;
 
-  try {
-    recentlyStudied = JSON.parse(localStorage.getItem("ccna_recently_studied") || "[]");
-    if (!Array.isArray(recentlyStudied)) recentlyStudied = [];
-  } catch {
-    recentlyStudied = [];
+  function getActiveAcademyUserId() {
+    const savedUser = sessionStorage.getItem("ccna_active_username") || localStorage.getItem("ccna_active_username");
+    if (savedUser && savedUser.trim()) {
+      return savedUser.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "_");
+    }
+    const authHash = sessionStorage.getItem("ccna_auth_session") || localStorage.getItem("ccna_auth_session");
+    if (authHash) {
+      return "user_" + authHash.substring(0, 12);
+    }
+    return "default_user";
   }
 
+  function getRecentStorageKey() {
+    return `ccna_recently_studied_${getActiveAcademyUserId()}`;
+  }
+
+  function loadRecentlyStudiedForCurrentUser() {
+    const uid = getActiveAcademyUserId();
+    try {
+      const raw = localStorage.getItem(getRecentStorageKey());
+      if (raw) {
+        recentlyStudied = JSON.parse(raw);
+      } else if (uid === "default_user" || uid === "admin" || uid.startsWith("user_04e7ca8d")) {
+        recentlyStudied = JSON.parse(localStorage.getItem("ccna_recently_studied") || "[]");
+      } else {
+        recentlyStudied = [];
+      }
+      if (!Array.isArray(recentlyStudied)) recentlyStudied = [];
+    } catch {
+      recentlyStudied = [];
+    }
+    return recentlyStudied;
+  }
+  loadRecentlyStudiedForCurrentUser();
+
   function recordRecentlyStudied(type, id, title, badge) {
+    loadRecentlyStudiedForCurrentUser();
     const key = `${type}-${id}`;
     recentlyStudied = recentlyStudied.filter((item) => item.key !== key);
     recentlyStudied.unshift({
@@ -36,8 +66,44 @@
     });
     recentlyStudied = recentlyStudied.slice(0, 8);
     try {
-      localStorage.setItem("ccna_recently_studied", JSON.stringify(recentlyStudied));
+      localStorage.setItem(getRecentStorageKey(), JSON.stringify(recentlyStudied));
     } catch {}
+  }
+
+  function updateRouteHash(sectionName, itemId = null) {
+    if (isApplyingHashRoute) return;
+    try {
+      const currentHash = window.location.hash || "";
+      if (currentHash.includes("sync=") || currentHash.includes("sync-data=")) return;
+      const newHash = itemId !== null && itemId !== undefined
+        ? `#${sectionName}/${itemId}`
+        : `#${sectionName}`;
+      if (currentHash !== newHash) {
+        history.replaceState(null, "", newHash);
+      }
+    } catch {}
+  }
+
+  function restoreRouteFromUrlHash() {
+    const rawHash = (window.location.hash || "").replace(/^#/, "").trim();
+    if (!rawHash || rawHash.includes("sync=") || rawHash.includes("sync-data=")) return false;
+
+    const parts = rawHash.split("/");
+    const sec = parts[0];
+    const idVal = parts[1] !== undefined ? Number(parts[1]) : null;
+    const validSections = new Set([
+      "dashboard", "roadmap", "fundamentals", "modules", "labs",
+      "projects", "troubleshooting", "glossary", "practice", "workspace", "settings"
+    ]);
+    if (!validSections.has(sec)) return false;
+
+    isApplyingHashRoute = true;
+    try {
+      navigateToAcademySection(sec, !isNaN(idVal) ? idVal : null);
+    } finally {
+      isApplyingHashRoute = false;
+    }
+    return true;
   }
 
   // --------------------------------------------------------------------------
@@ -86,18 +152,33 @@
           .map((obj) => `<li>${formatRichText(obj)}</li>`)
           .join("");
 
+        const prereqText = id === 1
+          ? "Không yêu cầu kiến thức mạng trước đó (Bắt đầu từ con số 0). Lưu ý: Các mục thiết bị ngoại vi văn phòng (Máy in Port 9100, Scan SMB, Switch đa hãng Web GUI) trong bài này là phần giới thiệu bức tranh thực tế (Track B) — bạn sẽ học sâu từng giao thức ở các học phần tiếp theo."
+          : `Đã hoàn thành **Học phần ${id - 1}** (Thuộc **Level ${enrich.level}** trong Lộ trình 8 Cấp độ).`;
+
+        const relatedLabsForMod = (typeof PACKET_TRACER_LABS !== "undefined" ? PACKET_TRACER_LABS : []).filter((l) => l.moduleId === id);
+        const relatedLabsChips = relatedLabsForMod.length > 0
+          ? relatedLabsForMod
+              .map((l) => `<button type="button" class="rm-lab-chip" data-lesson-jump-lab="${l.id}">🧪 Lab ${String(l.id).padStart(2, "0")}: ${escapeHtml(l.title_vi.replace(/^Lab \d+:\s*/, ""))}</button>`)
+              .join("")
+          : `<span style="font-size:0.84rem;color:var(--text-muted);">Xem các bài Lab tổng hợp tại mục 5. Practical Labs.</span>`;
+
         const topStandardHtml = `
-          <!-- 1. LEARNING OBJECTIVES & 2. REAL-WORLD SCENARIO (Part 3 Standard) -->
+          <!-- 1. LEARNING OBJECTIVES, PREREQUISITES, TRACK BADGE & 2. REAL-WORLD SCENARIO (Part 3 Standard) -->
           <section class="section-block std-objectives-block" id="sec-block-std-objectives">
             <div class="section-header-wrap" data-target="heading-std-objectives" role="button" tabindex="0">
               <h3 class="section-title" id="heading-std-objectives">
-                <span>1. Learning Objectives &amp; 2. Real-World Enterprise Scenario (${escapeHtml(enrich.examTag)})</span>
+                <span>1. Learning Objectives, Prerequisites &amp; 2. Real-World Enterprise Scenario (${escapeHtml(enrich.examTag)})</span>
               </h3>
               <div class="section-meta-actions">
+                <span class="pt-badge">TRACK A: CCNA 200-301 v1.1</span>
                 <span class="pt-badge">LEVEL ${enrich.level}</span>
               </div>
             </div>
             <div class="section-content-body">
+              <div class="rm-meta-bar" style="margin-bottom:0.85rem;">
+                <span><strong>🔗 Kiến thức tiên quyết (Prerequisites):</strong> ${formatRichText(prereqText)}</span>
+              </div>
               <div class="callout-box important">
                 <div class="callout-title">🎯 1. Mục tiêu học tập (Learning Objectives — Sau bài học này bạn sẽ làm được gì?)</div>
                 <ul class="std-objectives-list">${objectivesListHtml}</ul>
@@ -106,10 +187,19 @@
                 <div class="callout-title">🏢 2. Tình huống doanh nghiệp thực tế (Real-World Enterprise Scenario)</div>
                 <div class="callout-body">${formatRichText(enrich.scenario_vi)}</div>
               </div>
+              <div style="margin-top:0.95rem;">
+                <strong style="font-size:0.86rem;color:#15803d;display:block;margin-bottom:0.45rem;">🧪 Bài Lab thực hành Packet Tracer gắn trực tiếp với Học phần ${id}:</strong>
+                <div class="rm-labs-grid">${relatedLabsChips}</div>
+              </div>
             </div>
           </section>
         `;
         controlBar.insertAdjacentHTML("afterend", topStandardHtml);
+        document.querySelectorAll("[data-lesson-jump-lab]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            navigateToAcademySection("labs", Number(btn.dataset.lessonJumpLab));
+          });
+        });
       }
 
       // Inject 7. Verification & 8. Troubleshooting right after CLI Commands section
@@ -168,6 +258,10 @@
       window.CCNA_WORKSPACE.restoreHighlightsForLesson(`module-${id}`);
       window.CCNA_WORKSPACE.renderFloatingQuickNotesList();
     }
+    if (typeof loadCurrentNoteIntoEditor === "function") {
+      loadCurrentNoteIntoEditor();
+    }
+    updateRouteHash(window.currentAcademySection === "fundamentals" ? "fundamentals" : "modules", id);
     buildRightTableOfContents();
   };
 
@@ -249,7 +343,7 @@
     // F. Step-by-step Configuration & Line-by-line CLI Explanation
     const stepsList = isEn && lab.steps_en && lab.steps_en.length > 0 ? lab.steps_en : (lab.steps_vi || []);
     const stepsHtml = stepsList
-      .map((s) => `<li class="pt-step-item">${formatRichText(s)}</li>`)
+      .map((s, idx) => `<li class="pt-step-item" data-lab-id="${lab.id}" data-step-idx="${idx}" title="Click để chọn bước này làm ngữ cảnh cho Trợ lý AI Lab">${formatRichText(s)}</li>`)
       .join("");
 
     const rawCliText = (lab.cli_commands || [])
@@ -381,6 +475,11 @@
             <span class="pt-badge">BÀI LAB ${String(lab.id).padStart(2, "0")} / 35</span>
             <span class="pt-badge pt-tier-badge ${tierInfo.color}">${escapeHtml(tierInfo.tierLabel_vi)}</span>
             <span class="pt-badge">⏱️ ${escapeHtml(tierInfo.duration_vi)}</span>
+            ${
+              std && std.hasPktFile
+                ? `<a href="${escapeHtml(std.pktFileUrl)}" download class="pt-badge" style="background:#dcfce7;color:#15803d;border:1px solid #86efac;text-decoration:none;" title="Tải file mô phỏng Cisco Packet Tracer (.pkt) của bài Lab này">📥 Tải file lab01.pkt</a>`
+                : `<span class="pt-badge" title="Học viên tự dựng sơ đồ trên Cisco Packet Tracer 8.2+ theo Bảng E và nạp CLI theo Mục F">🖥️ Packet Tracer 8.2+ (Manual Build)</span>`
+            }
             <button type="button" class="pt-badge pt-link-mod-btn" data-jump-mod="${lab.moduleId}" title="Mở bài lý thuyết liên quan">
               📘 Lý thuyết: Học phần ${lab.moduleId} &rarr;
             </button>
@@ -397,6 +496,7 @@
               <div><strong>📊 Độ khó:</strong> ${escapeHtml(tierInfo.tierLabel_vi)} (${escapeHtml(lab.level)})</div>
               <div><strong>📚 Kiến thức tiên quyết:</strong> ${std ? formatRichText(std.prerequisites_vi) : ""}</div>
               <div><strong>🧰 Công cụ &amp; Thời gian dự kiến:</strong> ${std ? escapeHtml(std.tools_vi) : "Cisco Packet Tracer"} • Khoảng ${escapeHtml(tierInfo.duration_vi)}</div>
+              <div style="grid-column: 1 / -1;"><strong>🔬 Trạng thái kiểm chứng mô phỏng (Packet Tracer Compatibility):</strong> ${std ? formatRichText(std.ptCompatibilityNote_vi) : ""}</div>
             </div>
           </div>
 
@@ -548,6 +648,10 @@
       window.CCNA_WORKSPACE.restoreHighlightsForLesson(labId > 0 ? `lab-${labId}` : "labs-general");
       window.CCNA_WORKSPACE.renderFloatingQuickNotesList();
     }
+    if (typeof loadCurrentNoteIntoEditor === "function") {
+      loadCurrentNoteIntoEditor();
+    }
+    updateRouteHash("labs", labId);
     buildRightTableOfContents();
   };
 
@@ -930,10 +1034,12 @@
     container.innerHTML = `
       <div class="academy-roadmap-view">
         <header class="module-header">
-          <div class="module-kicker">SYSTEMATIC 8-LEVEL LEARNING PATH • CCNA 200-301 &amp; ENTERPRISE ENGINEERING</div>
+          <div class="module-kicker">SYSTEMATIC 8-LEVEL LEARNING PATH • TRACK A (CCNA 200-301 v1.1) &amp; TRACK B (REAL-WORLD ENGINEER)</div>
           <h2 class="module-heading">Lộ Trình Học Tập Có Hệ Thống Từ Con Số 0 Đến Kỹ Sư Mạng Doanh Nghiệp (8 Levels)</h2>
           <div class="module-heading-sub">
-            Kiến thức được tổ chức chặt chẽ theo sự phụ thuộc từ dễ đến khó (Level 1 &rarr; Level 8). Mỗi chủ đề đều được gắn nhãn phân biệt rõ giữa <span class="rm-scope-pill core">CCNA Exam Core</span> (Bắt buộc trong kỳ thi CCNA 200-301) và <span class="rm-scope-pill ext">Real-World Job Ext</span> (Mở rộng phục vụ công việc thực tế).
+            Hệ thống phân tách rõ ràng 2 luồng kiến thức bổ trợ nhau:
+            <br/>• <strong>TRACK A — CCNA 200-301 Official Exam Blueprint (v1.1 — 6 Domains):</strong> 1.0 Network Fundamentals (20%), 2.0 Network Access (20%), 3.0 IP Connectivity (25%), 4.0 IP Services (10%), 5.0 Security Fundamentals (15%), 6.0 Automation &amp; Programmability (10%) — Gắn nhãn <span class="rm-scope-pill core">CCNA Exam Core</span>.
+            <br/>• <strong>TRACK B — Real-World Enterprise Network Engineer:</strong> Thiết kế mạng phân cấp 3 lớp, quy hoạch IP/VLAN, lắp đặt tủ Rack &amp; Patch Panel, quản trị thiết bị đa hãng (HPE Aruba Web GUI, MikroTik, DrayTek, FortiGate), thiết bị ngoại vi văn phòng (Máy in Port 9100, Scan SMB 445, POS, VoIP, RMM) &amp; Change Management — Gắn nhãn <span class="rm-scope-pill ext">Real-World Job Ext</span>.
           </div>
         </header>
         ${levelsHtml}
@@ -1242,6 +1348,19 @@
       if (window.CCNA_WORKSPACE) {
         window.CCNA_WORKSPACE.loadWorkspaceForCurrentUser();
       }
+      if (typeof loadCompletedItemsForActiveUser === "function") {
+        loadCompletedItemsForActiveUser();
+      }
+      if (typeof initSyncKey === "function") {
+        initSyncKey();
+      }
+      loadRecentlyStudiedForCurrentUser();
+      if (typeof updateProgressSummary === "function") updateProgressSummary();
+      if (typeof filterAndRenderSidebar === "function") filterAndRenderSidebar();
+      if (typeof updateNotesCountBadges === "function") updateNotesCountBadges();
+      if (window.AI_NETWORK_TUTOR && typeof window.AI_NETWORK_TUTOR.loadUserConversations === "function") {
+        window.AI_NETWORK_TUTOR.loadUserConversations();
+      }
       renderSettingsPage();
     });
 
@@ -1275,9 +1394,11 @@
 
     if (sectionName === "dashboard") {
       if (breadcrumb) breadcrumb.textContent = "1. Dashboard Tổng quan";
+      updateRouteHash("dashboard");
       renderDashboardPage();
     } else if (sectionName === "roadmap") {
       if (breadcrumb) breadcrumb.textContent = "2. Learning Roadmap (8 Levels)";
+      updateRouteHash("roadmap");
       renderRoadmapPage();
     } else if (sectionName === "fundamentals") {
       currentMode = "modules";
@@ -1289,6 +1410,7 @@
       renderSidebar(fundMods);
       selectModule(targetId || 1);
       if (breadcrumb) breadcrumb.textContent = "3. Networking Fundamentals";
+      updateRouteHash("fundamentals", targetId || 1);
     } else if (sectionName === "modules") {
       currentMode = "modules";
       if (tabModulesBtn) tabModulesBtn.classList.add("active");
@@ -1296,6 +1418,7 @@
       if (tabMasteryBtn) tabMasteryBtn.classList.remove("active");
       filterAndRenderSidebar();
       selectModule(targetId || activeModuleId || 1);
+      updateRouteHash("modules", targetId || activeModuleId || 1);
     } else if (sectionName === "labs") {
       currentMode = "labs";
       if (tabModulesBtn) tabModulesBtn.classList.remove("active");
@@ -1304,6 +1427,7 @@
       activeLabId = targetId !== null ? targetId : 0;
       filterAndRenderSidebar();
       renderLabsView(activeLabId);
+      updateRouteHash("labs", activeLabId);
     } else if (sectionName === "projects") {
       currentMode = "mastery";
       if (tabModulesBtn) tabModulesBtn.classList.remove("active");
@@ -1312,24 +1436,30 @@
       activeMasteryId = targetId !== null ? targetId : 0;
       filterAndRenderSidebar();
       renderMasteryView(activeMasteryId);
+      updateRouteHash("projects", activeMasteryId);
       buildRightTableOfContents();
     } else if (sectionName === "troubleshooting") {
       if (breadcrumb) breadcrumb.textContent = "7. Troubleshooting Playbook";
+      updateRouteHash("troubleshooting");
       renderTroubleshootingCenterPage();
     } else if (sectionName === "glossary") {
       if (breadcrumb) breadcrumb.textContent = "8. Network Glossary & CLI";
+      updateRouteHash("glossary");
       renderGlossaryPage();
     } else if (sectionName === "practice") {
       if (breadcrumb) breadcrumb.textContent = "9. Practice, Calculators & Mock Exam";
+      updateRouteHash("practice");
       renderPracticeAndQuizPage();
     } else if (sectionName === "workspace") {
       if (breadcrumb) breadcrumb.textContent = "10. My Notes, Highlights & Flashcards";
+      updateRouteHash("workspace");
       if (window.CCNA_WORKSPACE) {
         window.CCNA_WORKSPACE.renderMyNotesCentralPage();
       }
       buildRightTableOfContents();
     } else if (sectionName === "settings") {
       if (breadcrumb) breadcrumb.textContent = "11. Settings & User Profile";
+      updateRouteHash("settings");
       renderSettingsPage();
     }
 
@@ -1393,13 +1523,21 @@
       });
     }
 
-    // Initial TOC & Workspace restore after initial module renders
+    // Initial Route Restore, TOC & Workspace restore after initial module renders
     setTimeout(() => {
+      restoreRouteFromUrlHash();
       if (window.CCNA_WORKSPACE) {
-        window.CCNA_WORKSPACE.restoreHighlightsForLesson(`module-${typeof activeModuleId !== "undefined" ? activeModuleId : 1}`);
+        const key = typeof getCurrentLessonNoteKey === "function"
+          ? getCurrentLessonNoteKey()
+          : `module-${typeof activeModuleId !== "undefined" ? activeModuleId : 1}`;
+        window.CCNA_WORKSPACE.restoreHighlightsForLesson(key);
         window.CCNA_WORKSPACE.renderFloatingQuickNotesList();
       }
       buildRightTableOfContents();
     }, 350);
+
+    window.addEventListener("hashchange", () => {
+      restoreRouteFromUrlHash();
+    });
   });
 })();

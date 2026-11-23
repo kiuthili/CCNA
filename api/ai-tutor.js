@@ -2,12 +2,24 @@
 // Vercel / Node.js Serverless Function: /api/ai-tutor
 // Secure Backend Proxy for AI NETWORK TUTOR (Gemini API)
 // - Protects secret GEMINI_API_KEY in server environment variables
-// - Enforces payload size limits, rate protection, timeout, and retry logic
+// - Enforces payload size limits (<= 4MB), rate protection, model allowlist,
+//   timeout, and retry logic
 // - Never logs API keys or sensitive user tokens
 // ============================================================================
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_MINUTE = 30;
+const MAX_PAYLOAD_BYTES = 4 * 1024 * 1024; // 4 MB limit
+const MAX_CONVERSATION_TURNS = 30;
+const ALLOWED_MODELS = new Set([
+  "gemini-2.5-flash-lite",
+  "gemini-2.5-flash",
+  "gemini-2.5-pro",
+  "gemini-2.0-flash",
+  "gemini-2.0-flash-lite",
+  "gemini-1.5-flash",
+  "gemini-1.5-pro"
+]);
 const ipRequestCounts = new Map();
 
 function checkRateLimit(clientIp) {
@@ -50,8 +62,9 @@ async function fetchWithRetry(url, options, maxRetries = 2, timeoutMs = 25000) {
 }
 
 module.exports = async (req, res) => {
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const origin = req.headers?.origin || "*";
+  res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Vary", "Origin");
   res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",
@@ -67,6 +80,13 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "Method Not Allowed. Use POST." });
   }
 
+  const contentLength = Number(req.headers?.["content-length"] || 0);
+  if (contentLength > MAX_PAYLOAD_BYTES) {
+    return res.status(413).json({
+      error: "Payload Too Large. Kích thước yêu cầu vượt quá giới hạn an toàn (4MB)."
+    });
+  }
+
   const clientIp = req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown";
   if (!checkRateLimit(clientIp)) {
     return res.status(429).json({
@@ -75,9 +95,15 @@ module.exports = async (req, res) => {
   }
 
   try {
+    const rawBody = typeof req.body === "string" ? req.body : JSON.stringify(req.body || {});
+    if (rawBody.length > MAX_PAYLOAD_BYTES) {
+      return res.status(413).json({ error: "Payload Too Large (Max 4MB)." });
+    }
+
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
-    const apiKey = process.env.GEMINI_API_KEY || body.clientApiKey || "";
-    const model = (body.model || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite").replace(/[^a-zA-Z0-9._-]/g, "");
+    const apiKey = (process.env.GEMINI_API_KEY || body.clientApiKey || "").trim();
+    const rawModel = (body.model || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite").replace(/[^a-zA-Z0-9._-]/g, "");
+    const model = ALLOWED_MODELS.has(rawModel) ? rawModel : "gemini-2.5-flash-lite";
 
     if (!apiKey) {
       return res.status(401).json({
@@ -86,14 +112,25 @@ module.exports = async (req, res) => {
       });
     }
 
+    if (!Array.isArray(body.contents) || body.contents.length === 0) {
+      return res.status(400).json({
+        error: "Bad Request: 'contents' phải là một mảng tin nhắn hợp lệ."
+      });
+    }
+
+    const sanitizedContents = body.contents.slice(-MAX_CONVERSATION_TURNS);
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
     const geminiPayload = {
       systemInstruction: body.systemInstruction,
-      contents: body.contents,
-      generationConfig: body.generationConfig || {
-        temperature: 0.25,
-        maxOutputTokens: 1536
+      contents: sanitizedContents,
+      generationConfig: {
+        temperature: typeof body.generationConfig?.temperature === "number"
+          ? Math.min(1.0, Math.max(0.0, body.generationConfig.temperature))
+          : 0.25,
+        maxOutputTokens: typeof body.generationConfig?.maxOutputTokens === "number"
+          ? Math.min(4096, Math.max(128, body.generationConfig.maxOutputTokens))
+          : 1536
       }
     };
 
