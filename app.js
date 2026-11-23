@@ -2974,6 +2974,10 @@ function initZenMode() {
 // Persistent Multi-Device Highlight System
 // --------------------------------------------------------------------------
 function applySavedHighlights(contextKey) {
+  if (window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.restoreHighlightsForLesson === "function") {
+    window.CCNA_WORKSPACE.restoreHighlightsForLesson(contextKey);
+    return;
+  }
   const container = document.getElementById("module-detail");
   if (!container) return;
 
@@ -3084,11 +3088,21 @@ function initTextSelectionHighlighter() {
       return;
     }
 
-    // Check if selection is within #module-detail
+    // Check if selection is within #module-detail and not inside CLI blocks / inputs / nav
     const anchorNode = sel.anchorNode;
     if (!anchorNode) return;
     const container = anchorNode.nodeType === 3 ? anchorNode.parentElement : anchorNode;
-    if (!container || !container.closest("#module-detail")) {
+    if (
+      !container ||
+      !container.closest("#module-detail") ||
+      container.closest("pre") ||
+      container.closest(".cli-block") ||
+      container.closest("button") ||
+      container.closest("input") ||
+      container.closest("textarea") ||
+      container.closest("select") ||
+      container.closest("svg")
+    ) {
       tooltip.hidden = true;
       return;
     }
@@ -3100,8 +3114,8 @@ function initTextSelectionHighlighter() {
     const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
     const scrollY = window.pageYOffset || document.documentElement.scrollTop;
 
-    tooltip.style.left = `${Math.max(10, rect.left + scrollX + (rect.width / 2) - 110)}px`;
-    tooltip.style.top = `${Math.max(10, rect.top + scrollY - 45)}px`;
+    tooltip.style.left = `${Math.max(10, rect.left + scrollX + (rect.width / 2) - 135)}px`;
+    tooltip.style.top = `${Math.max(10, rect.top + scrollY - 48)}px`;
     tooltip.hidden = false;
   };
 
@@ -3366,6 +3380,24 @@ function buildFlashcardDeck(targetModId = null, targetCategory = "all") {
       });
     }
   });
+
+  // 6. Custom Flashcards created by user in Personal Learning Workspace (Part 9.E)
+  if (window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.getWorkspaceDB === "function") {
+    const wsDB = window.CCNA_WORKSPACE.getWorkspaceDB();
+    const customCards = (wsDB && Array.isArray(wsDB.flashcards)) ? wsDB.flashcards : [];
+    customCards.forEach((fc) => {
+      if (!useAllModules && fc.moduleId !== (typeof targetModId === "number" ? targetModId : activeModuleId)) {
+        return;
+      }
+      deck.unshift({
+        modId: fc.moduleId || 1,
+        category: "custom",
+        type: isEn ? "⭐ Personal Custom Flashcard" : "⭐ Thẻ Cá Nhân (Custom)",
+        front: `<strong>${formatRichText(fc.front)}</strong>`,
+        back: formatRichText(fc.back)
+      });
+    });
+  }
 
   // Fisher-Yates shuffle
   for (let i = deck.length - 1; i > 0; i--) {
