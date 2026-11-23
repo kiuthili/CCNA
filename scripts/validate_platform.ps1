@@ -107,6 +107,7 @@ Assert-Condition ($aiRaw -match 'text/event-stream' -and $aiRaw -match 'followUp
 Assert-Condition ((Test-Path (Join-Path $root "assets\css\theme_executive.css")) -and $acadRaw -match 'function renderUserGuidePage') "Executive UI stylesheet & dedicated User Guide (#guide) active in structured directories"
 Assert-Condition ((Test-Path (Join-Path $root "js\features\guided_learning.js")) -and $acadRaw -match 'today-focus-hero') "Guided 4-Step Micro-Learning engine, ELI5 summary & Today Focus Hero active"
 Assert-Condition ((Test-Path (Join-Path $root "js\features\gamification_arcade.js")) -and $acadRaw -match 'renderArcadeHubPage') "Gamification XP/Ranks, Incident RPG, 60s Speed Arcade & Audio Podcast active"
+Assert-Condition (Test-Path (Join-Path $root "js\features\real_network_games.js")) "3 real interactive games (Canvas Firewall Defender, SVG Cable Patching, 8-Bit LED Bit-Flipper) active"
 
 Write-Output "`n=================================================================="
 Write-Output ("VALIDATION SUMMARY: {0} PASSED | {1} FAILED" -f $passed, $failed)

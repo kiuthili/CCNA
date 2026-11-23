@@ -5,15 +5,15 @@
 // - Network-First for /api/* requests (AI Tutor, Cloud Sync, Auth)
 // ============================================================================
 
-const CACHE_VERSION = "ccna-academy-v2026-11-23-v13";
+const CACHE_VERSION = "ccna-academy-v2026-11-23-v14";
 
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
   "./favicon.svg",
-  "./assets/css/style.css?v=20261123_v13",
-  "./assets/css/theme_executive.css?v=20261123_v13",
+  "./assets/css/style.css?v=20261123_v14",
+  "./assets/css/theme_executive.css?v=20261123_v14",
   "./data/ccna_data.json",
   "./data/diagrams.js?v=20261123_v11",
   "./data/glossary.js?v=20261123_v11",
@@ -30,7 +30,8 @@ const PRECACHE_ASSETS = [
   "./js/features/ios_simulator.js?v=20261123_v12",
   "./js/features/network_toolkit.js?v=20261123_v12",
   "./js/features/guided_learning.js?v=20261123_v13",
-  "./js/features/gamification_arcade.js?v=20261123_v13",
+  "./js/features/gamification_arcade.js?v=20261123_v14",
+  "./js/features/real_network_games.js?v=20261123_v14",
   "./assets/images/aruba_switch.jpg",
   "./assets/images/cctv_ip_camera.jpg",
   "./assets/images/coaxial_bnc_port.jpg",
