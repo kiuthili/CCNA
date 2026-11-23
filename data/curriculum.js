@@ -456,7 +456,7 @@ const MODULE_STANDARD_10_ENRICHMENT = {
     examTag: "CCNA Domain 1.0 & 2.0 • Data Link Layer",
     objectives_vi: [
       "Giải thích chức năng của Tầng 2 (Data Link Layer) và sự phối hợp giữa 2 tầng con: **LLC (IEEE 802.2 - kết nối lên Tầng 3)** và **MAC (IEEE 802.3/802.11 - đóng khung Frame và truy cập đường truyền)**.",
-      "Phân biệt các mô hình拓扑 vật lý và logic của mạng LAN (Star, Extended Star) và mạng WAN (Point-to-Point, Hub-and-Spoke, Full Mesh).",
+      "Phân biệt các mô hình topo vật lý và logic của mạng LAN (Star, Extended Star) và mạng WAN (Point-to-Point, Hub-and-Spoke, Full Mesh).",
       "So sánh cơ chế truyền **Half-Duplex (Bán song công - dùng CSMA/CD trên Hub hoặc CSMA/CA trên Wi-Fi)** và **Full-Duplex (Song công toàn phần - truyền và nhận đồng thời trên Switch hiện đại, triệt tiêu 100% xung đột Collision)**.",
       "Giải phẫu 3 phần của mọi khung tin Data Link Frame: Header (Địa chỉ đích/nguồn, Type), Payload (Packet Tầng 3) và Trailer (FCS kiểm lỗi CRC-32)."
     ],

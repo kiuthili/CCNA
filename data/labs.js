@@ -324,7 +324,7 @@ const PACKET_TRACER_LABS = [
       "Bước 1: Dùng lại sơ đồ nối `PC-Client` (192.168.1.10) qua `SW1` tới `Web-Server` (192.168.1.100).",
       "Bước 2 (Chuyển sang chế độ quay chậm Simulation): Ở góc dưới cùng bên phải của Packet Tracer, bấm chuyển từ **Realtime** sang biểu tượng đồng hồ bấm giờ **Simulation**.",
       "Bước 3 (Tạo gói tin thử nghiệm): Bấm vào biểu tượng **Phong bì thư có dấu cộng (Add Simple PDU - Phím tắt `P`)** ở thanh công cụ phía trên -> Bấm chuột vào `PC-Client` (làm nguồn) rồi bấm vào `Web-Server` (làm đích). Bạn sẽ thấy một phong bì thư xuất hiện ngay trên `PC-Client`!",
-      "Bước 4 (Giải phẫu 7 tầng OSI): Nháy đúp chuột прямо vào **chiếc phong bì thư** trên `PC-Client`. Cửa sổ **PDU Information** hiện ra với 2 thẻ cực kỳ giá trị: • Thẻ **OSI Model**: Cho thấy dữ liệu đang đi qua Layer 3 (`IP Header: Src 192.168.1.10 -> Dst 192.168.1.100`), Layer 2 (`Ethernet II: Src MAC -> Dst MAC`), và Layer 1 (`FastEthernet0`). • Thẻ **Outbound PDU Details**: Vẽ chính xác cấu trúc từng ô bit của khung tin Ethernet II, IPv4 Header và ICMP!",
+      "Bước 4 (Giải phẫu 7 tầng OSI): Nháy đúp chuột trực tiếp vào **chiếc phong bì thư** trên `PC-Client`. Cửa sổ **PDU Information** hiện ra với 2 thẻ cực kỳ giá trị: • Thẻ **OSI Model**: Cho thấy dữ liệu đang đi qua Layer 3 (`IP Header: Src 192.168.1.10 -> Dst 192.168.1.100`), Layer 2 (`Ethernet II: Src MAC -> Dst MAC`), và Layer 1 (`FastEthernet0`). • Thẻ **Outbound PDU Details**: Vẽ chính xác cấu trúc từng ô bit của khung tin Ethernet II, IPv4 Header và ICMP!",
       "Bước 5: Bấm nút **Capture / Forward (`Alt + C`)** từng nhịp một: Nhịp 1 phong bì bay tới `SW1` (bấm vào phong bì tại `SW1`, bạn sẽ thấy Switch **chỉ đọc đến Layer 2** chứ không hề mở Layer 3!). Nhịp 2 phong bì bay tới `Web-Server`, và nhịp 3-4 quay về `PC-Client` kèm dấu tích xanh `Successful`!"
     ],
     cli_commands: [
@@ -1068,7 +1068,7 @@ const PACKET_TRACER_LABS_PART2 = [
     steps_vi: [
       "Bước 1 (Đặt tên máy & Tên miền): Thuật toán sinh khóa mã hóa RSA bắt buộc thiết bị phải có tên khác mặc định (`hostname R1`) và có tên miền (`ip domain-name cisco.com`) để ghép thành tên khóa `R1.cisco.com`.",
       "Bước 2 (Sinh cặp khóa mã hóa RSA 2048-bit): Gõ lệnh `crypto key generate rsa`, khi máy hỏi `How many bits in the modulus [512]:`, hãy nhập **`2048`** (chuẩn bảo mật cao cho SSH v2).",
-      "Bước 3 (Tạo tài khoản локал trong cơ sở dữ liệu máy): Gõ `username admin secret Admin@123` và bật `ip ssh version 2`.",
+      "Bước 3 (Tạo tài khoản cục bộ (local) trong cơ sở dữ liệu máy): Gõ `username admin secret Admin@123` và bật `ip ssh version 2`.",
       "Bước 4 (Áp dụng lên cổng VTY và cấm Telnet): Vào `line vty 0 4`, gõ `login local` (bắt buộc tra cứu cả Username lẫn Password vừa tạo) và gõ `transport input ssh` (chỉ nhận SSH, từ chối mọi kết nối Telnet!).",
       "Bước 5 (Kiểm tra từ PC): Mở `PC-Admin -> Command Prompt`, gõ lệnh `ssh -l admin 192.168.1.1` (chú ý là chữ `-l` viết tắt của chữ *login*, không phải số 1!)."
     ],

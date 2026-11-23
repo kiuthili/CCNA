@@ -108,6 +108,11 @@ Assert-Condition ((Test-Path (Join-Path $root "assets\css\theme_executive.css"))
 Assert-Condition ((Test-Path (Join-Path $root "js\features\guided_learning.js")) -and $acadRaw -match 'today-focus-hero') "Guided 4-Step Micro-Learning engine, ELI5 summary & Today Focus Hero active"
 Assert-Condition ((Test-Path (Join-Path $root "js\features\gamification_arcade.js")) -and $acadRaw -match 'renderArcadeHubPage') "Gamification XP/Ranks, Incident RPG, 60s Speed Arcade & Audio Podcast active"
 Assert-Condition (Test-Path (Join-Path $root "js\features\real_network_games.js")) "3 real interactive games (Canvas Firewall Defender, SVG Cable Patching, 8-Bit LED Bit-Flipper) active"
+$foreignHits = Get-ChildItem -Path (Join-Path $root "data"),(Join-Path $root "js") -Recurse -File | ForEach-Object {
+  $c = Get-Content -Path $_.FullName -Raw -Encoding UTF8
+  if ($c -match '[\u0400-\u04FF\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF\u0E00-\u0E7F]') { $_.Name }
+}
+Assert-Condition ($null -eq $foreignHits -or $foreignHits.Count -eq 0) "Zero stray Cyrillic/CJK/foreign-script characters across all data/ and js/ files" "Found in: $($foreignHits -join ', ')"
 
 Write-Output "`n=================================================================="
 Write-Output ("VALIDATION SUMMARY: {0} PASSED | {1} FAILED" -f $passed, $failed)
