@@ -860,6 +860,31 @@
 
     container.innerHTML = `
       <div class="academy-dashboard">
+        <!-- Focus Hero: "Hôm nay học gì? (10 phút)" -->
+        <section class="today-focus-hero">
+          <div class="today-focus-left">
+            <div class="today-streak-row">
+              <span class="today-streak-badge">🔥 Chuỗi học: ${typeof window.getStudyStreak === "function" ? window.getStudyStreak().days : 1} ngày</span>
+              <span class="today-eta-badge">⏱️ Chỉ cần 10–15 phút hôm nay</span>
+            </div>
+            <h2 class="today-focus-title">Hôm nay bạn chỉ cần học 1 bài này thôi!</h2>
+            <p class="today-focus-sub">
+              <strong>Học phần ${nextMod.id}: ${escapeHtml(nextMod.title_vi || nextMod.title)}</strong> — Hệ thống tự chia nhỏ thành <strong>4 bước ngắn gọn</strong> (Hiểu nhanh 2 phút &rarr; Kiến thức &amp; CLI &rarr; Thực hành &rarr; 3 câu Quiz chốt bài) để bạn học nhẹ nhàng, không bị ngợp chữ.
+            </p>
+            <div class="today-mini-steps">
+              <span>1. 💡 Hiểu nhanh 3 ý chính</span>
+              <span>2. 📘 Học &amp; gõ thử lệnh</span>
+              <span>3. 🏆 Làm 3 câu chốt bài</span>
+            </div>
+          </div>
+          <div class="today-focus-actions">
+            <button type="button" class="ws-btn primary today-big-cta" id="dash-today-start-btn" data-id="${nextMod.id}">
+              ▶ Bắt đầu Học phần ${nextMod.id} ngay
+            </button>
+            <button type="button" class="ws-btn" id="dash-open-guide-btn">📖 Xem hướng dẫn cách học</button>
+          </div>
+        </section>
+
         <header class="module-header">
           <div class="module-kicker">CCNA NETWORK ACADEMY • ENTERPRISE LEARNING DASHBOARD</div>
           <h2 class="module-heading">Trung Tâm Điều Khiển &amp; Theo Dõi Tiến Độ Học Tập CCNA 200-301</h2>
@@ -962,6 +987,12 @@
       </div>
     `;
 
+    document.getElementById("dash-today-start-btn")?.addEventListener("click", (e) => {
+      navigateToAcademySection("modules", Number(e.currentTarget.dataset.id));
+    });
+    document.getElementById("dash-open-guide-btn")?.addEventListener("click", () => {
+      navigateToAcademySection("guide");
+    });
     document.getElementById("dash-continue-mod-btn")?.addEventListener("click", (e) => {
       navigateToAcademySection("modules", Number(e.currentTarget.dataset.id));
     });

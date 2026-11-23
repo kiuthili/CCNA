@@ -105,6 +105,7 @@ Assert-Condition ($appRaw -match 'computeSm2Schedule' -and $appRaw -match 'getDu
 Assert-Condition ($examRaw -match 'renderSixDomainRadarSvg' -and $examRaw -match 'startWeakSpotDrill' -and $acadRaw -match 'dash-sm2-banner') "6-Domain CCNA 200-301 Mastery Radar, Smart Weak-Spot Drill & Dashboard SM-2 reminder active"
 Assert-Condition ($aiRaw -match 'text/event-stream' -and $aiRaw -match 'followUpSuggestions') "js/features/ai_tutor.js consumes real-time SSE streaming tokens & renders follow-up suggestions"
 Assert-Condition ((Test-Path (Join-Path $root "assets\css\theme_executive.css")) -and $acadRaw -match 'function renderUserGuidePage') "Executive UI stylesheet & dedicated User Guide (#guide) active in structured directories"
+Assert-Condition ((Test-Path (Join-Path $root "js\features\guided_learning.js")) -and $acadRaw -match 'today-focus-hero') "Guided 4-Step Micro-Learning engine, ELI5 summary & Today Focus Hero active"
 
 Write-Output "`n=================================================================="
 Write-Output ("VALIDATION SUMMARY: {0} PASSED | {1} FAILED" -f $passed, $failed)
