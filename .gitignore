@@ -1,6 +1,7 @@
-# Local credentials and keys - DO NOT COMMIT
+# Local secrets & environment files
 local_config.js
-ai_key_local.js
-*.local.js
+js/core/local_config.js
 .env
-.env.*
+.env.local
+.vercel
+node_modules/

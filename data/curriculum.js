@@ -1165,9 +1165,9 @@ Ping statistics for 192.168.1.100:
   const extension_vi = buildLabRealWorldExtension(lab, allCmdStr);
 
   const hasPktFile = lab.id === 1;
-  const pktFileUrl = hasPktFile ? "lab/lab01.pkt" : null;
+  const pktFileUrl = hasPktFile ? "assets/labs/lab01.pkt" : null;
   const ptCompatibilityNote_vi = hasPktFile
-    ? "✅ Đã đính kèm file mô phỏng gốc `lab/lab01.pkt` (Tương thích Cisco Packet Tracer 8.0+). Các lệnh CLI và sơ đồ đã được kiểm chứng."
+    ? "✅ Đã đính kèm file mô phỏng gốc `assets/labs/lab01.pkt` (Tương thích Cisco Packet Tracer 8.0+). Các lệnh CLI và sơ đồ đã được kiểm chứng."
     : "🛠️ Tương thích Cisco Packet Tracer 8.2+ (Cần học viên tự dựng topology & nạp CLI để kiểm chứng trực tiếp trên phần mềm mô phỏng — Manual Simulation Verification Required). Lưu ý giới hạn mô phỏng: Packet Tracer hỗ trợ tập lệnh CCNA cốt lõi, một số tham số IOS-XE nâng cao ngoài phạm vi CCNA được ghi chú rõ.";
 
   return {

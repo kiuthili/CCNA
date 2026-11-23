@@ -1,59 +1,59 @@
 // ============================================================================
 // CCNA NETWORK ACADEMY — OFFLINE-FIRST SERVICE WORKER (PWA)
-// - Precaches all core HTML, CSS, JS, ccna_data.json, SVG & hardware images
+// - Precaches all core HTML, CSS, JS, data/ccna_data.json, SVG & hardware images
 // - Cache-First for static educational assets so students can study 100% offline
 // - Network-First for /api/* requests (AI Tutor, Cloud Sync, Auth)
 // ============================================================================
 
-const CACHE_VERSION = "ccna-academy-v2026-11-23-v10";
+const CACHE_VERSION = "ccna-academy-v2026-11-23-v11";
 
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
   "./favicon.svg",
-  "./style.css?v=20261123_v9",
-  "./theme_executive.css?v=20261123_v9",
-  "./ccna_data.json",
-  "./diagrams.js?v=20261123_v4",
-  "./glossary.js?v=20261123_v4",
-  "./labs.js?v=20261123_v4",
-  "./exam_mastery.js?v=20261123_v4",
-  "./en_translations.js?v=20261123_v4",
-  "./exam_sim.js?v=20261123_v4",
-  "./ai_tutor.js?v=20261123_v4",
-  "./curriculum.js?v=20261123_v4",
-  "./workspace.js?v=20261123_v4",
-  "./command_palette.js?v=20261123_v4",
-  "./ios_simulator.js?v=20261123_v4",
-  "./network_toolkit.js?v=20261123_v4",
-  "./app.js?v=20261123_v4",
-  "./academy_ui.js?v=20261123_v4",
-  "./images/aruba_switch.jpg",
-  "./images/cctv_ip_camera.jpg",
-  "./images/coaxial_bnc_port.jpg",
-  "./images/console_cable.jpg",
-  "./images/fiber_lc_sc_ports.jpg",
-  "./images/fiber_optic.jpg",
-  "./images/firewall_asa.jpg",
-  "./images/ip_phone.jpg",
-  "./images/mfp_printer_lcd.jpg",
-  "./images/mikrotik_router.jpg",
-  "./images/nic_card.jpg",
-  "./images/office_scanner.jpg",
-  "./images/patch_panel_ports.jpg",
-  "./images/poe_switch_ports.jpg",
-  "./images/pos_receipt_printer.jpg",
-  "./images/rack_rear_cabling.jpg",
-  "./images/rj45_connector_pins.jpg",
-  "./images/router_cisco.jpg",
-  "./images/router_rear_ports.jpg",
-  "./images/server_rack.jpg",
-  "./images/sfp_module.jpg",
-  "./images/switch_cisco.jpg",
-  "./images/switch_ports_closeup.jpg",
-  "./images/utp_cable.jpg",
-  "./images/wifi_ap.jpg"
+  "./assets/css/style.css?v=20261123_v11",
+  "./assets/css/theme_executive.css?v=20261123_v11",
+  "./data/ccna_data.json",
+  "./data/diagrams.js?v=20261123_v11",
+  "./data/glossary.js?v=20261123_v11",
+  "./data/labs.js?v=20261123_v11",
+  "./data/exam_mastery.js?v=20261123_v11",
+  "./data/en_translations.js?v=20261123_v11",
+  "./data/curriculum.js?v=20261123_v11",
+  "./js/core/workspace.js?v=20261123_v11",
+  "./js/core/app.js?v=20261123_v11",
+  "./js/core/academy_ui.js?v=20261123_v11",
+  "./js/features/exam_sim.js?v=20261123_v11",
+  "./js/features/ai_tutor.js?v=20261123_v11",
+  "./js/features/command_palette.js?v=20261123_v11",
+  "./js/features/ios_simulator.js?v=20261123_v11",
+  "./js/features/network_toolkit.js?v=20261123_v11",
+  "./assets/images/aruba_switch.jpg",
+  "./assets/images/cctv_ip_camera.jpg",
+  "./assets/images/coaxial_bnc_port.jpg",
+  "./assets/images/console_cable.jpg",
+  "./assets/images/fiber_lc_sc_ports.jpg",
+  "./assets/images/fiber_optic.jpg",
+  "./assets/images/firewall_asa.jpg",
+  "./assets/images/ip_phone.jpg",
+  "./assets/images/mfp_printer_lcd.jpg",
+  "./assets/images/mikrotik_router.jpg",
+  "./assets/images/nic_card.jpg",
+  "./assets/images/office_scanner.jpg",
+  "./assets/images/patch_panel_ports.jpg",
+  "./assets/images/poe_switch_ports.jpg",
+  "./assets/images/pos_receipt_printer.jpg",
+  "./assets/images/rack_rear_cabling.jpg",
+  "./assets/images/rj45_connector_pins.jpg",
+  "./assets/images/router_cisco.jpg",
+  "./assets/images/router_rear_ports.jpg",
+  "./assets/images/server_rack.jpg",
+  "./assets/images/sfp_module.jpg",
+  "./assets/images/switch_cisco.jpg",
+  "./assets/images/switch_ports_closeup.jpg",
+  "./assets/images/utp_cable.jpg",
+  "./assets/images/wifi_ap.jpg"
 ];
 
 self.addEventListener("install", (event) => {
@@ -86,7 +86,6 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(req.url);
 
-  // Never cache dynamic API requests or external ntfy streams
   if (url.pathname.startsWith("/api/") || url.hostname.includes("ntfy.sh") || url.hostname.includes("googleapis.com")) {
     event.respondWith(
       fetch(req).catch(() =>
@@ -99,7 +98,6 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Same-origin static assets: Cache-First with background refresh (Stale-While-Revalidate)
   if (url.origin === self.location.origin) {
     event.respondWith(
       caches.match(req, { ignoreSearch: false }).then((cached) => {

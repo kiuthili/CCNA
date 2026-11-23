@@ -428,7 +428,7 @@ async function initApp() {
   checkUrlForSyncParam();
 
   try {
-    const response = await fetch("ccna_data.json?v=20261111_v8");
+    const response = await fetch("data/ccna_data.json?v=20261123_v11");
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }

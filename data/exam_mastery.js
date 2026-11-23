@@ -527,42 +527,42 @@ const CCNA_EXAM_MASTERY = [
     },
     photos: [
       {
-        url: "images/switch_ports_closeup.jpg",
+        url: "assets/images/switch_ports_closeup.jpg",
         title_vi: "Góc Cận Cảnh: Dãy Cổng Đồng RJ-45 & Đèn LED Trạng Thái Trên Mặt Trước Switch",
         desc_vi: "Nhìn rõ từng lỗ cắm RJ-45 và đèn LED báo Link/Activity. Khi cắm hạt mạng vào phải nghe tiếng 'tách' của lẫy nhựa và đèn LED chuyển sang sáng xanh."
       },
       {
-        url: "images/router_rear_ports.jpg",
+        url: "assets/images/router_rear_ports.jpg",
         title_vi: "Góc Mặt Sau (Rear Panel): Các Cổng Kết Nối WAN, LAN, Console, AUX & Nguồn Trên Router Cisco",
         desc_vi: "Toàn cảnh mặt sau của một chiếc Router Cisco thực tế với các cổng giao tiếp vật lý, công tắc nguồn và khe cắm mở rộng."
       },
       {
-        url: "images/patch_panel_ports.jpg",
+        url: "assets/images/patch_panel_ports.jpg",
         title_vi: "Góc Mặt Trước & Mặt Sau: Thanh Đấu Nối Cáp Patch Panel 24-Port Chuẩn Tủ Rack 19-Inch",
         desc_vi: "Cáp âm tường từ các phòng ban được bắn cố định vào mặt sau Patch Panel, mặt trước dùng dây nhảy ngắn nối xuống Switch."
       },
       {
-        url: "images/rj45_connector_pins.jpg",
+        url: "assets/images/rj45_connector_pins.jpg",
         title_vi: "Góc Phóng Đại Cận Cảnh: 8 Chân Đồng (Pin 1 → Pin 8) Của Đầu Hạt Mạng & Ổ Cắm RJ-45 (8P8C)",
         desc_vi: "Cấu tạo cơ khí và 8 lá đồng mạ vàng bên trong đầu bấm RJ-45 đực và ổ cắm RJ-45 cái."
       },
       {
-        url: "images/fiber_lc_sc_ports.jpg",
+        url: "assets/images/fiber_lc_sc_ports.jpg",
         title_vi: "Góc Cận Cảnh: Đầu Nối Cáp Quang Chuẩn LC Duplex (Nhỏ) & Chuẩn SC (Vuông)",
         desc_vi: "Đầu LC cắm trực tiếp vào Module quang SFP/SFP+ trên Switch/Router; đầu SC cắm vào hộp phối quang ODF."
       },
       {
-        url: "images/sfp_module.jpg",
+        url: "assets/images/sfp_module.jpg",
         title_vi: "Góc Cận Cảnh: Module Quang SFP / SFP+ (Transceiver) Để Gắn Vào Khe Uplink Của Switch/Router",
         desc_vi: "Module chuyển đổi tín hiệu điện sang tia laser quang học, có thể cắm nóng (Hot-swappable) vào khe SFP."
       },
       {
-        url: "images/poe_switch_ports.jpg",
+        url: "assets/images/poe_switch_ports.jpg",
         title_vi: "Góc Nhìn Nội Thất Bo Mạch: Chip Chuyển Mạch Phần Cứng ASIC Ngay Phía Sau Dãy Cổng Switch Cisco 2960-S",
         desc_vi: "Bên trong nắp máy Switch Cisco Catalyst 2960-S: Con chip Broadcom ASIC xử lý chuyển mạch khung tin ở tốc độ dây (Wire-speed)."
       },
       {
-        url: "images/rack_rear_cabling.jpg",
+        url: "assets/images/rack_rear_cabling.jpg",
         title_vi: "Góc Nhìn Phía Sau Tủ Mạng: Hệ Thống Đấu Nối Cáp Mạng Mật Độ Cao Thực Tế",
         desc_vi: "Hình ảnh thực tế phía sau thanh đấu nối cáp trong phòng máy chủ (Server Room) khi triển khai hệ thống mạng lớn."
       }
@@ -636,12 +636,12 @@ const CCNA_EXAM_MASTERY = [
     `,
     photos: [
       {
-        url: "images/aruba_switch.jpg",
+        url: "assets/images/aruba_switch.jpg",
         title_vi: "Switch Doanh Nghiệp HPE Aruba (Quản trị bằng Giao diện Web GUI trực quan, Cloud Portal & CLI)",
         desc_vi: "Dòng Switch cực kỳ phổ biến tại các doanh nghiệp, khách sạn, văn phòng hiện đại: Hỗ trợ quản trị qua trình duyệt Web (HTTPS GUI), ứng dụng điện thoại/Cloud (Aruba Instant On / Aruba Central) và cấp nguồn PoE+ cho Wi-Fi/Camera."
       },
       {
-        url: "images/mikrotik_router.jpg",
+        url: "assets/images/mikrotik_router.jpg",
         title_vi: "Router Chuyên Dụng Đa Cổng WAN/LAN (MikroTik RouterBOARD / DrayTek / FortiGate)",
         desc_vi: "Ngoài Router Cisco, các doanh nghiệp vừa và nhỏ, quán cafe lớn, văn phòng dùng rất nhiều Router MikroTik (quản lý qua phần mềm WinBox / giao diện WebFig) hoặc DrayTek để gộp băng thông 2-4 đường truyền Internet cáp quang (Multi-WAN Load Balancing)."
       }
@@ -739,27 +739,27 @@ const CCNA_EXAM_MASTERY = [
     `,
     photos: [
       {
-        url: "images/mfp_printer_lcd.jpg",
+        url: "assets/images/mfp_printer_lcd.jpg",
         title_vi: "Máy In Đa Năng / Máy Photocopy Có Màn Hình Cảm Ứng Hiển Thị (Network MFP — Ricoh / Xerox / Canon / HP)",
         desc_vi: "Trên màn hình cảm ứng LCD lớn, kỹ sư bấm trực tiếp để đặt IP Tĩnh (Static IP), xem lượng mực, và cấu hình danh bạ Scan-to-Folder (SMB) / Scan-to-Email cho từng nhân viên."
       },
       {
-        url: "images/office_scanner.jpg",
+        url: "assets/images/office_scanner.jpg",
         title_vi: "Máy Scan Tài Liệu Tốc Độ Cao Qua Mạng LAN / Wi-Fi (Network Document Scanner)",
         desc_vi: "Kết nối thẳng vào Switch qua cổng RJ-45 hoặc Wi-Fi, cho phép quét hàng trăm trang hợp đồng thành file PDF và tự động đẩy về thư mục chia sẻ (Shared Folder SMB Port 445) trên máy tính nhân viên."
       },
       {
-        url: "images/pos_receipt_printer.jpg",
+        url: "assets/images/pos_receipt_printer.jpg",
         title_vi: "Máy In Hóa Đơn / Máy In Bill Nhiệt Mạng LAN Tại Quầy Thu Ngân & Nhà Bếp (POS Receipt Printer)",
         desc_vi: "Sử dụng cổng mạng RJ-45 với giao thức RAW Port 9100. Muốn biết IP hiện tại của máy in bill: Tắt nguồn, nhấn giữ nút FEED rồi bật nguồn để máy tự in ra tờ giấy Self-Test chứa địa chỉ IP!"
       },
       {
-        url: "images/ip_phone.jpg",
+        url: "assets/images/ip_phone.jpg",
         title_vi: "Điện Thoại Bàn IP Phone Có Màn Hình Hiển Thị & 2 Cổng Mạng Mặt Đế (Cổng SW PoE + Cổng PC)",
         desc_vi: "Nhận nguồn điện PoE từ Switch và cho phép nối tiếp 1 sợi dây mạng từ mặt dưới điện thoại sang máy tính của nhân viên. Quản trị số nội bộ SIP (Port 5060) ngay trên giao diện Web của điện thoại."
       },
       {
-        url: "images/cctv_ip_camera.jpg",
+        url: "assets/images/cctv_ip_camera.jpg",
         title_vi: "Camera An Ninh IP Cấp Nguồn Qua Cáp Mạng (PoE IP Camera — Chuẩn 802.3af/at)",
         desc_vi: "Chỉ cần kéo duy nhất 1 sợi cáp mạng Cat6 từ Switch PoE lên trần nhà là vừa cấp điện vừa truyền hình ảnh độ phân giải cao về đầu ghi NVR qua giao thức RTSP (Port 554) và ONVIF."
       }

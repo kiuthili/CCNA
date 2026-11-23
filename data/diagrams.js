@@ -99,28 +99,28 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/switch_cisco.jpg",
+        "url":  "assets/images/switch_cisco.jpg",
         "desc_vi":  "Thiết bị trung gian (Intermediary Device) phổ biến nhất trong mạng LAN. Mặt trước có hàng loạt cổng RJ-45 để cắm cáp mạng nối tới từng máy tính PC, máy in, Camera và IP Phone trong cùng tòa nhà.",
         "desc_en":  "The primary intermediary device in a LAN, featuring 24 to 48 RJ-45 ports to connect PCs, printers, and IP phones within the same building.",
         "title_en":  "Enterprise LAN Switch (Cisco Catalyst)",
         "title_vi":  "Thiết bị Switch doanh nghiệp (Cisco Catalyst 24/48 cổng)"
     },
     {
-        "url":  "images/router_cisco.jpg",
+        "url":  "assets/images/router_cisco.jpg",
         "desc_vi":  "Thiết bị trung gian đóng vai trò \u0027Cánh cổng biên giới\u0027 (Default Gateway) nối mạng nội bộ LAN ra ngoài mạng diện rộng WAN / Internet. Khác với Switch có nhiều cổng, Router có ít cổng hơn nhưng cực kỳ thông minh.",
         "desc_en":  "Acts as the Default Gateway connecting internal LANs to external WANs and the Internet based on IP addresses.",
         "title_en":  "Enterprise Router (Cisco ISR)",
         "title_vi":  "Thiết bị Định tuyến Router doanh nghiệp (Cisco ISR)"
     },
     {
-        "url":  "images/server_rack.jpg",
+        "url":  "assets/images/server_rack.jpg",
         "desc_vi":  "Bên trong phòng máy chủ (Server Room): Các thanh Patch Panel gom cáp mạng âm tường từ các phòng ban rồi đấu dây nhảy (Patch Cord) gọn gàng vào Switch và Router.",
         "desc_en":  "Patch panels terminate horizontal wall cabling and connect via short patch cords into rack-mounted switches and servers.",
         "title_en":  "Enterprise Wiring Closet \u0026 Server Rack",
         "title_vi":  "Tủ Rack Mạng \u0026 Hệ thống Cáp Đấu Nối Thực Tế"
     },
     {
-        "url":  "images/ip_phone.jpg",
+        "url":  "assets/images/ip_phone.jpg",
         "desc_vi":  "Ví dụ điển hình của Mạng Hội Tụ (Converged Network): Chiếc điện thoại bàn này cắm chung dây cáp mạng Ethernet với máy tính PC để truyền giọng nói số hóa (VoIP) và nhận cả nguồn điện PoE từ Switch.",
         "desc_en":  "An end device on a converged network that receives both voice data and electrical power (PoE) over a single Ethernet cable.",
         "title_en":  "Cisco VoIP IP Phone (End Device / Host)",
@@ -197,14 +197,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/console_cable.jpg",
+        "url":  "assets/images/console_cable.jpg",
         "desc_vi":  "Khi mới mua Switch hoặc Router về, thiết bị hoàn toàn trắng tinh và chưa có địa chỉ IP. Kỹ sư mạng phải dùng sợi cáp Console màu xanh ngọc này cắm một đầu vào cổng Console của máy, đầu kia (qua cổng USB/Serial) cắm vào Laptop để mở phần mềm PuTTY cấu hình lần đầu.",
         "desc_en":  "Used for out-of-band initial configuration by connecting a laptop\u0027s USB/Serial port directly to the Switch or Router Console port.",
         "title_en":  "Cisco Light-Blue Console Cable (Rollover Cable)",
         "title_vi":  "Dây cáp Console Cisco màu xanh ngọc (Rollover Cable)"
     },
     {
-        "url":  "images/switch_cisco.jpg",
+        "url":  "assets/images/switch_cisco.jpg",
         "desc_vi":  "Trên Switch thực tế không có màn hình hay bàn phím. Mọi thao tác đặt tên máy (hostname), đặt mật khẩu (enable secret) và đặt địa chỉ IP quản trị (interface vlan 1) đều thực hiện qua giao diện dòng lệnh CLI.",
         "desc_en":  "Enterprise switches have no monitor or keyboard; all configuration (hostname, passwords, SVI IP) is performed via IOS CLI.",
         "title_en":  "Cisco Catalyst Switch Front Panel \u0026 Status LEDs",
@@ -270,14 +270,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/nic_card.jpg",
+        "url":  "assets/images/nic_card.jpg",
         "desc_vi":  "Đây là linh kiện phần cứng gắn trong máy tính giúp biến dữ liệu phần mềm thành khung tin Ethernet Frame (Tầng 2) và phát thành xung điện trên dây cáp đồng (Tầng 1).",
         "desc_en":  "Hardware adapter inside a host that encapsulates IP packets into Ethernet frames (Layer 2) and transmits electrical bits onto the wire (Layer 1).",
         "title_en":  "Network Interface Card - NIC (OSI Layers 1 \u0026 2)",
         "title_vi":  "Card mạng NIC (Hoạt động ở Tầng 1 Physical \u0026 Tầng 2 Data Link)"
     },
     {
-        "url":  "images/router_cisco.jpg",
+        "url":  "assets/images/router_cisco.jpg",
         "desc_vi":  "Khi gói tin đi qua Router, thiết bị này sẽ bóc lớp vỏ Frame Tầng 2 ra để đọc Địa chỉ IP Nguồn \u0026 Đích ở Tầng 3 (Packet), sau đó đóng lại lớp vỏ Frame mới trước khi đẩy sang chặng tiếp theo.",
         "desc_en":  "De-encapsulates the Layer 2 Ethernet frame to inspect the Layer 3 IP packet destination address before re-encapsulating and forwarding.",
         "title_en":  "Cisco Router (OSI Layer 3 - Network Layer)",
@@ -344,28 +344,28 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/utp_cable.jpg",
+        "url":  "assets/images/utp_cable.jpg",
         "desc_vi":  "Bên trong vỏ nhựa cáp mạng LAN là 8 sợi dây đồng nhỏ chia thành 4 cặp xoắn chặt vào nhau (Cam, Xanh lá, Xanh dương, Nâu). Việc xoắn đôi giúp tự triệt tiêu nhiễu điện từ và nhiễu xuyên âm (Crosstalk), truyền tối đa 100 mét.",
         "desc_en":  "Contains 8 color-coded copper wires twisted into 4 pairs to cancel out EMI/RFI and crosstalk up to 100 meters.",
         "title_en":  "UTP Copper Cable (4 Twisted Pairs) \u0026 RJ-45 Connector",
         "title_vi":  "Cáp đồng xoắn đôi UTP (Unshielded Twisted Pair) \u0026 Đầu hạt mạng RJ-45"
     },
     {
-        "url":  "images/fiber_optic.jpg",
+        "url":  "assets/images/fiber_optic.jpg",
         "desc_vi":  "Lõi làm bằng sợi thủy tinh siêu tinh khiết truyền dữ liệu bằng tia sáng Laser hoặc đèn LED. Cáp quang hoàn toàn không dẫn điện nên chống sét 100%, không bị nhiễu điện từ và truyền xa hàng chục kilomet giữa các tòa nhà/thành phố.",
         "desc_en":  "Transmits data as pulses of light through glass strands, offering complete immunity to EMI/lightning and long-distance high bandwidth.",
         "title_en":  "Fiber-Optic Patch Cable",
         "title_vi":  "Cáp quang học (Fiber-Optic Cable)"
     },
     {
-        "url":  "images/sfp_module.jpg",
+        "url":  "assets/images/sfp_module.jpg",
         "desc_vi":  "Cục thu phát quang bằng kim loại cắm vào khe Uplink của Switch hoặc Router. Nó làm nhiệm vụ chuyển đổi tín hiệu điện trong bo mạch thành tia sáng Laser phóng vào sợi cáp quang.",
         "desc_en":  "Hot-swappable transceiver that plugs into Switch/Router SFP slots to convert electrical signals into optical laser pulses.",
         "title_en":  "SFP Fiber-Optic Transceiver Module",
         "title_vi":  "Module quang SFP (Small Form-factor Pluggable)"
     },
     {
-        "url":  "images/wifi_ap.jpg",
+        "url":  "assets/images/wifi_ap.jpg",
         "desc_vi":  "Phương tiện truyền dẫn thứ 3 tại Tầng Vật Lý: Chuyển đổi khung tin từ dây cáp mạng thành sóng điện từ vô tuyến (RF 2.4GHz / 5GHz / 6GHz) phát ra không gian cho Laptop và Điện thoại bắt sóng.",
         "desc_en":  "Bridges wired Ethernet LANs to wireless clients using radio frequency (RF) waves at 2.4 GHz, 5 GHz, and 6 GHz.",
         "title_en":  "Enterprise Wireless Access Point (WAP)",
@@ -427,14 +427,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/nic_card.jpg",
+        "url":  "assets/images/nic_card.jpg",
         "desc_vi":  "Tại sao phải học hệ cơ số 16 (Hexadecimal)? Vì mọi chiếc Card mạng NIC trên thế giới đều có mã định danh MAC gồm 12 chữ số Hex (ví dụ: 00:1B:63:84:45:E6) khắc cứng trên chip ROM.",
         "desc_en":  "Every network card has a globally unique 48-bit MAC address represented as 12 hexadecimal digits (0-9, A-F).",
         "title_en":  "Hexadecimal MAC Address Burned into a NIC",
         "title_vi":  "Địa chỉ vật lý MAC (Hệ Thập Lục Phân - Hexadecimal) trên Card mạng"
     },
     {
-        "url":  "images/router_cisco.jpg",
+        "url":  "assets/images/router_cisco.jpg",
         "desc_vi":  "Con người gõ địa chỉ IPv4 dạng Thập phân (192.168.1.1) hoặc IPv6 dạng Hex (2001:db8::1), nhưng CPU của Router hoàn toàn xử lý bằng chuỗi 32-bit và 128-bit Nhị phân (0 và 1).",
         "desc_en":  "Routers process 32-bit IPv4 addresses and 128-bit hexadecimal IPv6 addresses purely as binary bitstreams in hardware.",
         "title_en":  "Binary IPv4 \u0026 Hexadecimal IPv6 Processing on Routers",
@@ -495,14 +495,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/nic_card.jpg",
+        "url":  "assets/images/nic_card.jpg",
         "desc_vi":  "Chip xử lý trên Card mạng chịu trách nhiệm đóng gói Packet thành Frame, gắn địa chỉ MAC nguồn/đích và tính toán mã kiểm lỗi FCS (CRC-32) ở đuôi Frame.",
         "desc_en":  "Performs frame encapsulation, MAC addressing, and FCS CRC-32 error checking in hardware.",
         "title_en":  "PCIe Ethernet NIC (Layer 2 LLC \u0026 MAC Sublayers)",
         "title_vi":  "Card mạng PCIe (Nơi thực thi Tầng con LLC và MAC của Tầng 2)"
     },
     {
-        "url":  "images/switch_cisco.jpg",
+        "url":  "assets/images/switch_cisco.jpg",
         "desc_vi":  "Khi cắm cáp từ Card mạng vào cổng Switch Cisco, hai thiết bị tự động thương lượng chế độ Full-Duplex (vừa gửi vừa nhận đồng thời trên các cặp dây đồng riêng biệt), loại bỏ hoàn toàn hiện tượng đụng độ tín hiệu (Collision).",
         "desc_en":  "Modern switches operate in Full-Duplex mode over separate transmit and receive wire pairs, eliminating collisions.",
         "title_en":  "Full-Duplex Collision-Free Switching",
@@ -554,14 +554,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/switch_cisco.jpg",
+        "url":  "assets/images/switch_cisco.jpg",
         "desc_vi":  "Bên trong Switch có chip phần cứng ASIC siêu tốc và bộ nhớ CAM. Mỗi khi có khung tin đi vào cổng, Switch lập tức đọc Source MAC để ghi nhớ máy nào đang ngồi ở cổng số mấy, rồi đọc Destination MAC để chuyển khung tin tới đúng cổng đích.",
         "desc_en":  "Uses dedicated ASIC chips to learn Source MAC addresses into its CAM table and forward frames based on Destination MAC.",
         "title_en":  "Cisco Layer 2 Switch — Hardware ASIC \u0026 CAM Table",
         "title_vi":  "Switch Layer 2 Cisco Catalyst — Học MAC vào bảng CAM Table"
     },
     {
-        "url":  "images/server_rack.jpg",
+        "url":  "assets/images/server_rack.jpg",
         "desc_vi":  "Mỗi cổng trên Switch là một miền đụng độ riêng biệt (Microsegmentation), cho phép hàng chục máy tính truyền dữ liệu tốc độ Gigabit cùng lúc mà không làm nghẽn mạng của nhau.",
         "desc_en":  "Each switch port forms its own independent collision domain, enabling full-speed simultaneous communication.",
         "title_en":  "High-Density Switch Port Connections in a Rack",
@@ -605,14 +605,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/router_cisco.jpg",
+        "url":  "assets/images/router_cisco.jpg",
         "desc_vi":  "Router lưu trữ Bảng Định Tuyến (Routing Table - xem bằng lệnh show ip route). Khi nhận gói tin, Router so khớp địa chỉ IP đích với tuyến đường có Prefix dài nhất (Longest Prefix Match) để phóng gói tin đi.",
         "desc_en":  "Inspects the destination IP address of incoming packets and consults its routing table using Longest Prefix Match.",
         "title_en":  "Cisco ISR Router — Layer 3 Routing Engine",
         "title_vi":  "Router Cisco ISR — Bộ não Định tuyến ở Tầng 3 (Network Layer)"
     },
     {
-        "url":  "images/sfp_module.jpg",
+        "url":  "assets/images/sfp_module.jpg",
         "desc_vi":  "Để kết nối mạng LAN ở trụ sở Hà Nội với chi nhánh TP.HCM, các Router sử dụng cổng quang SFP hoặc cổng WAN tốc độ cao nối qua hạ tầng của nhà mạng ISP.",
         "desc_en":  "Connects enterprise branch routers across long-distance WAN links.",
         "title_en":  "WAN Fiber Uplink via SFP Transceiver",
@@ -658,14 +658,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/switch_cisco.jpg",
+        "url":  "assets/images/switch_cisco.jpg",
         "desc_vi":  "Khi PC1 biết IP của PC2 nhưng chưa biết địa chỉ vật lý MAC, PC1 gửi bản tin ARP Request với MAC đích là FF:FF:FF:FF:FF:FF. Switch nhận thấy địa chỉ Broadcast này sẽ nhân bản và phát ra tất cả các cổng trong mạng LAN.",
         "desc_en":  "Because an ARP Request uses destination MAC FF:FF:FF:FF:FF:FF, the switch floods it out all ports in the local VLAN.",
         "title_en":  "ARP Step 1: Switch Floods Broadcast ARP Request",
         "title_vi":  "Bước 1 của ARP: Switch phát tán gói tin ARP Request (Broadcast) ra mọi cổng"
     },
     {
-        "url":  "images/nic_card.jpg",
+        "url":  "assets/images/nic_card.jpg",
         "desc_vi":  "Chỉ duy nhất chiếc máy tính nào có địa chỉ IP trùng khớp mới tạo gói tin ARP Reply ghi rõ địa chỉ MAC trên Card mạng của mình và gửi riêng (Unicast) về cho máy hỏi.",
         "desc_en":  "Only the host owning the requested IPv4 address responds with a unicast ARP Reply containing its burned-in MAC address.",
         "title_en":  "ARP Step 2: Target NIC Sends Unicast ARP Reply",
@@ -720,14 +720,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/router_cisco.jpg",
+        "url":  "assets/images/router_cisco.jpg",
         "desc_vi":  "Khác với Switch (cắm dây là đèn sáng xanh), tất cả các cổng mạng trên Router Cisco khi xuất xưởng đều bị khóa (administratively down). Kỹ sư bắt buộc phải đặt IP và gõ lệnh \u0027no shutdown\u0027 thì cổng mới bật sáng!",
         "desc_en":  "Unlike switch ports, router interfaces are administratively down by default and require an IP address plus the \u0027no shutdown\u0027 command.",
         "title_en":  "Router GigabitEthernet Interfaces (Default Shutdown)",
         "title_vi":  "Các cổng GigabitEthernet (Gi0/0/0, Gi0/0/1) trên Router thực tế"
     },
     {
-        "url":  "images/console_cable.jpg",
+        "url":  "assets/images/console_cable.jpg",
         "desc_vi":  "Sử dụng dây cáp Console nối từ Laptop vào cổng Console của Router để thiết lập hostname, mật khẩu bảo mật, banner cảnh báo và địa chỉ IP Default Gateway cho các mạng LAN.",
         "desc_en":  "Connecting a laptop to the router\u0027s console port to configure initial security, interface IPs, and SSH access.",
         "title_en":  "Initial Router Provisioning via Console Cable",
@@ -772,14 +772,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/router_cisco.jpg",
+        "url":  "assets/images/router_cisco.jpg",
         "desc_vi":  "Khi chia mạng con (Subnetting), bạn không thể đặt 2 cổng của cùng 1 chiếc Router thuộc cùng 1 dải mạng. Ví dụ: Cổng Gi0/0/0 là mạng Phòng Kế Toán (192.168.1.0/26), cổng Gi0/0/1 là mạng Phòng Kỹ Thuật (192.168.1.64/26).",
         "desc_en":  "Every router interface bounds a separate broadcast domain and must be assigned a unique IPv4 subnet.",
         "title_en":  "Router Interfaces Separate Distinct IPv4 Subnets",
         "title_vi":  "Mỗi cổng trên Router là một Mạng Con (Subnet / Broadcast Domain) riêng biệt"
     },
     {
-        "url":  "images/server_rack.jpg",
+        "url":  "assets/images/server_rack.jpg",
         "desc_vi":  "Trong thực tế đi làm, các địa chỉ IP đầu tiên của mỗi Subnet (ví dụ .1 đến .10) luôn được kỹ sư quy hoạch đặt tĩnh cho Default Gateway (Router), Switch, Firewall và Máy chủ Server.",
         "desc_en":  "In production networks, the first usable IPs in each subnet are reserved for gateways, switches, and rack servers.",
         "title_en":  "Static IP Allocation for Servers \u0026 Network Infrastructure",
@@ -833,14 +833,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/router_cisco.jpg",
+        "url":  "assets/images/router_cisco.jpg",
         "desc_vi":  "Khi bật lệnh \u0027ipv6 unicast-routing\u0027, Router sẽ định kỳ phát bản tin ICMPv6 RA chứa Prefix /64 ra mạng LAN để mọi máy tính tự động sinh địa chỉ IPv6 Global Unicast mà không cần máy chủ DHCP!",
         "desc_en":  "Once \u0027ipv6 unicast-routing\u0027 is enabled, the router sends Router Advertisements so hosts can self-configure IPv6 addresses via SLAAC.",
         "title_en":  "Cisco Router Broadcasting ICMPv6 RA for SLAAC",
         "title_vi":  "Router Cisco phát bản tin RA (Router Advertisement) cấp IPv6 tự động (SLAAC)"
     },
     {
-        "url":  "images/nic_card.jpg",
+        "url":  "assets/images/nic_card.jpg",
         "desc_vi":  "Ngay khi bật IPv6, Card mạng lấy địa chỉ MAC 48-bit của mình, chèn thêm FFFE vào giữa và đảo bit thứ 7 (quy tắc EUI-64) để tự tạo ra địa chỉ giao tiếp nội bộ FE80::/10.",
         "desc_en":  "Network interfaces automatically create a Link-Local IPv6 address (\fe80::/10) using EUI-64 or random interface IDs.",
         "title_en":  "NIC Auto-Generating IPv6 Link-Local Address (FE80::)",
@@ -891,14 +891,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/router_cisco.jpg",
+        "url":  "assets/images/router_cisco.jpg",
         "desc_vi":  "Khi bạn gõ lệnh \u0027tracert 8.8.8.8\u0027, mỗi chiếc Router trên đường đi khi giảm TTL về 0 sẽ gửi trả lại một bản tin ICMP Time Exceeded về máy bạn, nhờ đó vẽ ra được toàn bộ bản đồ các trạm trung gian!",
         "desc_en":  "Each router decrements the packet\u0027s TTL and replies with ICMP Time Exceeded when TTL hits zero, enabling traceroute path discovery.",
         "title_en":  "Router Generating ICMP Time Exceeded for Traceroute",
         "title_vi":  "Router giảm chỉ số TTL và gửi bản tin báo lỗi ICMP Time Exceeded"
     },
     {
-        "url":  "images/switch_cisco.jpg",
+        "url":  "assets/images/switch_cisco.jpg",
         "desc_vi":  "Khi mạng gặp sự cố, kỹ sư dùng lệnh \u0027ping\u0027 (ICMP Echo Request / Echo Reply) theo thứ tự: Ping 127.0.0.1 -\u003e Ping IP máy mình -\u003e Ping Default Gateway (Router) -\u003e Ping 8.8.8.8.",
         "desc_en":  "Engineers isolate faults by pinging loopback (127.0.0.1), local LAN hosts, the Default Gateway, and remote Internet IPs.",
         "title_en":  "Step-by-Step Connectivity Verification with ICMP Ping",
@@ -955,14 +955,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/server_rack.jpg",
+        "url":  "assets/images/server_rack.jpg",
         "desc_vi":  "Một chiếc máy chủ chỉ có 1 địa chỉ IP nhưng chạy hàng chục dịch vụ cùng lúc nhờ Số hiệu Cổng (Port Number) ở Tầng 4: Cổng TCP 443 cho Web HTTPS, TCP 22 cho quản trị SSH, UDP 53 cho DNS.",
         "desc_en":  "A single server IP hosts multiple simultaneous services distinguished by Layer 4 port numbers (TCP 443 HTTPS, TCP 22 SSH, UDP 53 DNS).",
         "title_en":  "Multi-Service Rack Server Listening on TCP/UDP Ports",
         "title_vi":  "Hệ thống Máy chủ (Server) lắng nghe đồng thời nhiều Cổng dịch vụ (TCP/UDP Ports)"
     },
     {
-        "url":  "images/ip_phone.jpg",
+        "url":  "assets/images/ip_phone.jpg",
         "desc_vi":  "Tại sao gọi điện thoại VoIP hay họp Zoom không dùng TCP mà phải dùng UDP? Vì giọng nói cần truyền ngay lập tức với độ trễ thấp nhất — nếu rớt 1 gói âm thanh nhỏ (0.01 giây) thì bỏ qua luôn chứ không dừng cuộc gọi lại để xin gửi lại như TCP!",
         "desc_en":  "Real-time voice and video traffic rely on connectionless UDP to avoid retransmission delays and head-of-line blocking.",
         "title_en":  "VoIP IP Phone Using Low-Latency UDP Transport",
@@ -1009,14 +1009,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/server_rack.jpg",
+        "url":  "assets/images/server_rack.jpg",
         "desc_vi":  "Tại Tầng 7 (Application Layer), các máy chủ trong trung tâm dữ liệu cung cấp dịch vụ trực tiếp cho phần mềm người dùng: DNS dịch tên miền ra IP, DHCP cấp IP tự động, và Web/Mail Server phục vụ dữ liệu.",
         "desc_en":  "Enterprise servers running Layer 7 daemons that respond to client requests for name resolution, IP leasing, and web content.",
         "title_en":  "Data Center Application Servers (DNS, DHCP, Web, Email)",
         "title_vi":  "Máy chủ Dịch vụ Mạng: Web Server (HTTP/HTTPS), DNS Server \u0026 DHCP Server"
     },
     {
-        "url":  "images/wifi_ap.jpg",
+        "url":  "assets/images/wifi_ap.jpg",
         "desc_vi":  "Ngay giây phút điện thoại của bạn kết nối vào bộ phát Wi-Fi, nó tự động phát bản tin DHCP Discover để xin địa chỉ IP, Subnet Mask, Default Gateway và DNS Server mà bạn không cần nhập tay.",
         "desc_en":  "As soon as a smartphone associates with a Wi-Fi AP, it broadcasts a DHCP Discover message to obtain its IP configuration automatically.",
         "title_en":  "Wireless Clients Automatically Requesting IP via DHCP (DORA)",
@@ -1062,14 +1062,14 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/firewall_asa.jpg",
+        "url":  "assets/images/firewall_asa.jpg",
         "desc_vi":  "Thiết bị bảo mật đặt ở biên mạng doanh nghiệp (giữa Router Internet và mạng nội bộ). Tường lửa kiểm tra trạng thái từng phiên kết nối (Stateful Inspection), chặn hacker từ ngoài Internet xâm nhập vào LAN và thiết lập đường hầm mã hóa VPN.",
         "desc_en":  "Dedicated perimeter security appliance providing stateful packet inspection, VPN termination, and intrusion prevention.",
         "title_en":  "Cisco ASA 5500 Hardware Security Firewall",
         "title_vi":  "Thiết bị Tường lửa Phần cứng chuyên dụng Cisco ASA 5500 Series"
     },
     {
-        "url":  "images/switch_cisco.jpg",
+        "url":  "assets/images/switch_cisco.jpg",
         "desc_vi":  "An ninh mạng không chỉ ở Tường lửa! Ngay trên Switch cắm máy tính nhân viên, kỹ sư phải bật Port Security để khóa số lượng địa chỉ MAC (chống người lạ cắm nhờ dây mạng) và bật DHCP Snooping chống giả mạo máy chủ cấp IP.",
         "desc_en":  "Securing internal LAN switch ports against rogue devices, MAC flooding, and rogue DHCP servers.",
         "title_en":  "Layer 2 Access Switch Hardening (Port Security \u0026 DHCP Snooping)",
@@ -1119,21 +1119,21 @@ const MODULE_VISUALS = {
     `,
     photos: [
     {
-        "url":  "images/server_rack.jpg",
+        "url":  "assets/images/server_rack.jpg",
         "desc_vi":  "Sự kết hợp đồng bộ của toàn bộ 17 Module CCNA 1: Từ cáp quang nhà mạng đi vào Router biên, qua Tường lửa ASA, xuống Switch phân phối và nối cáp đồng UTP tới từng máy trạm, máy chủ, điện thoại IP và bộ phát Wi-Fi.",
         "desc_en":  "Integrates all CCNA 1 components: ISP fiber uplink, edge router, ASA firewall, Catalyst switch, patch panels, and end devices.",
         "title_en":  "Complete Small Enterprise Network Rack Deployment",
         "title_vi":  "Mô hình Mạng Doanh Nghiệp Nhỏ Hoàn Chỉnh trong Tủ Rack"
     },
     {
-        "url":  "images/router_cisco.jpg",
+        "url":  "assets/images/router_cisco.jpg",
         "desc_vi":  "Thực hiện định tuyến giữa các VLAN/Subnet nội bộ và chạy dịch vụ NAT (Network Address Translation) để dịch các IP Private (192.168.x.x) thành IP Public khi đi ra ngoài Internet.",
         "desc_en":  "Routes traffic between internal subnets and translates private RFC 1918 addresses to public Internet IPs using NAT/PAT.",
         "title_en":  "Edge Router Performing Routing \u0026 NAT",
         "title_vi":  "Router Biên (Edge Router / Default Gateway)"
     },
     {
-        "url":  "images/utp_cable.jpg",
+        "url":  "assets/images/utp_cable.jpg",
         "desc_vi":  "Thực tế đi làm, hơn 50% sự cố mất mạng bắt nguồn từ Tầng 1 (Physical Layer): lỏng đầu hạt mạng RJ-45, đứt ngầm sợi đồng số 1/2/3/6, chuột cắn cáp hoặc cắm nhầm cổng trên Switch.",
         "desc_en":  "Over half of real-world network outages stem from Layer 1 physical issues such as loose RJ-45 plugs, damaged pairs, or wrong patch ports.",
         "title_en":  "Layer 1 Physical Cable \u0026 Connector Inspection",
@@ -1148,13 +1148,13 @@ const MODULE_VISUALS = {
 const MODULE_EXTRA_PORT_PHOTOS = {
   1: [
     {
-      url: "images/switch_ports_closeup.jpg",
+      url: "assets/images/switch_ports_closeup.jpg",
       title_vi: "Cận cảnh Cổng RJ-45 & Đèn LED Trạng Thái trên Switch (Góc nhìn trực diện khi cắm dây)",
       title_en: "Close-Up of Switch RJ-45 Ports & Link/Activity LEDs",
       desc_vi: "Góc nhìn cận cảnh các lỗ cắm RJ-45 trên Switch: Mỗi cổng có 8 chân đồng tiếp xúc và 2 đèn LED báo trạng thái kết nối vật lý (Link - Xanh đứng im) và truyền dữ liệu (Activity - Nhấp nháy)."
     },
     {
-      url: "images/patch_panel_ports.jpg",
+      url: "assets/images/patch_panel_ports.jpg",
       title_vi: "Thanh Đấu Nối Cáp Patch Panel 24-Port (Cầu nối giữa cáp âm tường và Switch trong tủ Rack)",
       title_en: "19-Inch 24-Port Keystone Patch Panel (Front & Rear Termination)",
       desc_vi: "Ngoài đời thực, dây mạng từ bàn làm việc nhân viên sẽ được bấm cố định vào mặt sau của thanh Patch Panel này, sau đó dùng dây nhảy ngắn cắm từ mặt trước Patch Panel xuống cổng Switch."
@@ -1162,13 +1162,13 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   2: [
     {
-      url: "images/router_rear_ports.jpg",
+      url: "assets/images/router_rear_ports.jpg",
       title_vi: "Góc chụp Mặt Sau Thiết Bị Cisco (Nơi bố trí Cổng Console, Nguồn AC, AUX và các cổng WAN/LAN)",
       title_en: "Rear Panel View of Cisco Router Showing Console, AUX, and Interface Ports",
       desc_vi: "Khác với Switch có cổng ở mặt trước, các dòng Router thường bố trí toàn bộ cổng Console, cổng nguồn, công tắc bật/tắt và các khe cắm mở rộng ở mặt sau để tiện đi dây trong tủ Rack."
     },
     {
-      url: "images/switch_ports_closeup.jpg",
+      url: "assets/images/switch_ports_closeup.jpg",
       title_vi: "Cận cảnh Cổng FastEthernet / GigabitEthernet (Fa0/1, Gi0/1) khi cấu hình trên CLI",
       title_en: "Close-Up View of Physical Switch Ports Mapped to IOS CLI Interface Names",
       desc_vi: "Mỗi lỗ cắm vật lý có số thứ tự in ngay trên vỏ thép (1, 2, 3... 24) tương ứng chính xác với câu lệnh 'interface FastEthernet 0/1' đến '0/24' mà bạn gõ trong cửa sổ lệnh CLI."
@@ -1176,13 +1176,13 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   3: [
     {
-      url: "images/rj45_connector_pins.jpg",
+      url: "assets/images/rj45_connector_pins.jpg",
       title_vi: "Cận cảnh Cấu tạo 8 Chân Đồng (8P8C) của Đầu cắm và Ổ cắm RJ-45 Chuẩn IEEE 802.3",
       title_en: "Close-Up of 8P8C / RJ-45 Male Plug Pins and Female Jack Contacts",
       desc_vi: "Hình ảnh phóng đại cho thấy quy chuẩn vật lý thuộc Tầng 1: kích thước cơ khí của lẫy gài và vị trí 8 chân đồng tiếp xúc từ Chân số 1 đến Chân số 8 theo tiêu chuẩn EIA/TIA."
     },
     {
-      url: "images/fiber_lc_sc_ports.jpg",
+      url: "assets/images/fiber_lc_sc_ports.jpg",
       title_vi: "Cận cảnh Đầu nối Cáp Quang Chuẩn LC (Nhỏ) và SC (Vuông) khi đóng gói bit thành ánh sáng",
       title_en: "Close-Up Comparison of LC and SC Fiber-Optic Connectors",
       desc_vi: "Khi gói tin đi xuống Tầng Vật Lý trên đường cáp quang, các bit 0/1 được biến thành tia laser đi qua lõi sứ trắng siêu nhỏ (Ferrule) ở chính giữa đầu cắm LC/SC này."
@@ -1190,19 +1190,19 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   4: [
     {
-      url: "images/rj45_connector_pins.jpg",
+      url: "assets/images/rj45_connector_pins.jpg",
       title_vi: "Góc chụp Cận cảnh 8 Chân Hạt Mạng RJ-45 (8P8C) — Nơi bấm 8 sợi cáp đồng T568A / T568B",
       title_en: "Close-Up of 8P8C RJ-45 Connector Pins & Female Socket",
       desc_vi: "Khi cầm hạt mạng RJ-45 lật mặt lá đồng lên trên (lẫy nhựa quay xuống dưới), chân bên trái ngoài cùng là Chân 1 (Trắng-Cam theo chuẩn B) và chân bên phải ngoài cùng là Chân 8 (Nâu)."
     },
     {
-      url: "images/fiber_lc_sc_ports.jpg",
+      url: "assets/images/fiber_lc_sc_ports.jpg",
       title_vi: "Góc chụp Cận cảnh 2 Loại Đầu Cắm Quang Phổ Biến Nhất: Đầu LC (Trái) & Đầu SC (Phải)",
       title_en: "Side-by-Side Close-Up of LC Duplex and SC Fiber Connectors",
       desc_vi: "Đầu LC có kích thước nhỏ gọn bằng một nửa đầu SC, chuyên dùng để cắm vào lỗ Module quang SFP/SFP+ trên Switch/Router Cisco; còn đầu SC vuông lớn thường cắm vào hộp phối quang ODF."
     },
     {
-      url: "images/patch_panel_ports.jpg",
+      url: "assets/images/patch_panel_ports.jpg",
       title_vi: "Thanh Patch Panel 24 Cổng Chuẩn Tủ Rack 19-inch (Đấu nối cáp đồng Cat6 thực tế)",
       title_en: "24-Port Modular RJ-45 Patch Panel for Structured Cabling",
       desc_vi: "Mỗi ổ cắm (Keystone Jack) trên thanh Patch Panel có đánh mã màu chuẩn T568A và T568B ở mặt sau để kỹ sư dùng dao nhấn (Punch-down tool) cố định từng sợi dây đồng."
@@ -1210,7 +1210,7 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   5: [
     {
-      url: "images/switch_ports_closeup.jpg",
+      url: "assets/images/switch_ports_closeup.jpg",
       title_vi: "Cận cảnh các Cổng Switch nơi đọc hiểu chuỗi Bit Nhị phân 0/1 và Địa chỉ MAC Hexadecimal",
       title_en: "Switch RJ-45 Ports Processing Binary Frames and Hexadecimal MAC Addresses",
       desc_vi: "Mọi con số Thập phân hay Thập lục phân mà chúng ta cấu hình đều được vi mạch phía sau các cổng RJ-45 này thu phát dưới dạng chuỗi xung điện Nhị phân (0 và 1)."
@@ -1218,13 +1218,13 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   6: [
     {
-      url: "images/poe_switch_ports.jpg",
+      url: "assets/images/poe_switch_ports.jpg",
       title_vi: "Góc nhìn Bên Trong Bo Mạch & Chip Xử Lý Tầng 2 (MAC/PHY) Phía Sau Các Cổng Switch Cisco 2960",
       title_en: "Internal View of Broadcom Layer 2 PHY/Switch ASIC Inside a Cisco Catalyst 2960-S",
       desc_vi: "Ảnh chụp mở nắp vỏ một chiếc Switch Cisco Catalyst 2960-S thực tế: Ngay phía sau dãy cổng RJ-45 mặt trước là con chip phần cứng kiểm tra lỗi FCS/CRC và đọc địa chỉ MAC ở Tầng 2."
     },
     {
-      url: "images/router_rear_ports.jpg",
+      url: "assets/images/router_rear_ports.jpg",
       title_vi: "Mặt Sau Router với các Cổng Giao Tiếp WAN/Serial và Ethernet (Đổi khung tin Layer 2 ở mỗi chặng)",
       title_en: "Router Rear Interfaces Separating Layer 2 Data Link Domains",
       desc_vi: "Mỗi cổng vật lý ở mặt sau chiếc Router này sử dụng một giao thức Tầng 2 riêng (Ethernet ở cổng LAN, PPP/HDLC ở cổng Serial WAN); khi gói tin đi qua Router, nhãn Layer 2 sẽ được bóc ra và đóng mới hoàn toàn."
@@ -1232,13 +1232,13 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   7: [
     {
-      url: "images/switch_ports_closeup.jpg",
+      url: "assets/images/switch_ports_closeup.jpg",
       title_vi: "Cận cảnh Dãy Cổng Switch 24-Port: Mỗi cổng là 1 Miền Đụng Độ (Collision Domain) Riêng Biệt!",
       title_en: "Close-Up of Switch Ports — Each Port Forms an Independent Collision Domain",
       desc_vi: "Khi nhìn vào dãy cổng này, hãy nhớ: mỗi lỗ cắm có 1 cặp dây Gửi (TX) và 1 cặp dây Nhận (RX) độc lập, cho phép máy tính truyền và nhận cùng lúc (Full-Duplex) với 0% va chạm tín hiệu!"
     },
     {
-      url: "images/poe_switch_ports.jpg",
+      url: "assets/images/poe_switch_ports.jpg",
       title_vi: "Bên trong Switch Cisco Catalyst: Chip ASIC & Bộ nhớ CAM Table xử lý hàng triệu khung tin/giây",
       title_en: "Cisco Catalyst Switch Internal ASIC & CAM Table Hardware",
       desc_vi: "Nhờ con chip phần cứng chuyên dụng này gắn trực tiếp vào các cổng mạng, Switch tra cứu địa chỉ MAC đích trong bảng CAM chỉ mất vài nano-giây mà không làm bận CPU chính."
@@ -1246,13 +1246,13 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   8: [
     {
-      url: "images/router_rear_ports.jpg",
+      url: "assets/images/router_rear_ports.jpg",
       title_vi: "Cận cảnh Mặt Sau Router Cisco: Các cổng mạng nối các nhánh LAN và WAN khác nhau",
       title_en: "Close-Up of Cisco Router Rear Panel Interfaces (LAN, WAN, Console, AUX)",
       desc_vi: "Khi lắp đặt thực tế, kỹ sư cắm dây mạng từ Switch nội bộ vào cổng Ethernet (LAN) của Router, và cắm cáp từ nhà mạng ISP vào cổng WAN để định tuyến gói tin IP ra ngoài Internet."
     },
     {
-      url: "images/fiber_lc_sc_ports.jpg",
+      url: "assets/images/fiber_lc_sc_ports.jpg",
       title_vi: "Đầu cắm Cáp Quang LC/SC dùng trên các tuyến đường trục (Backbone) nối giữa các Router",
       title_en: "LC and SC Fiber Connectors Used on High-Speed Router Trunks",
       desc_vi: "Các tuyến kết nối giữa các Router ở các tòa nhà hoặc trạm viễn thông luôn sử dụng đầu cắm quang LC/SC để truyền gói tin Tầng 3 đi xa hàng chục km."
@@ -1260,7 +1260,7 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   9: [
     {
-      url: "images/switch_ports_closeup.jpg",
+      url: "assets/images/switch_ports_closeup.jpg",
       title_vi: "Cận cảnh Các Cổng Switch khi chuyển tiếp bản tin ARP Request (Broadcast ra tất cả các cổng)",
       title_en: "Switch Ports Flooding Broadcast ARP Requests (FF:FF:FF:FF:FF:FF)",
       desc_vi: "Khi một máy tính cắm ở cổng số 1 phát bản tin ARP Request tìm MAC, đèn LED của toàn bộ các cổng đang cắm máy khác trên cùng VLAN sẽ nhấp nháy vì Switch nhân bản gói Broadcast ra mọi cổng!"
@@ -1268,13 +1268,13 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   10: [
     {
-      url: "images/router_rear_ports.jpg",
+      url: "assets/images/router_rear_ports.jpg",
       title_vi: "Giải Phẫu Mặt Sau Router Cisco Thực Tế: Vị trí Cổng Console, AUX, Ethernet & Serial WAN",
       title_en: "Detailed Rear View of a Cisco Router Showing Physical Ports and Connectors",
       desc_vi: "Hình ảnh thực tế giúp bạn hình dung ngay khi đứng sau tủ Rack: nơi cắm dây nguồn, cổng Console để cấu hình từ Laptop, và các cổng giao tiếp mạng vật lý mặc định đang ở trạng thái 'shutdown'."
     },
     {
-      url: "images/fiber_lc_sc_ports.jpg",
+      url: "assets/images/fiber_lc_sc_ports.jpg",
       title_vi: "Cận cảnh Đầu cắm Quang LC Duplex (2 sợi Thu/Phát) cắm vào khe SFP trên Router",
       title_en: "LC Duplex Fiber Connectors for Router SFP Uplink Ports",
       desc_vi: "Trên Router Cisco ISR 4000 Series, cổng GigabitEthernet thường là cổng Combo (vừa có lỗ cắm đồng RJ-45, vừa có khe cắm quang SFP dùng đầu LC này)."
@@ -1282,13 +1282,13 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   11: [
     {
-      url: "images/patch_panel_ports.jpg",
+      url: "assets/images/patch_panel_ports.jpg",
       title_vi: "Quy hoạch các Cổng trên Thanh Patch Panel theo từng Mạng Con (Subnet / Phòng Ban)",
       title_en: "Patch Panel Ports Labeled and Grouped by Department IPv4 Subnets",
       desc_vi: "Khi đi làm thực tế, kỹ sư luôn dán nhãn đánh số trên mặt trước Patch Panel (ví dụ: Cổng 1-12 thuộc Subnet Phòng Kế Toán 192.168.10.0/26, Cổng 13-24 thuộc Phòng Kỹ Thuật)."
     },
     {
-      url: "images/switch_ports_closeup.jpg",
+      url: "assets/images/switch_ports_closeup.jpg",
       title_vi: "Chia nhóm các Cổng Vật Lý trên Switch tương ứng với từng VLAN và Subnet",
       title_en: "Grouping Physical Switch RJ-45 Ports into Separate VLANs and Subnets",
       desc_vi: "Mỗi dải mạng con (Subnet) mà bạn tính toán bằng VLSM sẽ được ánh xạ vào một VLAN và gán xuống một nhóm cổng RJ-45 cụ thể trên mặt trước chiếc Switch này."
@@ -1296,7 +1296,7 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   12: [
     {
-      url: "images/router_rear_ports.jpg",
+      url: "assets/images/router_rear_ports.jpg",
       title_vi: "Mặt sau Router chạy song song cả IPv4 và IPv6 (Dual-Stack) trên cùng một cổng vật lý",
       title_en: "Router Rear Interfaces Configured with Dual-Stack IPv4 and IPv6 Addresses",
       desc_vi: "Bạn không cần mua cáp mạng mới hay Router mới để chạy IPv6! Trên cùng một cổng vật lý ở mặt sau Router này, bạn gán đồng thời cả lệnh 'ip address' (IPv4) và 'ipv6 address' (IPv6)."
@@ -1304,7 +1304,7 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   13: [
     {
-      url: "images/switch_ports_closeup.jpg",
+      url: "assets/images/switch_ports_closeup.jpg",
       title_vi: "Quan sát Đèn LED Cổng Mạng đầu tiên khi Lệnh Ping báo lỗi Request Timed Out",
       title_en: "Checking Physical Port Link LEDs First When ICMP Ping Fails",
       desc_vi: "Kinh nghiệm thực tế: Khi gõ lệnh ping không thông, việc đầu tiên là nhìn vào đèn LED ngay trên lỗ cắm RJ-45 này xem đèn có sáng xanh hay đã tắt ngúm do lỏng đầu cáp!"
@@ -1312,7 +1312,7 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   14: [
     {
-      url: "images/rack_rear_cabling.jpg",
+      url: "assets/images/rack_rear_cabling.jpg",
       title_vi: "Góc nhìn Mặt Sau Hệ Thống Đấu Nối Tủ Rack Máy Chủ nơi tập trung hàng ngàn phiên TCP/UDP",
       title_en: "Rear Cabling View of High-Density Patch Panel in a Data Center Rack",
       desc_vi: "Góc nhìn phía sau hệ thống đấu nối cáp của trung tâm dữ liệu: hàng trăm sợi cáp đồng thời vận chuyển cả các luồng dữ liệu TCP (cần độ tin cậy tuyệt đối) và UDP (cần tốc độ thời gian thực)."
@@ -1320,7 +1320,7 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   15: [
     {
-      url: "images/patch_panel_ports.jpg",
+      url: "assets/images/patch_panel_ports.jpg",
       title_vi: "Đấu nối Máy chủ Web, DNS, DHCP và Máy trạm qua hệ thống Patch Panel chuẩn doanh nghiệp",
       title_en: "Connecting Application Servers and Workstations via Structured Patch Panels",
       desc_vi: "Toàn bộ lưu lượng Tầng 7 (HTTP, HTTPS, DNS, DHCP, Email, SMB) của nhân viên đều đi từ ổ cắm tường về thanh Patch Panel này trước khi vào Switch và tới Server."
@@ -1328,7 +1328,7 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   16: [
     {
-      url: "images/switch_ports_closeup.jpg",
+      url: "assets/images/switch_ports_closeup.jpg",
       title_vi: "Cận cảnh các Cổng Switch cần bật Bảo mật Port Security & Tắt các cổng không sử dụng",
       title_en: "Unused Switch RJ-45 Ports Must Be Administratively Shut Down for Security",
       desc_vi: "Nguyên tắc bảo mật thực tế bắt buộc: Tất cả những lỗ cắm RJ-45 đang để trống (không cắm dây) trên mặt trước Switch phải được gõ lệnh 'shutdown' và đẩy vào một VLAN rác để kẻ gian cắm dây vào cũng không có mạng!"
@@ -1336,13 +1336,13 @@ const MODULE_EXTRA_PORT_PHOTOS = {
   ],
   17: [
     {
-      url: "images/rack_rear_cabling.jpg",
+      url: "assets/images/rack_rear_cabling.jpg",
       title_vi: "Góc nhìn Thực tế Hệ thống Đi Dây & Đấu Nối Cổng Phía Sau Tủ Rack Khi Xây Dựng Mạng",
       title_en: "Real-World Structured Cabling & Port Termination Inside an Enterprise Rack",
       desc_vi: "Khi thiết kế và lắp đặt mạng thực tế, việc bó dây gọn gàng và dán nhãn (Labeling) ở cả 2 đầu mỗi sợi cáp quan trọng không kém việc gõ lệnh cấu hình trên CLI!"
     },
     {
-      url: "images/switch_ports_closeup.jpg",
+      url: "assets/images/switch_ports_closeup.jpg",
       title_vi: "Cận cảnh Cổng Access & Cổng Uplink trên Switch khi nghiệm thu Hệ thống Mạng Nhỏ",
       title_en: "Close-Up Inspection of Switch Access & Trunk Ports During Network Commissioning",
       desc_vi: "Bước kiểm tra vật lý cuối cùng trước khi bàn giao mạng: Đảm bảo mọi đầu hạt mạng RJ-45 đã gài chặt lẫy khóa và đèn LED tất cả các cổng đang hoạt động đều sáng xanh ổn định."
@@ -1576,31 +1576,31 @@ function renderMultiAnglePortAnatomySvg(modId) {
 const MODULE_DIVERSE_ENTERPRISE_PHOTOS = {
   1: [
     {
-      url: "images/aruba_switch.jpg",
+      url: "assets/images/aruba_switch.jpg",
       title_vi: "Switch Doanh Nghiệp HPE Aruba (Quản trị bằng Giao diện Web GUI trực quan & Cloud Portal)",
       title_en: "HPE Aruba Enterprise Switch (Managed via Web GUI, Aruba Central Cloud & CLI)",
       desc_vi: "Không chỉ có Switch Cisco gõ lệnh CLI! Trong thực tế các công ty, tòa nhà, khách sạn sử dụng rất nhiều Switch HPE Aruba quản lý trực tiếp trên trình duyệt Web (HTTPS GUI) với giao diện chọn VLAN Untagged/Tagged cực kỳ trực quan."
     },
     {
-      url: "images/mfp_printer_lcd.jpg",
+      url: "assets/images/mfp_printer_lcd.jpg",
       title_vi: "Máy In Đa Năng / Máy Photocopy Có Màn Hình Cảm Ứng Hiển Thị (Network MFP Printer)",
       title_en: "Touch-Screen Multifunction Network Printer & Copier (Static IP, Port 9100, SMB Scan)",
       desc_vi: "Thiết bị đầu cuối (End Device) quan trọng bậc nhất văn phòng: Kỹ sư bấm trực tiếp trên màn hình cảm ứng LCD để đặt IP Tĩnh (Static IP) và cấu hình in mạng qua cổng TCP 9100."
     },
     {
-      url: "images/office_scanner.jpg",
+      url: "assets/images/office_scanner.jpg",
       title_vi: "Máy Scan Tài Liệu Qua Mạng LAN (Scan-to-Folder SMB Port 445 & Scan-to-Email SMTP)",
       title_en: "Network Document Scanner (Scan-to-SMB Shared Folder & Scan-to-Email)",
       desc_vi: "Kết nối vào mạng LAN để nhân viên quét hợp đồng, hóa đơn thành file PDF và tự động đẩy thẳng về thư mục chia sẻ (Shared Folder) trên máy tính cá nhân của từng người."
     },
     {
-      url: "images/pos_receipt_printer.jpg",
+      url: "assets/images/pos_receipt_printer.jpg",
       title_vi: "Máy In Hóa Đơn / Máy In Bill Nhiệt Mạng LAN Tại Quầy Thu Ngân & Nhà Bếp (POS Printer)",
       title_en: "Ethernet Thermal POS Receipt Printer (TCP Port 9100 RAW Socket)",
       desc_vi: "Thiết bị đầu cuối bắt buộc trong siêu thị, nhà hàng, quán cafe: Cắm dây mạng RJ-45 đặt IP Tĩnh (Port 9100). Muốn xem IP hiện tại: Tắt nguồn, giữ nút FEED rồi bật nguồn để máy tự in phiếu Self-Test!"
     },
     {
-      url: "images/cctv_ip_camera.jpg",
+      url: "assets/images/cctv_ip_camera.jpg",
       title_vi: "Camera An Ninh IP Cấp Nguồn Qua Cáp Mạng (PoE CCTV Camera — RTSP Port 554 & ONVIF)",
       title_en: "PoE IP Surveillance Camera (802.3af/at Power over Ethernet & RTSP Streaming)",
       desc_vi: "Nhận cả điện năng lẫn truyền hình ảnh qua duy nhất 1 sợi cáp mạng Cat6 cắm vào Switch PoE, quy hoạch vào một VLAN Camera riêng biệt."
@@ -1608,13 +1608,13 @@ const MODULE_DIVERSE_ENTERPRISE_PHOTOS = {
   ],
   2: [
     {
-      url: "images/aruba_switch.jpg",
+      url: "assets/images/aruba_switch.jpg",
       title_vi: "Quản trị Switch qua Giao diện Web GUI (HPE Aruba / Cisco CBS / TP-Link Omada) vs. Dòng lệnh CLI",
       title_en: "Web GUI Switch Management (HPE Aruba / Smart Managed Switches) vs. Console CLI",
       desc_vi: "Ngoài cách cắm dây Console gõ lệnh CLI, các dòng Switch hiện đại như HPE Aruba cho phép mở trình duyệt Web (https://IP-Switch) để xem sơ đồ cổng màu xanh/cam, tạo VLAN và bật chống Loop bằng chuột!"
     },
     {
-      url: "images/mfp_printer_lcd.jpg",
+      url: "assets/images/mfp_printer_lcd.jpg",
       title_vi: "Cấu hình IP Tĩnh trực tiếp trên Màn hình cảm ứng của Máy in / Máy Photocopy văn phòng",
       title_en: "Configuring Static IPv4 Address on an Office MFP Touch Screen",
       desc_vi: "Khi đi làm, đối với máy in có màn hình hiển thị, bạn bấm vào Settings -> Network -> TCP/IP -> IPv4 trên màn hình cảm ứng để khóa IP Tĩnh (tránh lỗi nhảy IP DHCP làm máy in bị Offline)."
@@ -1622,7 +1622,7 @@ const MODULE_DIVERSE_ENTERPRISE_PHOTOS = {
   ],
   7: [
     {
-      url: "images/aruba_switch.jpg",
+      url: "assets/images/aruba_switch.jpg",
       title_vi: "Switch HPE Aruba: Cách gọi tên VLAN 'Untagged (U) / Tagged (T)' và chữ 'Trunk (LACP)' khác Cisco",
       title_en: "HPE Aruba Switch Terminology: Untagged (Access) vs. Tagged (802.1Q) & Trunk (LACP)",
       desc_vi: "Lưu ý sống còn khi đi làm: Trên giao diện Web của Switch Aruba/HP, cổng cắm PC gọi là Untagged (U), cổng chở nhiều VLAN gọi là Tagged (T), còn chữ 'Trunk (Trk1)' lại có nghĩa là bó cáp LACP!"
@@ -1630,7 +1630,7 @@ const MODULE_DIVERSE_ENTERPRISE_PHOTOS = {
   ],
   10: [
     {
-      url: "images/mikrotik_router.jpg",
+      url: "assets/images/mikrotik_router.jpg",
       title_vi: "Router Doanh Nghiệp Đa Cổng WAN/LAN (MikroTik RouterBOARD / DrayTek Vigor / FortiGate)",
       title_en: "Multi-WAN Enterprise Router (MikroTik WinBox/WebFig, PPPoE Client & Load Balancing)",
       desc_vi: "Trong thực tế tại Việt Nam, kỹ sư thường chuyển Modem nhà mạng sang Bridge Mode rồi dùng Router MikroTik / DrayTek / FortiGate quay số PPPoE và gộp băng thông 2-3 đường truyền Internet (Multi-WAN Load Balancing)."
@@ -1638,13 +1638,13 @@ const MODULE_DIVERSE_ENTERPRISE_PHOTOS = {
   ],
   15: [
     {
-      url: "images/office_scanner.jpg",
+      url: "assets/images/office_scanner.jpg",
       title_vi: "Ứng dụng Giao thức SMB (Port 445) & SMTP (Port 587) trên Máy Scan Mạng Văn Phòng",
       title_en: "Network Scanner Using Layer 7 SMB (Port 445) and SMTP (Port 587) Protocols",
       desc_vi: "Ví dụ thực tế nhất của Tầng Ứng Dụng (Layer 7): Máy Scan dùng giao thức SMB để đẩy file PDF thẳng vào thư mục Shared Folder trên máy tính nhân viên, hoặc dùng SMTP để gửi file Scan vào Email."
     },
     {
-      url: "images/pos_receipt_printer.jpg",
+      url: "assets/images/pos_receipt_printer.jpg",
       title_vi: "Ứng dụng Giao thức In Mạng RAW Socket (TCP Port 9100) trên Máy In Bill Thu Ngân",
       title_en: "POS Receipt Printer Listening on Layer 4/7 TCP Port 9100",
       desc_vi: "Phần mềm bán hàng trên máy thu ngân hoặc điện thoại nhân viên order kết nối tới địa chỉ IP Tĩnh của máy in bill qua cổng TCP 9100 để in hóa đơn tức thì."
@@ -1652,7 +1652,7 @@ const MODULE_DIVERSE_ENTERPRISE_PHOTOS = {
   ],
   17: [
     {
-      url: "images/aruba_switch.jpg",
+      url: "assets/images/aruba_switch.jpg",
       title_vi: "Kết hợp Switch HPE Aruba (Web GUI), Router Đa WAN, Máy In Màn Hình LCD & Quản Lý Từ Xa PC Nhân Viên",
       title_en: "Real-World Office Network Integrating Multi-Vendor Switches, MFP Printers & Remote Desktop",
       desc_vi: "Một hệ thống mạng văn phòng hoàn chỉnh ngoài đời thực kết hợp Switch PoE quản lý qua Web, máy in/scan đa năng, máy in bill, điện thoại bàn IP Phone và quản trị máy tính nhân viên từ xa qua RDP (Port 3389) / Wake-on-LAN."
