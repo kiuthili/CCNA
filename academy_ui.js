@@ -1437,8 +1437,216 @@
     buildRightTableOfContents();
   }
 
+  // Page 12: USER GUIDE & 5-STEP STUDY WORKFLOW (Hướng dẫn sử dụng Web)
+  function renderUserGuidePage() {
+    const container = document.getElementById("module-detail");
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="academy-guide-page">
+        <header class="module-header">
+          <div class="module-kicker">CCNA NETWORK ACADEMY • HƯỚNG DẪN SỬ DỤNG &amp; QUY TRÌNH HỌC TẬP</div>
+          <h2 class="module-heading">Hướng Dẫn Sử Dụng Web &amp; Quy Trình Học CCNA 200-301 Hiệu Quả</h2>
+          <div class="module-heading-sub">
+            Tài liệu hướng dẫn từng bước giúp bạn biết chính xác <strong>trong mỗi buổi học cần bấm vào đâu, thao tác như thế nào, và khi nào nên dùng công cụ nào</strong> để tối ưu tốc độ học từ con số 0 đến thi đỗ chứng chỉ CCNA 200-301.
+          </div>
+          <div class="lesson-study-actions">
+            <button type="button" class="ws-btn primary" data-guide-act="dashboard">📊 Về Tổng quan (Dashboard)</button>
+            <button type="button" class="ws-btn" data-guide-act="roadmap">🗺️ Mở Lộ trình 8 Level</button>
+            <button type="button" class="ws-btn" data-guide-act="cmd">🔍 Thử Tìm nhanh (Ctrl+K)</button>
+            <button type="button" class="ws-btn" data-guide-act="shortcuts">⌨️ Xem Bảng phím tắt (?)</button>
+          </div>
+        </header>
+
+        <!-- SECTION 1: 5-STEP DAILY STUDY WORKFLOW -->
+        <section class="section-block" id="guide-sec-workflow">
+          <div class="section-header-wrap">
+            <h3 class="section-title" id="heading-guide-workflow"><span>🚀 1. Quy Trình Học Chuẩn 5 Bước Cho Mỗi Buổi Học (60–90 Phút)</span></h3>
+          </div>
+          <div class="section-content-body">
+            <div class="table-responsive">
+              <table class="tech-table">
+                <thead>
+                  <tr>
+                    <th style="width:14%;">Bước &amp; Thời lượng</th>
+                    <th style="width:24%;">Mục tiêu giai đoạn</th>
+                    <th>Thao tác cụ thể trên Web</th>
+                    <th style="width:18%;">Truy cập nhanh</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Bước 1</strong><br/><span style="color:var(--text-muted);font-size:0.76rem;">5 phút đầu</span></td>
+                    <td><strong>Khởi động &amp; Ôn trí nhớ dài hạn (SM-2)</strong></td>
+                    <td>Mở trang <strong>Tổng quan (Dashboard)</strong>, xem dòng nhắc <em>"Hôm nay bạn có X thẻ Flashcard đến hạn"</em>. Lật thẻ bằng phím <code class="inline-code">Space</code> và đánh giá mức độ nhớ bằng phím <code class="inline-code">1</code> (Quên) / <code class="inline-code">2</code> (Khó) / <code class="inline-code">3</code> (Tốt) / <code class="inline-code">4</code> (Dễ).</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="flashcards-due">🃏 Ôn SM-2 ngay</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Bước 2</strong><br/><span style="color:var(--text-muted);font-size:0.76rem;">25 phút</span></td>
+                    <td><strong>Học Lý thuyết Chủ động (Active Reading)</strong></td>
+                    <td>Chọn bài trong <strong>Lý thuyết (17 Học phần)</strong> theo thứ tự <strong>Lộ trình 8 Level</strong>. Khi gặp khái niệm quan trọng, <strong>bôi đen đoạn chữ</strong> để chọn <strong>Tô dạ quang 4 màu</strong>, <strong>Trích dẫn vào Sổ tay</strong> (<code class="inline-code">Alt+N</code>) hoặc <strong>Tạo Flashcard riêng</strong>. Nhìn <strong>Mục lục bên phải</strong> để theo dõi thời gian đọc và mục đã ghi chú (<code class="inline-code">📝</code> / <code class="inline-code">🖍️</code>).</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="modules">📘 Mở Học phần</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Bước 3</strong><br/><span style="color:var(--text-muted);font-size:0.76rem;">25–30 phút</span></td>
+                    <td><strong>Thực hành Lab, Mô phỏng Gói tin &amp; Gõ CLI</strong></td>
+                    <td>Chuyển sang tab <strong>Bài Lab (35)</strong> tương ứng. 1) Bấm <strong>▶️ Mô phỏng gửi gói tin (PDU Inspector)</strong> ngay dưới sơ đồ để xem MAC, 802.1Q VLAN, IP, TTL biến đổi qua từng Switch/Router. 2) Bấm <strong>▶ Mở Terminal Lab</strong> ngay trong bài Lab để tự gõ lệnh Cisco IOS (<code class="inline-code">Tab</code>, <code class="inline-code">?</code>, viết tắt) và để hệ thống chấm tiến độ <strong>0% &rarr; 100%</strong>. 3) Gặp bài chia IP/Subnet thì mở <strong>Máy tính Subnet &amp; VLSM</strong> (<code class="inline-code">Alt+S</code>).</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="labs">🧪 Mở 35 Bài Lab</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Bước 4</strong><br/><span style="color:var(--text-muted);font-size:0.76rem;">Khi gặp vướng mắc</span></td>
+                    <td><strong>Gỡ rối tức thì với Trợ lý AI Cisco</strong></td>
+                    <td>Đang đọc đoạn khó hiểu hoặc cấu hình Packet Tracer bị đèn đỏ? Bấm <strong>Hỏi AI Lab</strong> (<code class="inline-code">Alt+A</code>) ở góc phải. AI tự động đọc ngữ cảnh bài bạn đang mở, hỗ trợ <strong>dán ảnh chụp màn hình Packet Tracer</strong> để soi lỗi và trả lời Streaming từng chữ kèm câu hỏi gợi ý tiếp theo.</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="ai">🤖 Mở Trợ lý AI</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Bước 5</strong><br/><span style="color:var(--text-muted);font-size:0.76rem;">10–15 phút cuối</span></td>
+                    <td><strong>Kiểm tra, Chốt tiến độ &amp; Vá điểm yếu</strong></td>
+                    <td>Làm <strong>Trắc nghiệm cuối bài</strong> hoặc vào <strong>Phòng thi thử CCNA 200-301</strong>. Sau khi nộp bài, xem <strong>Biểu đồ Radar 6 Domain</strong> và bấm <strong>🩺 Luyện khắc phục điểm yếu</strong> để chỉ ôn lại các câu từng làm sai. Cuối cùng bấm <strong>✓ Đánh dấu đã học xong</strong> để cập nhật thanh tiến độ.</td>
+                    <td><button type="button" class="ws-btn primary" data-guide-act="exam">🎯 Vào Thi thử</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: WHEN TO USE WHICH FEATURE -->
+        <section class="section-block" id="guide-sec-matrix">
+          <div class="section-header-wrap">
+            <h3 class="section-title" id="heading-guide-matrix"><span>🧭 2. Khi Nào Xài Tính Năng Nào? (Bản Đồ Công Cụ Đầy Đủ)</span></h3>
+          </div>
+          <div class="section-content-body">
+            <div class="table-responsive">
+              <table class="tech-table">
+                <thead>
+                  <tr>
+                    <th style="width:26%;">Tình huống bạn đang gặp</th>
+                    <th style="width:26%;">Tính năng nên dùng</th>
+                    <th>Cách mở &amp; Lợi ích</th>
+                    <th style="width:15%;">Dùng thử</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Quên lệnh, muốn tìm nhanh bất kỳ bài học, Lab, thuật ngữ hay ghi chú cũ nào</td>
+                    <td><strong>🔍 Omni-Search Command Palette</strong></td>
+                    <td>Nhấn <code class="inline-code">Ctrl + K</code> (hoặc nút trên Topbar). Tìm xuyên suốt 7 nguồn dữ liệu trong &lt;15ms, bấm <code class="inline-code">Enter</code> nhảy thẳng tới nơi.</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="cmd">Mở Ctrl+K</button></td>
+                  </tr>
+                  <tr>
+                    <td>Muốn tập gõ lệnh Router/Switch nhưng không có máy cài Cisco Packet Tracer</td>
+                    <td><strong>💻 Trình giả lập Cisco IOS CLI</strong></td>
+                    <td>Nhấn <code class="inline-code">Alt + T</code> hoặc bấm nút Terminal trong từng bài Lab. Hỗ trợ đầy đủ <code class="inline-code">Tab</code>, <code class="inline-code">?</code>, <code class="inline-code">sh run</code>, <code class="inline-code">sh ip int br</code> và chấm điểm tự động.</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="ios">Mở Terminal</button></td>
+                  </tr>
+                  <tr>
+                    <td>Gặp bài tập chia Subnet, tìm Network/Broadcast, Wildcard Mask cho OSPF/ACL hay chia VLSM</td>
+                    <td><strong>🧮 Máy tính Subnet &amp; VLSM Architect</strong></td>
+                    <td>Nhấn <code class="inline-code">Alt + S</code>. Hiển thị 32 bit nhị phân tô màu Network/Subnet/Host, giải thích từng bước Magic Number và sinh sẵn lệnh Router-on-a-Stick.</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="subnet">Mở Subnet</button></td>
+                  </tr>
+                  <tr>
+                    <td>Chưa hình dung được gói tin Ping đi qua Switch/Router thì MAC, VLAN, IP, TTL đổi ra sao</td>
+                    <td><strong>📦 Packet Flow &amp; OSI 7-Layer PDU Inspector</strong></td>
+                    <td>Mở bất kỳ bài nào trong <strong>35 Bài Lab</strong> &rarr; Bấm nút <strong>▶️ Mô phỏng gửi gói tin</strong> ngay dưới sơ đồ SVG để xem diễn hoạt từng chặng.</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="lab1">Xem ở Lab 1</button></td>
+                  </tr>
+                  <tr>
+                    <td>Cần tra cứu nhanh 120+ lệnh CLI, bảng AD, Port TCP/UDP, 8 mức Syslog, Multicast</td>
+                    <td><strong>⌨️ Sổ Tay Tra Cứu CLI &amp; Bảng Công Thức</strong></td>
+                    <td>Mở từ menu <strong>Công cụ học tập</strong> trên Topbar. Gõ từ khóa như <code class="inline-code">ospf</code>, <code class="inline-code">nat</code>, <code class="inline-code">stp</code> để lọc tức thì.</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="cheatsheet">Tra cứu CLI</button></td>
+                  </tr>
+                  <tr>
+                    <td>Muốn ghi chép lại mẹo nhớ, bẫy đề thi và đồng bộ sang điện thoại để đọc lại</td>
+                    <td><strong>📝 Sổ tay Ghi chú &amp; Workspace</strong></td>
+                    <td>Nhấn <code class="inline-code">Alt + N</code> để mở khung ghi chú chia đôi màn hình ngay cạnh bài học. Mọi ghi chú &amp; highlight tự đồng bộ đám mây (và lưu offline queue nếu mất mạng).</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="notes">Mở Sổ tay</button></td>
+                  </tr>
+                  <tr>
+                    <td>Học xong nhiều bài nhưng sợ quên kiến thức cũ trước ngày thi</td>
+                    <td><strong>🃏 Flashcards Anki SM-2</strong></td>
+                    <td>Bấm mục <strong>Thẻ nhớ Flashcard (SM-2)</strong>. Tự động tính ngày ôn lại tối ưu cho từng thẻ theo thuật toán lặp lại ngắt quãng chuẩn Anki.</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="flashcards-due">Lật thẻ</button></td>
+                  </tr>
+                  <tr>
+                    <td>Muốn biết mình đang yếu phần nào trong 6 Domain của đề thi Cisco CCNA 200-301</td>
+                    <td><strong>🩺 6-Domain Radar &amp; Weak-Spot Drill</strong></td>
+                    <td>Xem biểu đồ Radar ở trang <strong>Tổng quan</strong> hoặc sau mỗi lần thi thử &rarr; Bấm <strong>Luyện khắc phục điểm yếu</strong> để tập trung cày đúng lỗ hổng.</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="weak-drill">Luyện điểm yếu</button></td>
+                  </tr>
+                  <tr>
+                    <td>Cần xử lý sự cố mạng doanh nghiệp thực tế (Switch Aruba, MikroTik, Máy in, Scan SMB, Wi-Fi...)</td>
+                    <td><strong>🏢 10 Chuyên đề &amp; 🛠️ Xử lý sự cố</strong></td>
+                    <td>Mở tab <strong>Chuyên đề (10)</strong> trên Sidebar trái hoặc mục <strong>Xử lý sự cố</strong> trong nút <strong>Menu ▾</strong>.</td>
+                    <td><button type="button" class="ws-btn" data-guide-act="projects">Mở Chuyên đề</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3: LAYOUT, SHORTCUTS, OFFLINE PWA & SYNC -->
+        <section class="section-block" id="guide-sec-tips">
+          <div class="section-header-wrap">
+            <h3 class="section-title" id="heading-guide-tips"><span>⚙️ 3. Mẹo Thao Tác Nhanh, Đọc Êm Mắt &amp; Học Offline 100%</span></h3>
+          </div>
+          <div class="section-content-body">
+            <div class="dash-dual-grid">
+              <div class="dash-action-card">
+                <span class="pt-badge">🎨 CÁ NHÂN HÓA TRẢI NGHIỆM ĐỌC</span>
+                <h4 style="margin:0.5rem 0 0.45rem;font-size:0.95rem;">Tùy biến Giao diện, Ngôn ngữ &amp; Cỡ chữ</h4>
+                <ul style="padding-left:1.15rem;font-size:0.84rem;line-height:1.7;color:var(--text-secondary);">
+                  <li><strong>3 Chế độ màu</strong> (nút icon góc trên phải): <strong>Sáng</strong> (Executive sắc nét), <strong>Sepia</strong> (giấy ấm dịu mắt khi đọc lâu), và <strong>Tối</strong> (ban đêm).</li>
+                  <li><strong>3 Chế độ ngôn ngữ</strong>: <strong>Tiếng Việt</strong>, <strong>English</strong> (luyện đọc thuật ngữ đề thi gốc), hoặc <strong>Song ngữ VI + EN</strong>.</li>
+                  <li><strong>Thu gọn Sidebar</strong>: Bấm <code class="inline-code">Ctrl + B</code> để mở rộng toàn màn hình đọc bài hoặc bật <strong>Chế độ Tập trung (Zen)</strong>.</li>
+                </ul>
+              </div>
+
+              <div class="dash-action-card">
+                <span class="pt-badge">📱 CÀI APP OFFLINE (PWA) &amp; ĐỒNG BỘ</span>
+                <h4 style="margin:0.5rem 0 0.45rem;font-size:0.95rem;">Học không cần Internet &amp; Đa thiết bị</h4>
+                <ul style="padding-left:1.15rem;font-size:0.84rem;line-height:1.7;color:var(--text-secondary);">
+                  <li><strong>Cài thành App trên Máy tính / Điện thoại</strong>: Bấm biểu tượng <em>Cài đặt ứng dụng (Install)</em> trên thanh địa chỉ Chrome/Edge (hoặc <em>Thêm vào màn hình chính</em> trên iOS/Android). Toàn bộ bài học, 35 Lab và ảnh thiết bị được cache sẵn để học Offline 100%.</li>
+                  <li><strong>Tự động đồng bộ &amp; Chống mất dữ liệu</strong>: Khi mất mạng, ghi chú mới tự động xếp vào hàng đợi (<code class="inline-code">Offline Queue</code>) và tự đẩy lên đám mây hợp nhất thông minh ngay khi có mạng lại.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    `;
+
+    // Wire interactive "Try it now" buttons
+    container.querySelectorAll("[data-guide-act]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const act = btn.dataset.guideAct;
+        if (act === "dashboard") navigateToAcademySection("dashboard");
+        else if (act === "roadmap") navigateToAcademySection("roadmap");
+        else if (act === "modules") navigateToAcademySection("modules", activeModuleId || 1);
+        else if (act === "labs") navigateToAcademySection("labs", 0);
+        else if (act === "lab1") navigateToAcademySection("labs", 1);
+        else if (act === "projects") navigateToAcademySection("projects", 0);
+        else if (act === "cmd") typeof window.openCommandPalette === "function" && window.openCommandPalette("");
+        else if (act === "shortcuts") typeof window.openShortcutsModal === "function" && window.openShortcutsModal();
+        else if (act === "ios") typeof window.openStandaloneIosTerminal === "function" && window.openStandaloneIosTerminal(0);
+        else if (act === "subnet") typeof window.openSubnetToolkitModal === "function" && window.openSubnetToolkitModal("cidr");
+        else if (act === "ai") typeof window.openAiTutorModal === "function" && window.openAiTutorModal();
+        else if (act === "notes") typeof openNotesModal === "function" && openNotesModal("current");
+        else if (act === "flashcards-due") typeof window.openFlashcardsModal === "function" && window.openFlashcardsModal("due");
+        else if (act === "exam") typeof startMockExam === "function" && startMockExam(30);
+        else if (act === "weak-drill") typeof window.startWeakSpotDrill === "function" && window.startWeakSpotDrill();
+        else if (act === "cheatsheet") typeof openCheatSheetModal === "function" && openCheatSheetModal("commands");
+      });
+    });
+
+    buildRightTableOfContents();
+  }
+
   // --------------------------------------------------------------------------
-  // 5. UNIFIED 11-SECTION NAVIGATION ROUTER
+  // 5. UNIFIED 12-SECTION NAVIGATION ROUTER
   // --------------------------------------------------------------------------
   function navigateToAcademySection(sectionName, targetId = null) {
     window.currentAcademySection = sectionName;
@@ -1519,6 +1727,10 @@
       if (breadcrumb) breadcrumb.textContent = "11. Settings & User Profile";
       updateRouteHash("settings");
       renderSettingsPage();
+    } else if (sectionName === "guide") {
+      if (breadcrumb) breadcrumb.textContent = "Hướng dẫn sử dụng Web";
+      updateRouteHash("guide");
+      renderUserGuidePage();
     }
 
     if (typeof closeMobileSidebar === "function") closeMobileSidebar();

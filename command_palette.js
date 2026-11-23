@@ -150,6 +150,16 @@
         run: () => typeof openCheatSheetModal === "function" && openCheatSheetModal("commands")
       },
       {
+        id: "act-guide",
+        category: "action",
+        badge: "📖 GUIDE",
+        icon: "🧭",
+        title: isEn ? "User Guide & 5-Step CCNA Study Workflow" : "Hướng Dẫn Sử Dụng Web & Quy Trình Học CCNA 5 Bước",
+        subtitle: "Khi nào dùng tính năng nào • Thao tác trong lúc học • Phím tắt & PWA Offline",
+        keywords: "huong dan su dung web guide workflow cach hoc tinh nang",
+        run: () => typeof window.navigateToAcademySection === "function" && window.navigateToAcademySection("guide")
+      },
+      {
         id: "act-shortcuts",
         category: "action",
         badge: "⌨️ HELP",

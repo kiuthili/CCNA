@@ -488,6 +488,8 @@ function executeStudyToolAction(action) {
     if (typeof window.openStandaloneIosTerminal === "function") window.openStandaloneIosTerminal(activeLabId || 0);
   } else if (action === "weak-drill") {
     if (typeof window.startWeakSpotDrill === "function") window.startWeakSpotDrill();
+  } else if (action === "guide") {
+    if (typeof window.navigateToAcademySection === "function") window.navigateToAcademySection("guide");
   } else if (action === "shortcuts") {
     if (typeof window.openShortcutsModal === "function") window.openShortcutsModal();
   } else if (action === "zen") {
