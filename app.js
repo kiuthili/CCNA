@@ -468,63 +468,99 @@ async function initApp() {
   updateNotesCountBadges();
 }
 
+function executeStudyToolAction(action) {
+  if (!action) return;
+  if (action === "ai-tutor") {
+    if (typeof window.openAiTutorModal === "function") window.openAiTutorModal();
+  } else if (action === "notes") {
+    if (typeof openNotesModal === "function") openNotesModal("current");
+  } else if (action === "flashcards") {
+    if (typeof openFlashcardsModal === "function") openFlashcardsModal();
+  } else if (action === "exam") {
+    if (typeof window.openMockExam === "function") window.openMockExam(30);
+    else if (typeof startMockExam === "function") startMockExam(30);
+  } else if (action === "cheatsheet") {
+    if (typeof window.openCheatSheet === "function") window.openCheatSheet("commands");
+    else if (typeof openCheatSheetModal === "function") openCheatSheetModal("commands");
+  } else if (action === "subnet-toolkit") {
+    if (typeof window.openSubnetToolkitModal === "function") window.openSubnetToolkitModal("cidr");
+  } else if (action === "ios-terminal") {
+    if (typeof window.openStandaloneIosTerminal === "function") window.openStandaloneIosTerminal(activeLabId || 0);
+  } else if (action === "weak-drill") {
+    if (typeof window.startWeakSpotDrill === "function") window.startWeakSpotDrill();
+  } else if (action === "shortcuts") {
+    if (typeof window.openShortcutsModal === "function") window.openShortcutsModal();
+  } else if (action === "zen") {
+    if (typeof window.toggleZenMode === "function") window.toggleZenMode();
+  }
+}
+
 function initStudyToolsSelect() {
   const select = document.getElementById("study-tools-select");
-  if (!select) return;
+  if (select) {
+    select.addEventListener("change", (e) => {
+      executeStudyToolAction(e.target.value);
+      select.value = "";
+      select.selectedIndex = 0;
+    });
+  }
 
-  select.addEventListener("change", (e) => {
-    const action = e.target.value;
-    if (!action) return;
+  // Bind Custom Executive Popover Dropdowns (Study Tools + Language)
+  const closeAllExecDropdowns = () => {
+    document.querySelectorAll(".exec-dropdown-menu").forEach((m) => (m.hidden = true));
+    document.querySelectorAll(".exec-dropdown-trigger").forEach((b) => {
+      b.setAttribute("aria-expanded", "false");
+      b.classList.remove("is-open");
+    });
+  };
 
-    if (action === "ai-tutor") {
-      if (typeof window.openAiTutorModal === "function") {
-        window.openAiTutorModal();
+  const wirePopover = (btnId, menuId) => {
+    const btn = document.getElementById(btnId);
+    const menu = document.getElementById(menuId);
+    if (!btn || !menu) return;
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const willOpen = menu.hidden;
+      closeAllExecDropdowns();
+      if (willOpen) {
+        menu.hidden = false;
+        btn.setAttribute("aria-expanded", "true");
+        btn.classList.add("is-open");
       }
-    } else if (action === "notes") {
-      if (typeof openNotesModal === "function") {
-        openNotesModal("current");
-      }
-    } else if (action === "flashcards") {
-      if (typeof openFlashcardsModal === "function") {
-        openFlashcardsModal();
-      }
-    } else if (action === "exam") {
-      if (typeof window.openMockExam === "function") {
-        window.openMockExam(30);
-      } else if (typeof startMockExam === "function") {
-        startMockExam(30);
-      }
-    } else if (action === "cheatsheet") {
-      if (typeof window.openCheatSheet === "function") {
-        window.openCheatSheet("commands");
-      } else if (typeof openCheatSheetModal === "function") {
-        openCheatSheetModal("commands");
-      }
-    } else if (action === "subnet-toolkit") {
-      if (typeof window.openSubnetToolkitModal === "function") {
-        window.openSubnetToolkitModal("cidr");
-      }
-    } else if (action === "ios-terminal") {
-      if (typeof window.openStandaloneIosTerminal === "function") {
-        window.openStandaloneIosTerminal(activeLabId || 0);
-      }
-    } else if (action === "weak-drill") {
-      if (typeof window.startWeakSpotDrill === "function") {
-        window.startWeakSpotDrill();
-      }
-    } else if (action === "shortcuts") {
-      if (typeof window.openShortcutsModal === "function") {
-        window.openShortcutsModal();
-      }
-    } else if (action === "zen") {
-      if (typeof window.toggleZenMode === "function") {
-        window.toggleZenMode();
-      }
-    }
+    });
+  };
 
-    // Reset select to default placeholder so user can select any tool again
-    select.value = "";
-    select.selectedIndex = 0;
+  wirePopover("tools-dropdown-btn", "tools-dropdown-menu");
+  wirePopover("lang-dropdown-btn", "lang-dropdown-menu");
+
+  document.querySelectorAll("#tools-dropdown-menu .exec-menu-item").forEach((item) => {
+    item.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeAllExecDropdowns();
+      executeStudyToolAction(item.dataset.toolAction);
+    });
+  });
+
+  const langLabels = { vi: "Tiếng Việt", en: "English", both: "VI + EN" };
+  document.querySelectorAll("#lang-dropdown-menu .exec-menu-item").forEach((item) => {
+    item.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const val = item.dataset.langVal || "vi";
+      closeAllExecDropdowns();
+      const lbl = document.getElementById("lang-trigger-label");
+      if (lbl) lbl.textContent = langLabels[val] || val;
+      document.querySelectorAll("#lang-dropdown-menu .exec-menu-item").forEach((b) => b.classList.toggle("active", b === item));
+      const nativeLang = document.getElementById("lang-select");
+      if (nativeLang) {
+        nativeLang.value = val;
+        nativeLang.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    });
+  });
+
+  document.addEventListener("click", closeAllExecDropdowns);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAllExecDropdowns();
   });
 }
 

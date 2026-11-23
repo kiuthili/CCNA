@@ -66,8 +66,8 @@
   }
   </script>
 
-  <link rel="stylesheet" href="style.css?v=20261123_v8" />
-  <link rel="stylesheet" href="theme_executive.css?v=20261123_v8" />
+  <link rel="stylesheet" href="style.css?v=20261123_v9" />
+  <link rel="stylesheet" href="theme_executive.css?v=20261123_v9" />
 </head>
 <body class="not-authenticated">
   <!-- Clean & Bright Login Gateway Screen -->
@@ -163,24 +163,42 @@
         <kbd class="topbar-kbd">Ctrl+K</kbd>
       </button>
 
-      <!-- Grouped Study Tools Dropdown (Dropbox tiện ích CCNA gọn gàng) -->
-      <div class="topbar-select-wrap tools-dropdown-wrap" id="tools-select-wrap" title="Chọn công cụ học tập CCNA">
-        <select class="topbar-dropdown" id="study-tools-select" aria-label="Chọn công cụ học tập CCNA">
+      <!-- Custom Executive Study Tools Popover Menu -->
+      <div class="exec-dropdown-wrap" id="tools-dropdown-wrap">
+        <button type="button" class="exec-dropdown-trigger" id="tools-dropdown-btn" aria-haspopup="true" aria-expanded="false">
+          <span id="tools-trigger-label">Công cụ học tập</span>
+          <svg class="exec-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="exec-dropdown-menu" id="tools-dropdown-menu" role="menu" hidden>
+          <div class="exec-menu-group-label">CÔNG CỤ KỸ SƯ &amp; AI</div>
+          <button type="button" class="exec-menu-item" data-tool-action="ai-tutor"><span class="exec-mi-icon">🤖</span><span class="exec-mi-text">Trợ lý AI Cisco (Streaming)</span><kbd>Alt+A</kbd></button>
+          <button type="button" class="exec-menu-item" data-tool-action="ios-terminal"><span class="exec-mi-icon">💻</span><span class="exec-mi-text">Giả lập Cisco IOS CLI</span><kbd>Alt+T</kbd></button>
+          <button type="button" class="exec-menu-item" data-tool-action="subnet-toolkit"><span class="exec-mi-icon">🧮</span><span class="exec-mi-text">Máy tính Subnet &amp; VLSM</span><kbd>Alt+S</kbd></button>
+          <button type="button" class="exec-menu-item" data-tool-action="cheatsheet"><span class="exec-mi-icon">⌨️</span><span class="exec-mi-text">Tra cứu 120+ lệnh CLI</span></button>
+          <div class="exec-menu-divider"></div>
+          <div class="exec-menu-group-label">ÔN TẬP &amp; THI THỬ</div>
+          <button type="button" class="exec-menu-item" data-tool-action="notes"><span class="exec-mi-icon">📝</span><span class="exec-mi-text">Sổ tay ghi chú</span><kbd>Alt+N</kbd></button>
+          <button type="button" class="exec-menu-item" data-tool-action="flashcards"><span class="exec-mi-icon">🃏</span><span class="exec-mi-text">Thẻ nhớ Flashcard (SM-2)</span></button>
+          <button type="button" class="exec-menu-item" data-tool-action="exam"><span class="exec-mi-icon">🎯</span><span class="exec-mi-text">Phòng thi thử CCNA 200-301</span></button>
+          <button type="button" class="exec-menu-item" data-tool-action="weak-drill"><span class="exec-mi-icon">🩺</span><span class="exec-mi-text">Luyện khắc phục điểm yếu</span></button>
+          <div class="exec-menu-divider"></div>
+          <button type="button" class="exec-menu-item" data-tool-action="shortcuts"><span class="exec-mi-icon">❓</span><span class="exec-mi-text">Bảng phím tắt hệ thống</span><kbd>?</kbd></button>
+          <button type="button" class="exec-menu-item" data-tool-action="zen"><span class="exec-mi-icon">🧘</span><span class="exec-mi-text">Chế độ tập trung (Zen)</span></button>
+        </div>
+        <!-- Hidden native select for backwards compatibility -->
+        <select id="study-tools-select" style="display:none;" aria-hidden="true">
           <option value="" disabled selected id="opt-tools-default">Công cụ học tập</option>
-          <option value="ai-tutor" id="opt-tool-ai-tutor">🤖 Trợ lý AI Cisco (Streaming &amp; Soi lỗi Lab)</option>
-          <option value="ios-terminal" id="opt-tool-ios-terminal">💻 Trình giả lập Cisco IOS CLI (Alt+T)</option>
-          <option value="subnet-toolkit" id="opt-tool-subnet-toolkit">🧮 Máy tính Subnet &amp; VLSM (Alt+S)</option>
-          <option value="notes" id="opt-tool-notes">📝 Sổ tay ghi chú (Alt+N)</option>
-          <option value="flashcards" id="opt-tool-flashcard">🃏 Thẻ nhớ Flashcard (SM-2 Anki)</option>
-          <option value="exam" id="opt-tool-exam">🎯 Phòng thi thử CCNA 200-301</option>
-          <option value="weak-drill" id="opt-tool-weak-drill">🩺 Luyện khắc phục điểm yếu (Weak-Spot)</option>
-          <option value="cheatsheet" id="opt-tool-cheatsheet">⌨️ Tra cứu 120+ lệnh CLI Cisco</option>
-          <option value="shortcuts" id="opt-tool-shortcuts">❓ Bảng phím tắt hệ thống (?)</option>
-          <option value="zen" id="opt-tool-zen">🧘 Chế độ tập trung (Zen Mode)</option>
+          <option value="ai-tutor" id="opt-tool-ai-tutor">AI</option>
+          <option value="ios-terminal" id="opt-tool-ios-terminal">IOS</option>
+          <option value="subnet-toolkit" id="opt-tool-subnet-toolkit">Subnet</option>
+          <option value="notes" id="opt-tool-notes">Notes</option>
+          <option value="flashcards" id="opt-tool-flashcard">Flashcards</option>
+          <option value="exam" id="opt-tool-exam">Exam</option>
+          <option value="weak-drill" id="opt-tool-weak-drill">Drill</option>
+          <option value="cheatsheet" id="opt-tool-cheatsheet">CLI</option>
+          <option value="shortcuts" id="opt-tool-shortcuts">Shortcuts</option>
+          <option value="zen" id="opt-tool-zen">Zen</option>
         </select>
-        <svg class="select-chevron-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
       </div>
 
       <!-- Hidden Compatibility Triggers (đảm bảo hotkeys Alt+N, badges & scripts cũ luôn hoạt động chuẩn xác) -->
@@ -204,21 +222,26 @@
         <span id="theme-icon">Sáng</span>
       </button>
 
-      <!-- Language Selector Dropdown in Topbar (Gọn gàng, đồng bộ) -->
-      <div class="topbar-select-wrap lang-dropdown-wrap" title="Chọn ngôn ngữ hiển thị">
-        <svg class="select-prefix-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="2" y1="12" x2="22" y2="12"/>
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-        </svg>
-        <select class="topbar-dropdown" id="lang-select" aria-label="Chọn ngôn ngữ hiển thị">
+      <!-- Custom Executive Language Popover Menu -->
+      <div class="exec-dropdown-wrap" id="lang-dropdown-wrap">
+        <button type="button" class="exec-dropdown-trigger" id="lang-dropdown-btn" aria-haspopup="true" aria-expanded="false" title="Chọn ngôn ngữ hiển thị">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          <span id="lang-trigger-label">Tiếng Việt</span>
+          <svg class="exec-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="exec-dropdown-menu exec-dropdown-menu-sm" id="lang-dropdown-menu" role="menu" hidden>
+          <button type="button" class="exec-menu-item active" data-lang-val="vi"><span class="exec-mi-icon">🇻🇳</span><span class="exec-mi-text">Tiếng Việt</span></button>
+          <button type="button" class="exec-menu-item" data-lang-val="en"><span class="exec-mi-icon">🇬🇧</span><span class="exec-mi-text">English</span></button>
+          <button type="button" class="exec-menu-item" data-lang-val="both"><span class="exec-mi-icon">🌐</span><span class="exec-mi-text">Song ngữ (VI + EN)</span></button>
+        </div>
+        <select id="lang-select" style="display:none;" aria-hidden="true">
           <option value="vi">Tiếng Việt</option>
           <option value="en">English</option>
           <option value="both">VI + EN</option>
         </select>
-        <svg class="select-chevron-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
       </div>
 
       <!-- Secure Logout Button -->
@@ -792,7 +815,7 @@
   <script src="ai_tutor.js?v=20261123_v4"></script>
   <script src="curriculum.js?v=20261123_v4"></script>
   <script src="workspace.js?v=20261123_v4"></script>
-  <script src="app.js?v=20261123_v8"></script>
+  <script src="app.js?v=20261123_v9"></script>
   <script src="academy_ui.js?v=20261123_v8"></script>
   <script src="command_palette.js?v=20261123_v4"></script>
   <script src="ios_simulator.js?v=20261123_v4"></script>
