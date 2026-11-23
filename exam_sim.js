@@ -669,6 +669,194 @@ function buildMockExamPool() {
   return pool;
 }
 
+// ============================================================================
+// 6-DOMAIN CCNA 200-301 ANALYTICS, WEAKNESS RADAR & SMART WEAK-SPOT DRILL
+// ============================================================================
+const CCNA_OFFICIAL_DOMAINS = [
+  { id: "1.0", name: "1.0 Network Fundamentals", short: "Fundamentals", weight: 20 },
+  { id: "2.0", name: "2.0 Network Access", short: "Net Access", weight: 20 },
+  { id: "3.0", name: "3.0 IP Connectivity", short: "IP Connect", weight: 25 },
+  { id: "4.0", name: "4.0 IP Services", short: "IP Services", weight: 10 },
+  { id: "5.0", name: "5.0 Security Fundamentals", short: "Security", weight: 15 },
+  { id: "6.0", name: "6.0 Automation & Programmability", short: "Automation", weight: 10 }
+];
+
+function getExamUserId() {
+  if (typeof getActiveUserProfileId === "function") return getActiveUserProfileId();
+  return (sessionStorage.getItem("ccna_active_username") || localStorage.getItem("ccna_active_username") || "default_user").toLowerCase();
+}
+
+function normalizeToOfficialDomain(domainStr) {
+  const s = String(domainStr || "");
+  if (s.startsWith("1.") || /fundamental/i.test(s)) return CCNA_OFFICIAL_DOMAINS[0].name;
+  if (s.startsWith("2.") || /access|vlan|stp|wireless/i.test(s)) return CCNA_OFFICIAL_DOMAINS[1].name;
+  if (s.startsWith("3.") || /connectivity|routing|ospf/i.test(s)) return CCNA_OFFICIAL_DOMAINS[2].name;
+  if (s.startsWith("4.") || /services|nat|dhcp|qos|ntp|snmp/i.test(s)) return CCNA_OFFICIAL_DOMAINS[3].name;
+  if (s.startsWith("5.") || /security|acl|aaa|vpn/i.test(s)) return CCNA_OFFICIAL_DOMAINS[4].name;
+  return CCNA_OFFICIAL_DOMAINS[5].name;
+}
+
+function loadExamAnalyticsHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(`ccna_exam_history_${getExamUserId()}`) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveExamAnalyticsAttempt(attempt) {
+  const uid = getExamUserId();
+  const hist = loadExamAnalyticsHistory();
+  hist.push(attempt);
+  try {
+    localStorage.setItem(`ccna_exam_history_${uid}`, JSON.stringify(hist.slice(-40)));
+  } catch {}
+  if (typeof triggerAutoSync === "function") triggerAutoSync();
+}
+
+function getAggregatedSixDomainStats() {
+  const hist = loadExamAnalyticsHistory();
+  const stats = {};
+  CCNA_OFFICIAL_DOMAINS.forEach((d) => {
+    stats[d.name] = { ...d, correct: 0, total: 0, pct: 0 };
+  });
+
+  hist.forEach((attempt) => {
+    if (!attempt || !attempt.domainBreakdown) return;
+    Object.keys(attempt.domainBreakdown).forEach((dKey) => {
+      const norm = normalizeToOfficialDomain(dKey);
+      const entry = attempt.domainBreakdown[dKey];
+      if (stats[norm] && entry) {
+        stats[norm].correct += Number(entry.correct || 0);
+        stats[norm].total += Number(entry.total || 0);
+      }
+    });
+  });
+
+  return CCNA_OFFICIAL_DOMAINS.map((d) => {
+    const st = stats[d.name];
+    st.pct = st.total > 0 ? Math.round((st.correct / st.total) * 100) : 0;
+    return st;
+  });
+}
+
+function renderSixDomainRadarSvg() {
+  const domains = getAggregatedSixDomainStats();
+  const cx = 160;
+  const cy = 140;
+  const maxR = 92;
+
+  const angleFor = (i) => ((Math.PI * 2 * i) / 6) - Math.PI / 2;
+  const pt = (r, i) => [cx + r * Math.cos(angleFor(i)), cy + r * Math.sin(angleFor(i))];
+
+  const gridRings = [0.25, 0.5, 0.75, 1].map((ratio) => {
+    const pts = domains.map((_, i) => pt(maxR * ratio, i).map((v) => v.toFixed(1)).join(",")).join(" ");
+    return `<polygon points="${pts}" fill="none" stroke="var(--border-color, #cbd5e1)" stroke-width="1" stroke-dasharray="${ratio === 1 ? "" : "3,3"}"/>`;
+  }).join("");
+
+  const axes = domains.map((d, i) => {
+    const [x, y] = pt(maxR, i);
+    const [lx, ly] = pt(maxR + 22, i);
+    return `
+      <line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--border-color, #cbd5e1)" stroke-width="1"/>
+      <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="10" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="var(--text-primary, #1e293b)">${d.short} (${d.weight}%)</text>
+    `;
+  }).join("");
+
+  const dataPts = domains.map((d, i) => {
+    const r = Math.max(10, (d.pct / 100) * maxR);
+    return pt(r, i).map((v) => v.toFixed(1)).join(",");
+  }).join(" ");
+
+  const dots = domains.map((d, i) => {
+    const r = Math.max(10, (d.pct / 100) * maxR);
+    const [x, y] = pt(r, i);
+    const fill = d.total === 0 ? "#94a3b8" : d.pct >= 80 ? "#10b981" : d.pct >= 60 ? "#f59e0b" : "#ef4444";
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${fill}" stroke="#fff" stroke-width="1.5"/>`;
+  }).join("");
+
+  const barsHtml = domains.map((d) => {
+    const color = d.total === 0 ? "#94a3b8" : d.pct >= 80 ? "#10b981" : d.pct >= 60 ? "#f59e0b" : "#ef4444";
+    return `
+      <div class="radar-bar-row">
+        <div class="radar-bar-meta">
+          <span>${d.name} <small>(${d.weight}%)</small></span>
+          <strong style="color:${color}">${d.total > 0 ? `${d.pct}% (${d.correct}/${d.total})` : "Chưa thi"}</strong>
+        </div>
+        <div class="exam-domain-bar-bg"><div class="exam-domain-bar-fill" style="width:${d.pct}%;background:${color};"></div></div>
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="six-domain-radar-wrap">
+      <div class="radar-svg-box">
+        <svg viewBox="0 0 320 280" width="100%" style="max-width:320px;" aria-label="Biểu đồ Radar 6 Domain CCNA 200-301">
+          ${gridRings}
+          ${axes}
+          <polygon points="${dataPts}" fill="rgba(2, 132, 199, 0.24)" stroke="#0284c7" stroke-width="2.2"/>
+          ${dots}
+        </svg>
+      </div>
+      <div class="radar-bars-box">
+        ${barsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function startWeakSpotDrill() {
+  const allPool = buildMockExamPool();
+  if (allPool.length === 0) {
+    alert("Dữ liệu câu hỏi đang được nạp, vui lòng thử lại sau vài giây.");
+    return;
+  }
+
+  const uid = getExamUserId();
+  let missedIds = [];
+  try {
+    missedIds = JSON.parse(localStorage.getItem(`ccna_missed_questions_${uid}`) || "[]");
+  } catch { missedIds = []; }
+
+  const domains = getAggregatedSixDomainStats();
+  const weakest = [...domains].sort((a, b) => a.pct - b.pct)[0];
+  const missedSet = new Set(missedIds);
+
+  // Prioritize previously wrong questions, then weakest domain questions
+  const prioritized = [
+    ...allPool.filter((q) => missedSet.has(q.question)),
+    ...allPool.filter((q) => !missedSet.has(q.question) && normalizeToOfficialDomain(q.domain) === weakest.name),
+    ...allPool.filter((q) => !missedSet.has(q.question) && normalizeToOfficialDomain(q.domain) !== weakest.name)
+  ];
+
+  mockExamQuestions = prioritized.slice(0, Math.min(15, prioritized.length));
+  mockExamUserAnswers = {};
+  mockExamFlagged = {};
+  mockExamCurrentIndex = 0;
+  mockExamIsRunning = true;
+  mockExamSecondsLeft = 20 * 60;
+
+  const modal = document.getElementById("mock-exam-modal");
+  if (modal) {
+    modal.hidden = false;
+    modal.removeAttribute("hidden");
+    modal.classList.add("active");
+    modal.classList.remove("in-result");
+  }
+  const resultsView = document.getElementById("mock-exam-result-view") || document.getElementById("exam-results-view");
+  const activeView = document.querySelector(".mock-exam-body") || document.getElementById("exam-active-view");
+  if (resultsView) resultsView.style.display = "none";
+  if (activeView) activeView.style.display = "flex";
+
+  startExamTimer();
+  renderMockExamQuestion();
+  renderMockExamNavigator();
+}
+
+window.renderSixDomainRadarSvg = renderSixDomainRadarSvg;
+window.startWeakSpotDrill = startWeakSpotDrill;
+window.getAggregatedSixDomainStats = getAggregatedSixDomainStats;
+
 function getDomainForModule(modId) {
   if (modId <= 4) return "1.0 Network Fundamentals";
   if (modId <= 6) return "2.0 Network Access (VLAN / STP / EtherChannel)";
@@ -868,6 +1056,39 @@ function finishMockExam(isTimeout = false) {
   const scaledScore = Math.round(300 + percentage * 700);
   const isPassed = scaledScore >= 825;
 
+  // Persist attempt & missed questions per user for 6-Domain Weakness Radar & Weak-Spot Drill
+  const normalizedBreakdown = {};
+  const newlyMissed = [];
+  const newlyCorrect = new Set();
+  mockExamQuestions.forEach((q, idx) => {
+    const normD = normalizeToOfficialDomain(q.domain);
+    if (!normalizedBreakdown[normD]) normalizedBreakdown[normD] = { total: 0, correct: 0 };
+    normalizedBreakdown[normD].total++;
+    if (mockExamUserAnswers[idx] === q.answerIndex) {
+      normalizedBreakdown[normD].correct++;
+      newlyCorrect.add(q.question);
+    } else {
+      newlyMissed.push(q.question);
+    }
+  });
+
+  const uid = getExamUserId();
+  try {
+    const prevMissed = JSON.parse(localStorage.getItem(`ccna_missed_questions_${uid}`) || "[]");
+    const updatedMissed = Array.from(new Set([...prevMissed.filter((m) => !newlyCorrect.has(m)), ...newlyMissed])).slice(-80);
+    localStorage.setItem(`ccna_missed_questions_${uid}`, JSON.stringify(updatedMissed));
+  } catch {}
+
+  saveExamAnalyticsAttempt({
+    id: "exam_" + Date.now(),
+    updatedAt: Date.now(),
+    scaledScore,
+    correctCount,
+    totalQuestions,
+    isPassed,
+    domainBreakdown: normalizedBreakdown
+  });
+
   const modal = document.getElementById("mock-exam-modal");
   if (modal) modal.classList.add("in-result");
 
@@ -920,10 +1141,29 @@ function finishMockExam(isTimeout = false) {
             <div class="exam-review-exp">
               <strong>💡 Giải thích chi tiết:</strong> ${formatExamRichText(q.explanation)}
             </div>
+            <div class="exam-review-tools" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.6rem;">
+              <button type="button" class="ws-btn" onclick="askAiAboutExamQuestion(${idx})">🤖 Hỏi AI giải thích sâu câu này</button>
+              <button type="button" class="ws-btn" onclick="jumpToModuleFromExam(${q.modId || 1})">📘 Đọc lại lý thuyết liên quan</button>
+            </div>
           </div>
         `;
       })
       .join("");
+
+    window.askAiAboutExamQuestion = function (qIdx) {
+      const qObj = mockExamQuestions[qIdx];
+      if (!qObj) return;
+      closeMockExamModal();
+      if (typeof window.openAiTutorModal === "function") {
+        window.openAiTutorModal(`Hãy giải thích sâu tại sao đáp án đúng của câu hỏi CCNA sau lại là "${qObj.options[qObj.answerIndex]}" và các đáp án còn lại sai ở đâu:\n\nCâu hỏi: ${qObj.question}`);
+      }
+    };
+
+    window.jumpToModuleFromExam = function (modId) {
+      closeMockExamModal();
+      if (typeof setActiveModeTab === "function") setActiveModeTab("modules");
+      if (typeof selectModule === "function") selectModule(modId || 1);
+    };
 
     resultsView.innerHTML = `
       <div class="exam-report-card">
@@ -939,12 +1179,13 @@ function finishMockExam(isTimeout = false) {
         </p>
 
         <div class="exam-domains-breakdown">
-          <h3 class="exam-domains-title">Phân Tích Năng Lực Theo Từng Domain Cisco</h3>
+          <h3 class="exam-domains-title">Phân Tích Năng Lực Theo 6 Domain Chuẩn Cisco CCNA 200-301</h3>
           ${domainRows}
         </div>
 
         <div class="exam-result-actions">
-          <button type="button" class="exam-btn-primary" onclick="startMockExam(30)">Thi lại đề khác</button>
+          <button type="button" class="exam-btn-primary" onclick="startWeakSpotDrill()">🎯 Luyện tập khắc phục điểm yếu (Weak-Spot Drill)</button>
+          <button type="button" class="exam-btn-secondary" onclick="startMockExam(30)">Thi lại đề khác</button>
           <button type="button" class="exam-btn-secondary" onclick="closeMockExamModal()">Đóng phòng thi</button>
         </div>
 

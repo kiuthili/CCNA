@@ -1003,9 +1003,9 @@
   }
 
   // --------------------------------------------------------------------------
-  // 7. GEMINI API CLIENT WITH BACKEND PROXY, MULTI-TURN & RETRY (PART 10.8)
+  // 7. GEMINI API CLIENT WITH SSE STREAMING, BACKEND PROXY, MULTI-TURN & RETRY
   // --------------------------------------------------------------------------
-  async function callAiNetworkTutorService(userPrompt, imagesList) {
+  async function callAiNetworkTutorService(userPrompt, imagesList, onStreamDelta = null) {
     const conv = ensureActiveConversationForContext();
     const ctxBundle = buildContextAndSourcesForQuery(userPrompt);
     const { liveCtx, combinedContext, sources } = ctxBundle;
@@ -1078,23 +1078,71 @@
       }
     };
 
-    // 1. Try Secure Backend Proxy `/api/ai-tutor` first (Part 10.8 requirement)
+    // 1. Try Secure Backend Proxy `/api/ai-tutor` with Real-Time SSE Streaming first
     if (window.location.protocol.startsWith("http")) {
       try {
+        const supportsStream = typeof ReadableStream !== "undefined" && typeof TextDecoder !== "undefined";
         const proxyRes = await fetch("/api/ai-tutor", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ...requestPayload,
+            stream: supportsStream && typeof onStreamDelta === "function",
             clientApiKey: isValidGoogleApiKey ? apiKey : undefined
           })
         });
 
         if (proxyRes.ok) {
-          const proxyData = await proxyRes.json();
-          const textPart = proxyData?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("\n") || "";
-          if (textPart) {
-            return { text: textPart, sources };
+          const contentType = proxyRes.headers.get("content-type") || "";
+          if (contentType.includes("text/event-stream") && proxyRes.body) {
+            const reader = proxyRes.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+            let buffer = "";
+            let accumulated = "";
+            let usageMetadata = null;
+            let followUpSuggestions = [];
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split("\n");
+              buffer = lines.pop() || "";
+
+              for (const rawLine of lines) {
+                const line = rawLine.trim();
+                if (!line.startsWith("data:")) continue;
+                const payloadStr = line.slice(5).trim();
+                if (!payloadStr) continue;
+                try {
+                  const evt = JSON.parse(payloadStr);
+                  if (evt.type === "delta" && evt.text) {
+                    accumulated += evt.text;
+                    if (typeof onStreamDelta === "function") onStreamDelta(accumulated);
+                  } else if (evt.type === "done") {
+                    usageMetadata = evt.usageMetadata || null;
+                    followUpSuggestions = Array.isArray(evt.followUpSuggestions) ? evt.followUpSuggestions : [];
+                  }
+                } catch {
+                  // Ignore malformed partial chunk
+                }
+              }
+            }
+
+            if (accumulated) {
+              return { text: accumulated, sources, usageMetadata, followUpSuggestions };
+            }
+          } else {
+            const proxyData = await proxyRes.json();
+            const textPart = proxyData?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("\n") || "";
+            if (textPart) {
+              return {
+                text: textPart,
+                sources,
+                usageMetadata: proxyData.usageMetadata || null,
+                followUpSuggestions: Array.isArray(proxyData.followUpSuggestions) ? proxyData.followUpSuggestions : []
+              };
+            }
           }
         }
       } catch {
@@ -1130,7 +1178,12 @@
         const resData = await response.json();
         const textPart = resData?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("\n") || "";
         if (textPart) {
-          return { text: textPart, sources };
+          return {
+            text: textPart,
+            sources,
+            usageMetadata: resData.usageMetadata || null,
+            followUpSuggestions: getDynamicSuggestedQuestions(liveCtx).slice(0, 3)
+          };
         }
       } catch (err) {
         clearTimeout(timeoutId);
@@ -1139,8 +1192,12 @@
     }
 
     // 3. Context-Aware Local RAG Engine (Instant, 100% grounded in website's Lesson & Lab knowledge base)
-    await new Promise((r) => setTimeout(r, 350));
-    return generateContextAwareGroundedResponse(userPrompt, imagesList, ctxBundle, conv);
+    await new Promise((r) => setTimeout(r, 250));
+    const localRes = generateContextAwareGroundedResponse(userPrompt, imagesList, ctxBundle, conv);
+    return {
+      ...localRes,
+      followUpSuggestions: getDynamicSuggestedQuestions(liveCtx).slice(0, 3)
+    };
   }
 
   // --------------------------------------------------------------------------
@@ -1578,6 +1635,19 @@
         ? `
           <div class="ai-msg-footer-bar">
             ${sourcesHtml ? `<div class="ai-sources-inline">${sourcesHtml}</div>` : ""}
+            ${
+              msg.usageMetadata && (msg.usageMetadata.promptTokenCount || msg.usageMetadata.candidatesTokenCount)
+                ? `<div class="ai-usage-meta">⚡ Tokens: ${msg.usageMetadata.promptTokenCount || 0} prompt • ${msg.usageMetadata.candidatesTokenCount || 0} output</div>`
+                : ""
+            }
+            ${
+              Array.isArray(msg.followUpSuggestions) && msg.followUpSuggestions.length > 0 && idx === messages.length - 1
+                ? `<div class="ai-followup-bar">${msg.followUpSuggestions
+                    .slice(0, 3)
+                    .map((q) => `<button type="button" class="ai-followup-chip" data-followup="${escapeHtml(q)}">💬 ${escapeHtml(q)}</button>`)
+                    .join("")}</div>`
+                : ""
+            }
             <div class="ai-msg-action-bar">
               <button type="button" class="ai-msg-act-btn" data-msg-act="save-note" data-idx="${idx}" title="Lưu câu trả lời này vào My Notes">📝 Lưu Note</button>
               <button type="button" class="ai-msg-act-btn" data-msg-act="make-fc" data-idx="${idx}" title="Tạo thẻ Flashcard">🗂️ Flashcard</button>
@@ -1630,11 +1700,11 @@
 
     if (isGenerating) {
       html += `
-        <div class="ai-message-row assistant">
+        <div class="ai-message-row assistant" id="ai-live-stream-row">
           <div class="ai-msg-avatar">🤖</div>
           <div class="ai-msg-content-wrap">
-            <div class="ai-msg-sender">AI Network Tutor</div>
-            <div class="ai-msg-body ai-loading-body">
+            <div class="ai-msg-sender">AI Network Tutor <span class="ai-stream-live-pill">LIVE STREAM</span></div>
+            <div class="ai-msg-body ai-loading-body" id="ai-live-stream-body">
               <span class="ai-typing-dot"></span>
               <span class="ai-typing-dot"></span>
               <span class="ai-typing-dot"></span>
@@ -1648,6 +1718,14 @@
     }
 
     stream.innerHTML = html;
+
+    // Bind Follow-up Suggestion Chips
+    stream.querySelectorAll(".ai-followup-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const q = chip.dataset.followup;
+        if (q) handleSendUserMessage(q);
+      });
+    });
 
     // Bind CLI Copy buttons
     stream.querySelectorAll(".ai-cli-copy-btn").forEach((btn) => {
@@ -1770,13 +1848,23 @@
     renderChatMessages();
 
     try {
-      const result = await callAiNetworkTutorService(promptText, imagesToSend);
+      const result = await callAiNetworkTutorService(promptText, imagesToSend, (partialText) => {
+        const liveBody = document.getElementById("ai-live-stream-body");
+        if (liveBody) {
+          liveBody.classList.remove("ai-loading-body");
+          liveBody.innerHTML = formatMarkdown(partialText);
+          const streamEl = document.getElementById("ai-chat-stream");
+          if (streamEl) streamEl.scrollTop = streamEl.scrollHeight;
+        }
+      });
       lastFailedPrompt = null;
       conv.messages.push({
         role: "assistant",
         mode: activeAiMode,
         text: result.text,
         sources: result.sources || [],
+        usageMetadata: result.usageMetadata || null,
+        followUpSuggestions: result.followUpSuggestions || [],
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
       });
       conv.updatedAt = Date.now();

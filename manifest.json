@@ -1,0 +1,41 @@
+{
+  "name": "CCNA NETWORK ACADEMY — Cisco 200-301",
+  "short_name": "CCNA Academy",
+  "description": "Hệ thống học tập, thực hành Cisco Packet Tracer, trình giả lập Cisco IOS CLI, máy tính Subnet/VLSM và ôn thi CCNA 200-301 Offline-First.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b1120",
+  "theme_color": "#0284c7",
+  "lang": "vi",
+  "categories": ["education", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "35 Bài Lab Packet Tracer",
+      "short_name": "Labs",
+      "url": "./index.html#labs",
+      "description": "Mở danh sách 35 bài Lab thực hành Cisco"
+    },
+    {
+      "name": "Phòng Thi Thử CCNA",
+      "short_name": "Mock Exam",
+      "url": "./index.html#practice",
+      "description": "Vào phòng thi thử CCNA 200-301"
+    },
+    {
+      "name": "Sổ Tay Ghi Chú",
+      "short_name": "Notes",
+      "url": "./index.html#workspace",
+      "description": "Mở không gian ghi chú và flashcard cá nhân"
+    }
+  ]
+}

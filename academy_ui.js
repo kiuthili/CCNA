@@ -676,6 +676,16 @@
 
     tocSidebar.classList.remove("is-empty");
 
+    // Compute estimated reading time & check active lesson Notes / Highlights
+    const wordCount = (detailEl.innerText || "").trim().split(/\s+/).filter(Boolean).length;
+    const estMinutes = Math.max(1, Math.round(wordCount / 210));
+    const currentKey = typeof getCurrentLessonNoteKey === "function" ? getCurrentLessonNoteKey() : "";
+    const wsDB = window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.getWorkspaceDB === "function"
+      ? window.CCNA_WORKSPACE.getWorkspaceDB()
+      : { notes: [], highlights: [] };
+    const lessonNotes = (wsDB.notes || []).filter((n) => !n.deletedAt && n.lessonKey === currentKey);
+    const lessonHighlights = (wsDB.highlights || []).filter((h) => !h.deletedAt && h.lessonKey === currentKey);
+
     const itemsHtml = headings
       .slice(0, 18)
       .map((h, idx) => {
@@ -683,12 +693,16 @@
           h.id = `toc-target-${idx}`;
         }
         const rawText = h.textContent.trim();
-        const shortText = rawText.length > 48 ? rawText.substring(0, 48) + "..." : rawText;
+        const shortText = rawText.length > 44 ? rawText.substring(0, 44) + "..." : rawText;
         const isSub = h.tagName === "H5";
+        const parentSection = h.closest("section, article");
+        const hasHlInSec = parentSection ? !!parentSection.querySelector("mark.ws-highlight-mark, mark.user-highlight") : false;
+        const hasNoteInSec = idx === 0 && lessonNotes.length > 0;
+        const badges = `${hasNoteInSec ? `<span class="toc-status-icon" title="Có ${lessonNotes.length} ghi chú">📝</span>` : ""}${hasHlInSec ? `<span class="toc-status-icon" title="Có đoạn đã Highlight">🖍️</span>` : ""}`;
         return `
           <li>
             <a href="#${h.id}" class="right-toc-link ${isSub ? "sub-level" : ""}" data-toc-target="${h.id}">
-              ${escapeHtml(shortText)}
+              <span>${escapeHtml(shortText)}</span>${badges}
             </a>
           </li>
         `;
@@ -697,10 +711,15 @@
 
     tocContainer.innerHTML = `
       <div class="right-toc-header">📑 MỤC LỤC TRANG (ON THIS PAGE)</div>
+      <div class="right-toc-meta">
+        <span>⏱️ ~${estMinutes} phút đọc</span>
+        <span>📝 ${lessonNotes.length} • 🖍️ ${lessonHighlights.length}</span>
+      </div>
       <ul class="right-toc-list">${itemsHtml}</ul>
       <div class="right-toc-quick-tools">
         <button type="button" class="right-toc-tool-btn" id="toc-open-notes-btn">📝 Mở Sổ tay Ghi chú (Alt+N)</button>
         <button type="button" class="right-toc-tool-btn" id="toc-open-ai-btn">🤖 Hỏi Trợ lý AI Cisco (Alt+A)</button>
+        <button type="button" class="right-toc-tool-btn" id="toc-open-cmd-btn">🔍 Tìm toàn hệ thống (Ctrl+K)</button>
       </div>
     `;
 
@@ -724,6 +743,9 @@
     });
     document.getElementById("toc-open-ai-btn")?.addEventListener("click", () => {
       if (typeof window.openAiTutorModal === "function") window.openAiTutorModal();
+    });
+    document.getElementById("toc-open-cmd-btn")?.addEventListener("click", () => {
+      if (typeof window.openCommandPalette === "function") window.openCommandPalette("");
     });
   }
 
@@ -871,6 +893,30 @@
           </div>
         </div>
 
+        <!-- SM-2 Spaced Repetition Daily Reminder Banner -->
+        <div class="dash-sm2-banner">
+          <div>
+            <strong>🃏 Lịch ôn tập Anki SM-2 hôm nay:</strong>
+            <span>Hôm nay bạn có <strong>${typeof window.getDueFlashcardsCount === "function" ? window.getDueFlashcardsCount() : 15}</strong> thẻ Flashcard đến hạn cần ôn tập để ghi nhớ dài hạn.</span>
+          </div>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <button type="button" class="ws-btn primary" id="dash-sm2-review-btn">🔥 Ôn tập thẻ đến hạn (SM-2)</button>
+            <button type="button" class="ws-btn" id="dash-open-ios-btn">💻 Cisco IOS CLI Simulator</button>
+            <button type="button" class="ws-btn" id="dash-open-subnet-btn">🧮 Subnet &amp; VLSM Architect</button>
+          </div>
+        </div>
+
+        <!-- 6-Domain CCNA 200-301 Mastery Radar & Smart Weak-Spot Drill -->
+        <section class="section-block" id="dash-sec-radar">
+          <div class="section-header-wrap">
+            <h3 class="section-title" id="heading-dash-radar"><span>🎯 Phân tích 6 Domain CCNA 200-301 &amp; Radar Điểm Yếu</span></h3>
+            <button type="button" class="ws-btn primary" id="dash-weak-drill-btn">🩺 Luyện tập khắc phục điểm yếu (Weak-Spot Drill)</button>
+          </div>
+          <div class="section-content">
+            ${typeof window.renderSixDomainRadarSvg === "function" ? window.renderSixDomainRadarSvg() : ""}
+          </div>
+        </section>
+
         <!-- Continue Learning & Upcoming Lab Split -->
         <div class="dash-dual-grid">
           <div class="dash-action-card">
@@ -927,6 +973,18 @@
     });
     document.getElementById("dash-open-exam-btn")?.addEventListener("click", () => {
       if (typeof window.openMockExam === "function") window.openMockExam(30);
+    });
+    document.getElementById("dash-sm2-review-btn")?.addEventListener("click", () => {
+      if (typeof window.openFlashcardsModal === "function") window.openFlashcardsModal("due");
+    });
+    document.getElementById("dash-open-ios-btn")?.addEventListener("click", () => {
+      if (typeof window.openStandaloneIosTerminal === "function") window.openStandaloneIosTerminal(0);
+    });
+    document.getElementById("dash-open-subnet-btn")?.addEventListener("click", () => {
+      if (typeof window.openSubnetToolkitModal === "function") window.openSubnetToolkitModal("cidr");
+    });
+    document.getElementById("dash-weak-drill-btn")?.addEventListener("click", () => {
+      if (typeof window.startWeakSpotDrill === "function") window.startWeakSpotDrill();
     });
     container.querySelectorAll("[data-rec-type]").forEach((el) => {
       el.addEventListener("click", () => {

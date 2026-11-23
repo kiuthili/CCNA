@@ -19,9 +19,10 @@
     })();
   </script>
 
-  <!-- Modern Browser Tab Favicon -->
+  <!-- Modern Browser Tab Favicon & PWA Manifest -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="apple-touch-icon" href="favicon.svg" />
+  <link rel="manifest" href="manifest.json" />
 
   <!-- SEO Meta Tags -->
   <meta name="description" content="Hệ thống học tập và thực hành chứng chỉ quốc tế Cisco CCNA 200-301 (cập nhật v1.1 &amp; v2.0 mới nhất): 17 học phần từ cơ bản đến nâng cao, hình ảnh cận cảnh cổng port đa góc độ, bách khoa thuật ngữ, 10 chuyên đề thi &amp; đi làm thực tế, cùng 35 bài Lab Cisco Packet Tracer và Sổ tay ghi chú đồng bộ đa thiết bị." />
@@ -65,7 +66,7 @@
   }
   </script>
 
-  <link rel="stylesheet" href="style.css?v=20261123_v3" />
+  <link rel="stylesheet" href="style.css?v=20261123_v4" />
 </head>
 <body class="not-authenticated">
   <!-- Clean & Bright Login Gateway Screen -->
@@ -152,16 +153,29 @@
     </div>
 
     <div class="topbar-right">
+      <!-- Global Omni-Search Command Palette Trigger (Ctrl+K) -->
+      <button type="button" class="topbar-cmd-btn" id="open-cmd-palette-btn" title="Tìm kiếm toàn hệ thống (Ctrl+K / Cmd+K)" aria-label="Tìm kiếm toàn hệ thống Ctrl+K">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span class="btn-text">Tìm nhanh</span>
+        <kbd class="topbar-kbd">Ctrl+K</kbd>
+      </button>
+
       <!-- Grouped Study Tools Dropdown (Dropbox tiện ích CCNA gọn gàng) -->
       <div class="topbar-select-wrap tools-dropdown-wrap" id="tools-select-wrap" title="Chọn công cụ học tập CCNA">
         <select class="topbar-dropdown" id="study-tools-select" aria-label="Chọn công cụ học tập CCNA">
           <option value="" disabled selected id="opt-tools-default">Công cụ học tập</option>
-          <option value="ai-tutor" id="opt-tool-ai-tutor">🤖 Trợ lý AI Cisco (Hỏi đáp &amp; Soi lỗi Lab)</option>
-          <option value="notes" id="opt-tool-notes">Sổ tay ghi chú (Alt+N)</option>
-          <option value="flashcards" id="opt-tool-flashcard">Thẻ nhớ Flashcard</option>
-          <option value="exam" id="opt-tool-exam">Phòng thi thử CCNA</option>
-          <option value="cheatsheet" id="opt-tool-cheatsheet">Tra cứu lệnh CLI Cisco</option>
-          <option value="zen" id="opt-tool-zen">Chế độ tập trung (Zen Mode)</option>
+          <option value="ai-tutor" id="opt-tool-ai-tutor">🤖 Trợ lý AI Cisco (Streaming &amp; Soi lỗi Lab)</option>
+          <option value="ios-terminal" id="opt-tool-ios-terminal">💻 Trình giả lập Cisco IOS CLI (Alt+T)</option>
+          <option value="subnet-toolkit" id="opt-tool-subnet-toolkit">🧮 Máy tính Subnet &amp; VLSM (Alt+S)</option>
+          <option value="notes" id="opt-tool-notes">📝 Sổ tay ghi chú (Alt+N)</option>
+          <option value="flashcards" id="opt-tool-flashcard">🃏 Thẻ nhớ Flashcard (SM-2 Anki)</option>
+          <option value="exam" id="opt-tool-exam">🎯 Phòng thi thử CCNA 200-301</option>
+          <option value="weak-drill" id="opt-tool-weak-drill">🩺 Luyện khắc phục điểm yếu (Weak-Spot)</option>
+          <option value="cheatsheet" id="opt-tool-cheatsheet">⌨️ Tra cứu 120+ lệnh CLI Cisco</option>
+          <option value="shortcuts" id="opt-tool-shortcuts">❓ Bảng phím tắt hệ thống (?)</option>
+          <option value="zen" id="opt-tool-zen">🧘 Chế độ tập trung (Zen Mode)</option>
         </select>
         <svg class="select-chevron-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 12 15 18 9"/>
@@ -614,6 +628,7 @@
 
       <div class="flashcard-filter-bar">
         <select id="flashcard-scope-select" class="flashcard-select" aria-label="Phạm vi bài học">
+          <option value="due">🔥 Thẻ đến hạn hôm nay (SM-2 Due)</option>
           <option value="current">Bài học hiện tại</option>
           <option value="all">Toàn bộ 17 Học phần CCNA</option>
         </select>
@@ -634,6 +649,17 @@
         <div class="flashcard-flipper" id="flashcard-flipper">
           <span class="flashcard-hint-pill" id="flashcard-hint-pill">Bấm vào thẻ để lật đáp án</span>
           <div class="flashcard-body-text" id="flashcard-card-text">Đang tải thẻ...</div>
+        </div>
+      </div>
+
+      <!-- SM-2 Anki Spaced Repetition Rating Bar (Shown when card is flipped) -->
+      <div class="flashcard-sm2-bar" id="flashcard-sm2-bar" hidden>
+        <div class="sm2-bar-label">Đánh giá mức độ ghi nhớ (Thuật toán Anki SM-2):</div>
+        <div class="sm2-btn-group">
+          <button type="button" class="sm2-btn again" data-sm2="0"><strong>1. Quên</strong><span>&lt;10 phút</span></button>
+          <button type="button" class="sm2-btn hard" data-sm2="3"><strong>2. Khó</strong><span>1 ngày</span></button>
+          <button type="button" class="sm2-btn good" data-sm2="4"><strong>3. Tốt</strong><span>3 ngày</span></button>
+          <button type="button" class="sm2-btn easy" data-sm2="5"><strong>4. Dễ</strong><span>7 ngày</span></button>
         </div>
       </div>
 
@@ -755,17 +781,27 @@
     </div>
   </div>
 
-  <script src="diagrams.js?v=20261123_v3"></script>
-  <script src="glossary.js?v=20261123_v3"></script>
-  <script src="labs.js?v=20261123_v3"></script>
-  <script src="exam_mastery.js?v=20261123_v3"></script>
-  <script src="en_translations.js?v=20261123_v3"></script>
-  <script src="exam_sim.js?v=20261123_v3"></script>
+  <script src="diagrams.js?v=20261123_v4"></script>
+  <script src="glossary.js?v=20261123_v4"></script>
+  <script src="labs.js?v=20261123_v4"></script>
+  <script src="exam_mastery.js?v=20261123_v4"></script>
+  <script src="en_translations.js?v=20261123_v4"></script>
+  <script src="exam_sim.js?v=20261123_v4"></script>
   <script src="local_config.js" onerror="void 0;"></script>
-  <script src="ai_tutor.js?v=20261123_v3"></script>
-  <script src="curriculum.js?v=20261123_v3"></script>
-  <script src="workspace.js?v=20261123_v3"></script>
-  <script src="app.js?v=20261123_v3"></script>
-  <script src="academy_ui.js?v=20261123_v3"></script>
+  <script src="ai_tutor.js?v=20261123_v4"></script>
+  <script src="curriculum.js?v=20261123_v4"></script>
+  <script src="workspace.js?v=20261123_v4"></script>
+  <script src="app.js?v=20261123_v4"></script>
+  <script src="academy_ui.js?v=20261123_v4"></script>
+  <script src="command_palette.js?v=20261123_v4"></script>
+  <script src="ios_simulator.js?v=20261123_v4"></script>
+  <script src="network_toolkit.js?v=20261123_v4"></script>
+  <script>
+    if ("serviceWorker" in navigator && window.location.protocol.startsWith("http")) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>

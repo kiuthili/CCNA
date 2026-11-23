@@ -8061,3 +8061,663 @@ mark.hl-pulse-focus {
   background-color: var(--accent-light) !important;
   box-shadow: 0 2px 10px rgba(2, 132, 199, 0.14);
 }
+
+
+/* ============================================================================
+   FULL-STACK UPGRADE STYLES (Light / Sepia / Dark + Desktop / Mobile)
+   - Global Command Palette (Ctrl+K) & Keyboard Shortcuts (?)
+   - Interactive Cisco IOS CLI Terminal Simulator & Live Lab Task Checker
+   - Visual Subnet & VLSM Architect (32-bit Binary Grid)
+   - Interactive Packet Flow & OSI 7-Layer PDU Inspector
+   - SM-2 Spaced Repetition Bar, 6-Domain Mastery Radar, AI Streaming & TOC Meta
+   ============================================================================ */
+
+/* Topbar Ctrl+K Omni-Search Trigger */
+.topbar-cmd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  height: 32px;
+  padding: 0 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+.topbar-cmd-btn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  background: var(--accent-hover);
+}
+.topbar-kbd, .cmd-kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.12rem 0.35rem;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+  color: var(--text-muted);
+}
+
+/* Command Palette Modal */
+.cmd-palette-modal, .shortcuts-modal, .ios-sim-modal, .subnet-toolkit-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2600;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 6vh 1rem 2rem;
+}
+.cmd-palette-modal[hidden], .shortcuts-modal[hidden], .ios-sim-modal[hidden], .subnet-toolkit-modal[hidden] {
+  display: none !important;
+}
+.cmd-palette-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.56);
+  backdrop-filter: blur(4px);
+}
+.cmd-palette-box {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 720px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(2, 6, 23, 0.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 82vh;
+}
+.cmd-palette-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.05rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.cmd-search-svg { color: var(--accent-color); flex-shrink: 0; }
+.cmd-palette-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.98rem;
+  font-weight: 500;
+}
+.cmd-palette-filters {
+  display: flex;
+  gap: 0.38rem;
+  padding: 0.55rem 0.9rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-page);
+}
+.cmd-filter-pill {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.24rem 0.58rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.cmd-filter-pill.active, .cmd-filter-pill:hover {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: #ffffff;
+}
+.cmd-palette-results {
+  overflow-y: auto;
+  padding: 0.45rem;
+  max-height: 52vh;
+}
+.cmd-result-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.62rem 0.75rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.cmd-result-item.active {
+  background: var(--accent-light);
+}
+.cmd-item-icon { font-size: 1.1rem; flex-shrink: 0; }
+.cmd-item-main { flex: 1; min-width: 0; }
+.cmd-item-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmd-item-sub {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmd-item-badge {
+  font-size: 0.66rem;
+  font-weight: 800;
+  padding: 0.16rem 0.48rem;
+  border-radius: 6px;
+  background: var(--bg-page);
+  color: var(--accent-color);
+  border: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+.cmd-palette-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0.95rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-page);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+.cmd-footer-hints { display: flex; gap: 0.85rem; }
+.cmd-empty-state { padding: 1.6rem; text-align: center; color: var(--text-muted); font-size: 0.88rem; }
+.cmd-jump-highlight {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 4px;
+  border-radius: 10px;
+  transition: outline-color 0.4s ease;
+}
+
+/* Shortcuts Modal */
+.shortcuts-box {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(2, 6, 23, 0.35);
+  overflow: hidden;
+}
+.shortcuts-header, .ios-sim-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-page);
+}
+.shortcuts-close-btn {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.shortcuts-grid { padding: 0.9rem 1.1rem; display: flex; flex-direction: column; gap: 0.55rem; }
+.shortcut-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.86rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+.shortcut-row kbd {
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.14rem 0.42rem;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+}
+
+/* Interactive Cisco IOS CLI Simulator */
+.ios-sim-modal-box, .subnet-toolkit-box {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 920px;
+  max-height: 88vh;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(2, 6, 23, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.ios-sim-modal-body, .toolkit-body {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1;
+}
+.ios-inline-wrapper {
+  margin-top: 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-page);
+}
+.ios-inline-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+}
+.ios-inline-mount { padding: 0.75rem; border-top: 1px solid var(--border-color); }
+.ios-sim-shell {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #334155;
+  background: #0b1120;
+  color: #e2e8f0;
+}
+.ios-sim-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+}
+.ios-sim-dots { display: flex; align-items: center; gap: 0.35rem; }
+.ios-sim-dots .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.ios-sim-dots .dot.red { background: #ef4444; }
+.ios-sim-dots .dot.yellow { background: #f59e0b; }
+.ios-sim-dots .dot.green { background: #22c55e; }
+.ios-sim-title { font-size: 0.78rem; font-weight: 700; color: #38bdf8; margin-left: 0.35rem; }
+.ios-sim-controls { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.ios-mini-btn {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.24rem 0.55rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.ios-sim-topbar .ios-mini-btn {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+.ios-mini-btn:hover { border-color: var(--accent-color); color: var(--accent-color); }
+.ios-lab-checker {
+  padding: 0.65rem 0.85rem;
+  background: #0f172a;
+  border-bottom: 1px solid #334155;
+  font-size: 0.8rem;
+}
+.ios-checker-head { display: flex; justify-content: space-between; margin-bottom: 0.35rem; color: #e2e8f0; }
+.ios-checker-bar { height: 7px; background: #1e293b; border-radius: 999px; overflow: hidden; }
+.ios-checker-fill { height: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8); transition: width 0.25s ease; }
+.ios-checker-fill.is-complete { background: linear-gradient(90deg, #16a34a, #4ade80); }
+.ios-checker-checklist { margin-top: 0.45rem; color: #94a3b8; }
+.ios-task-list {
+  list-style: none;
+  margin-top: 0.4rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 0.25rem 0.65rem;
+  font-size: 0.76rem;
+}
+.ios-task-list li.done { color: #4ade80; }
+.ios-sim-screen {
+  padding: 0.8rem 0.9rem;
+  min-height: 220px;
+  max-height: 360px;
+  overflow-y: auto;
+  font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+.ios-line { white-space: pre-wrap; word-break: break-word; margin-bottom: 0.15rem; }
+.ios-line.sys { color: #38bdf8; }
+.ios-line.cmd-echo { color: #f8fafc; font-weight: 700; }
+.ios-line.error { color: #f87171; }
+.ios-line.success { color: #4ade80; }
+.ios-line.help { color: #fde047; }
+.ios-sim-input-line { display: flex; align-items: center; gap: 0.45rem; margin-top: 0.35rem; }
+.ios-prompt { color: #4ade80; font-weight: 700; white-space: nowrap; }
+.ios-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f8fafc;
+  font-family: inherit;
+  font-size: inherit;
+}
+.ios-diag-ok {
+  margin-top: 0.45rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(22, 163, 74, 0.16);
+  border: 1px solid #16a34a;
+  color: #16a34a;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+.ios-diag-warn {
+  margin-top: 0.45rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid #f59e0b;
+  color: #b45309;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+[data-theme="dark"] .ios-diag-warn { color: #fcd34d; }
+
+/* Visual Subnet & VLSM Architect */
+.toolkit-tabs {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-page);
+}
+.toolkit-tab-btn {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  padding: 0.42rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.toolkit-tab-btn.active { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+.toolkit-pane { display: none; }
+.toolkit-pane.active { display: block; }
+.cidr-input-bar { display: flex; gap: 0.55rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.65rem; }
+.tk-input {
+  flex: 1;
+  min-width: 170px;
+  padding: 0.48rem 0.72rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-family: ui-monospace, monospace;
+}
+.cidr-presets { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.85rem; }
+.tk-preset-chip {
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+  color: var(--accent-color);
+  padding: 0.2rem 0.52rem;
+  border-radius: 6px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.bin-visualizer {
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+  margin-bottom: 0.85rem;
+  overflow-x: auto;
+}
+.bin-legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.55rem; }
+.bit-swatch { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: middle; margin-right: 4px; }
+.bit-swatch.net, .bin-bit.bit-net { background: #0284c7; color: #fff; }
+.bit-swatch.sub, .bin-bit.bit-sub { background: #ea580c; color: #fff; }
+.bit-swatch.host, .bin-bit.bit-host { background: #16a34a; color: #fff; }
+.bin-row { display: flex; align-items: center; gap: 0.65rem; margin-top: 0.35rem; }
+.bin-row-label { width: 92px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); flex-shrink: 0; }
+.bin-octets { display: flex; gap: 0.55rem; }
+.bin-octet { display: flex; gap: 2px; }
+.bin-bit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 22px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+.subnet-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+}
+.subnet-kpi {
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+}
+.subnet-kpi.accent { border-color: var(--accent-color); background: var(--accent-light); }
+.subnet-kpi span { display: block; font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+.subnet-kpi strong { font-size: 0.9rem; font-family: ui-monospace, monospace; color: var(--text-primary); }
+.subnet-teacher-box {
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  background: var(--bg-job);
+  border-left: 4px solid var(--border-job);
+  font-size: 0.84rem;
+}
+.subnet-teacher-box h4 { margin-bottom: 0.45rem; font-size: 0.9rem; }
+.subnet-teacher-box ol { padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.vlsm-rows { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 0.75rem; }
+.vlsm-input-row { display: flex; gap: 0.5rem; align-items: center; }
+.vlsm-row-overflow { background: rgba(239, 68, 68, 0.14); }
+
+/* Interactive Packet Flow & OSI 7-Layer PDU Inspector */
+.pdu-sim-bar {
+  margin: 0.65rem 0 0.95rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+}
+.pdu-sim-controls { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.pdu-hop-pill {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  background: var(--accent-light);
+  padding: 0.24rem 0.62rem;
+  border-radius: 999px;
+}
+.pdu-inspector-panel {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border-color);
+}
+.pdu-inspector-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.86rem;
+}
+.pdu-hop-tabs { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.pdu-hop-chip {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.52rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.pdu-hop-chip.active { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+.pdu-action-note {
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  background: var(--bg-analogy);
+  border-left: 4px solid var(--border-analogy);
+  font-size: 0.82rem;
+  margin-bottom: 0.6rem;
+}
+.pdu-layers-grid { display: flex; flex-direction: column; gap: 0.35rem; }
+.pdu-layer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding: 0.42rem 0.68rem;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-size: 0.78rem;
+}
+.pdu-layer span { font-weight: 700; color: var(--text-secondary); }
+.pdu-layer code { font-family: ui-monospace, monospace; color: var(--accent-color); font-weight: 700; }
+
+/* SM-2 Spaced Repetition Rating Bar */
+.flashcard-sm2-bar {
+  padding: 0.7rem 1rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-page);
+}
+.sm2-bar-label { font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-align: center; margin-bottom: 0.45rem; }
+.sm2-btn-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem; }
+.sm2-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.45rem 0.35rem;
+  border-radius: 9px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.15s ease;
+}
+.sm2-btn:hover { transform: translateY(-1px); }
+.sm2-btn strong { font-size: 0.82rem; }
+.sm2-btn span { font-size: 0.7rem; color: var(--text-muted); }
+.sm2-btn.again { border-color: #ef4444; }
+.sm2-btn.again strong { color: #ef4444; }
+.sm2-btn.hard { border-color: #f59e0b; }
+.sm2-btn.hard strong { color: #d97706; }
+.sm2-btn.good { border-color: #0284c7; }
+.sm2-btn.good strong { color: #0284c7; }
+.sm2-btn.easy { border-color: #16a34a; }
+.sm2-btn.easy strong { color: #16a34a; }
+
+/* Dashboard SM-2 Banner & 6-Domain Mastery Radar */
+.dash-sm2-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1.25rem;
+  border-radius: 14px;
+  background: var(--accent-light);
+  border: 1px solid var(--accent-color);
+  font-size: 0.88rem;
+}
+.six-domain-radar-wrap {
+  display: grid;
+  grid-template-columns: minmax(250px, 320px) 1fr;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 0.85rem 0;
+}
+.radar-svg-box { display: flex; justify-content: center; }
+.radar-bars-box { display: flex; flex-direction: column; gap: 0.65rem; }
+.radar-bar-meta { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.22rem; }
+
+/* AI Tutor Streaming Pill, Usage Meta & Follow-up Chips */
+.ai-stream-live-pill {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 0.1rem 0.38rem;
+  border-radius: 4px;
+  background: #16a34a;
+  color: #fff;
+  margin-left: 0.35rem;
+}
+.ai-usage-meta {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+  font-family: ui-monospace, monospace;
+}
+.ai-followup-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+.ai-followup-chip {
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+  color: var(--accent-color);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.14s ease;
+}
+.ai-followup-chip:hover {
+  background: var(--accent-color);
+  color: #ffffff;
+  border-color: var(--accent-color);
+}
+
+/* Right TOC Meta & Status Badges */
+.right-toc-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 0.25rem 0.4rem 0.55rem;
+  border-bottom: 1px dashed var(--border-subtle);
+  margin-bottom: 0.45rem;
+}
+.toc-status-icon { margin-left: 0.25rem; font-size: 0.72rem; }
+
+@media (max-width: 820px) {
+  .six-domain-radar-wrap { grid-template-columns: 1fr; }
+  .sm2-btn-group { grid-template-columns: repeat(2, 1fr); }
+  .topbar-cmd-btn .btn-text, .topbar-cmd-btn .topbar-kbd { display: none; }
+}

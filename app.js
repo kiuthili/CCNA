@@ -167,8 +167,14 @@ let noteSaveDebounceTimer = null;
 let cloudSyncDebounceTimer = null;
 
 // ============================================================
-// Secure Access Gateway (SHA-256 Auth & Anti-Scraping Shield)
+// Secure Access Gateway (/api/auth HMAC-SHA256 + Local SHA-256 Fallback)
+// Supports independent multi-student profiles with isolated progress & sync keys
 // ============================================================
+const LOCAL_STUDENT_ACCOUNTS = [
+  { username: "student1", pass: "ccna2026", displayName: "Học viên CCNA #1", role: "student" },
+  { username: "student2", pass: "ccna2026", displayName: "Học viên CCNA #2", role: "student" }
+];
+
 async function hashCredentials(username, password) {
   const raw = `${username.trim().toLowerCase()}:${password}::${AUTH_SALT}`;
   const enc = new TextEncoder();
@@ -181,7 +187,87 @@ async function hashCredentials(username, password) {
 function checkCurrentAuth() {
   const s = sessionStorage.getItem("ccna_auth_session");
   const l = localStorage.getItem("ccna_auth_session");
-  return (s === AUTH_HASH_TARGET || l === AUTH_HASH_TARGET);
+  const tok = sessionStorage.getItem("ccna_auth_token") || localStorage.getItem("ccna_auth_token");
+  if (tok && tok.split(".").length === 3) return true;
+  if (s === AUTH_HASH_TARGET || l === AUTH_HASH_TARGET) return true;
+  if ((s && s.startsWith("student_")) || (l && l.startsWith("student_"))) return true;
+  return false;
+}
+
+function reloadActiveUserIsolatedState() {
+  const uid = getActiveUserProfileId();
+  loadCompletedItemsForActiveUser();
+  try {
+    studyNotes = JSON.parse(localStorage.getItem(`ccna_study_notes_${uid}`) || (uid === "default_user" || uid === "admin" ? localStorage.getItem("ccna_study_notes") : "{}") || "{}");
+  } catch { studyNotes = {}; }
+  try {
+    studyHighlights = JSON.parse(localStorage.getItem(`ccna_study_highlights_${uid}`) || (uid === "default_user" || uid === "admin" ? localStorage.getItem("ccna_study_highlights") : "{}") || "{}");
+  } catch { studyHighlights = {}; }
+  cloudSyncKey = getUserCloudSyncKey(uid);
+  localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
+  if (window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.reloadUserWorkspace === "function") {
+    window.CCNA_WORKSPACE.reloadUserWorkspace();
+  }
+  updateProgressSummary();
+  updateNotesCountBadges();
+}
+
+async function authenticateWithBackendOrFallback(u, p) {
+  const cleanUser = u.trim().toLowerCase();
+  // 1. Try /api/auth serverless endpoint first when served over HTTP(S)
+  if (window.location.protocol.startsWith("http")) {
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: cleanUser, password: p })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.authenticated && data.token && data.user) {
+          return {
+            ok: true,
+            token: data.token,
+            sessionVal: data.authHash || AUTH_HASH_TARGET,
+            username: data.user.username,
+            userId: data.user.userId,
+            syncKey: data.user.syncKey
+          };
+        }
+      } else if (res.status === 401) {
+        return { ok: false };
+      }
+    } catch {
+      // Static local mode: fall through to Local SHA-256 verification
+    }
+  }
+
+  // 2. Local SHA-256 Fallback (works 100% offline / static file mode)
+  const computed = await hashCredentials(cleanUser, p);
+  if (computed === AUTH_HASH_TARGET) {
+    return {
+      ok: true,
+      token: "",
+      sessionVal: AUTH_HASH_TARGET,
+      username: cleanUser || "admin",
+      userId: cleanUser.replace(/[^a-z0-9_-]/g, "_") || "admin",
+      syncKey: getUserCloudSyncKey(cleanUser || "admin")
+    };
+  }
+  for (const acc of LOCAL_STUDENT_ACCOUNTS) {
+    const accHash = await hashCredentials(acc.username, acc.pass);
+    if (cleanUser === acc.username && computed === accHash) {
+      return {
+        ok: true,
+        token: "",
+        sessionVal: `student_${accHash.substring(0, 16)}`,
+        username: acc.username,
+        userId: acc.username,
+        syncKey: getUserCloudSyncKey(acc.username)
+      };
+    }
+  }
+  return { ok: false };
 }
 
 function initSecurityAndAuth() {
@@ -197,7 +283,7 @@ function initSecurityAndAuth() {
   if (checkCurrentAuth()) {
     document.body.classList.remove("not-authenticated");
     if (loginOverlay) loginOverlay.style.display = "none";
-    cloudSyncKey = ACCOUNT_SYNC_VAULT_KEY;
+    cloudSyncKey = getUserCloudSyncKey();
     localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
     pullNotesFromCloud(cloudSyncKey, true);
     initRealtimeSyncListener();
@@ -232,18 +318,25 @@ function initSecurityAndAuth() {
       }
 
       try {
-        const computed = await hashCredentials(u, p);
-        if (computed === AUTH_HASH_TARGET) {
-          sessionStorage.setItem("ccna_auth_session", AUTH_HASH_TARGET);
+        const authResult = await authenticateWithBackendOrFallback(u, p);
+        if (authResult.ok) {
+          sessionStorage.setItem("ccna_auth_session", authResult.sessionVal);
+          sessionStorage.setItem("ccna_active_username", authResult.username);
+          if (authResult.token) sessionStorage.setItem("ccna_auth_token", authResult.token);
+
           if (loginRemember && loginRemember.checked) {
-            localStorage.setItem("ccna_auth_session", AUTH_HASH_TARGET);
+            localStorage.setItem("ccna_auth_session", authResult.sessionVal);
+            localStorage.setItem("ccna_active_username", authResult.username);
+            if (authResult.token) localStorage.setItem("ccna_auth_token", authResult.token);
           } else {
             localStorage.removeItem("ccna_auth_session");
+            localStorage.removeItem("ccna_active_username");
+            localStorage.removeItem("ccna_auth_token");
           }
+
           if (loginErrorMsg) loginErrorMsg.hidden = true;
           document.body.classList.remove("not-authenticated");
-          cloudSyncKey = ACCOUNT_SYNC_VAULT_KEY;
-          localStorage.setItem("ccna_cloud_sync_key", cloudSyncKey);
+          reloadActiveUserIsolatedState();
           pullNotesFromCloud(cloudSyncKey, true);
           initRealtimeSyncListener();
           updateAccountSyncStatusUI();
@@ -279,6 +372,10 @@ function initSecurityAndAuth() {
     topbarLogoutBtn.addEventListener("click", () => {
       sessionStorage.removeItem("ccna_auth_session");
       localStorage.removeItem("ccna_auth_session");
+      sessionStorage.removeItem("ccna_auth_token");
+      localStorage.removeItem("ccna_auth_token");
+      sessionStorage.removeItem("ccna_active_username");
+      localStorage.removeItem("ccna_active_username");
       if (realtimeSyncSource) {
         try { realtimeSyncSource.close(); } catch {}
         realtimeSyncSource = null;
@@ -402,6 +499,22 @@ function initStudyToolsSelect() {
         window.openCheatSheet("commands");
       } else if (typeof openCheatSheetModal === "function") {
         openCheatSheetModal("commands");
+      }
+    } else if (action === "subnet-toolkit") {
+      if (typeof window.openSubnetToolkitModal === "function") {
+        window.openSubnetToolkitModal("cidr");
+      }
+    } else if (action === "ios-terminal") {
+      if (typeof window.openStandaloneIosTerminal === "function") {
+        window.openStandaloneIosTerminal(activeLabId || 0);
+      }
+    } else if (action === "weak-drill") {
+      if (typeof window.startWeakSpotDrill === "function") {
+        window.startWeakSpotDrill();
+      }
+    } else if (action === "shortcuts") {
+      if (typeof window.openShortcutsModal === "function") {
+        window.openShortcutsModal();
       }
     } else if (action === "zen") {
       if (typeof window.toggleZenMode === "function") {
@@ -2605,28 +2718,102 @@ function triggerAutoSync() {
   }, 700);
 }
 
-async function pushNotesToCloud() {
-  if (!cloudSyncKey) return;
+const SYNC_PENDING_QUEUE_KEY = "ccna_sync_pending_queue";
+
+function enqueuePendingSync(payload) {
+  try {
+    const queue = JSON.parse(localStorage.getItem(SYNC_PENDING_QUEUE_KEY) || "[]");
+    const filtered = queue.filter((q) => q.userId !== payload.userId);
+    filtered.push({ ...payload, queuedAt: Date.now() });
+    localStorage.setItem(SYNC_PENDING_QUEUE_KEY, JSON.stringify(filtered.slice(-5)));
+  } catch {
+    // Ignore storage quota errors
+  }
+}
+
+async function flushPendingSyncQueue() {
+  if (!navigator.onLine) return;
+  let queue = [];
+  try {
+    queue = JSON.parse(localStorage.getItem(SYNC_PENDING_QUEUE_KEY) || "[]");
+  } catch {
+    return;
+  }
+  if (!Array.isArray(queue) || queue.length === 0) return;
+
+  localStorage.removeItem(SYNC_PENDING_QUEUE_KEY);
+  for (const item of queue) {
+    if (item && item.syncKey) {
+      await pushNotesToCloud(item);
+    }
+  }
+}
+
+window.addEventListener("online", () => {
+  flushPendingSyncQueue();
+});
+
+async function pushNotesToCloud(overridePayload = null) {
+  if (!cloudSyncKey && !overridePayload) return;
   const isEn = typeof currentLang !== "undefined" && currentLang === "en";
-  setCloudSyncStatus("syncing", isEn ? "Syncing..." : "Đang đồng bộ...");
+  const uid = getActiveUserProfileId();
 
   const wsDB = window.CCNA_WORKSPACE && typeof window.CCNA_WORKSPACE.getWorkspaceDB === "function"
     ? window.CCNA_WORKSPACE.getWorkspaceDB()
     : null;
 
-  const payload = {
+  let examHistory = [];
+  try {
+    examHistory = JSON.parse(localStorage.getItem(`ccna_exam_history_${uid}`) || "[]");
+  } catch { examHistory = []; }
+
+  let srsState = {};
+  try {
+    srsState = JSON.parse(localStorage.getItem(`ccna_sm2_srs_${uid}`) || "{}");
+  } catch { srsState = {}; }
+
+  const payload = overridePayload || {
     syncKey: cloudSyncKey,
-    userId: getActiveUserProfileId(),
+    userId: uid,
     notes: studyNotes,
     highlights: studyHighlights,
     completedItems: completedItems,
+    examHistory,
+    srsState,
     workspaceDB: wsDB,
     updatedAt: Date.now()
   };
 
+  if (!navigator.onLine) {
+    enqueuePendingSync(payload);
+    setCloudSyncStatus("synced", isEn ? "Queued (Offline)" : "Đã xếp hàng đợi (Offline)");
+    if (noteSaveStatusText) {
+      noteSaveStatusText.textContent = isEn ? "Saved offline — will auto-sync online" : "Đã lưu offline — sẽ tự đồng bộ khi có mạng";
+    }
+    return;
+  }
+
+  setCloudSyncStatus("syncing", isEn ? "Syncing..." : "Đang đồng bộ...");
+
   try {
-    const topic = getSyncTopic(cloudSyncKey);
     const jsonStr = JSON.stringify(payload);
+    let syncedViaApi = false;
+
+    // 0. Try Smart Delta/Timestamp Merge endpoint `/api/sync` when served over HTTP(S)
+    if (window.location.protocol.startsWith("http")) {
+      try {
+        const apiRes = await fetch(`/api/sync?key=${encodeURIComponent(payload.syncKey)}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: jsonStr
+        });
+        if (apiRes.ok) syncedViaApi = true;
+      } catch {
+        // Fallback to ntfy.sh below
+      }
+    }
+
+    const topic = getSyncTopic(payload.syncKey);
 
     // 1. Upload to ntfy.sh with attachment for full size persistence (supports up to 15MB)
     await fetch(`https://ntfy.sh/${topic}`, {
@@ -2636,6 +2823,8 @@ async function pushNotesToCloud() {
         "Title": "CCNA Study Sync"
       },
       body: jsonStr
+    }).catch((err) => {
+      if (!syncedViaApi) throw err;
     });
 
     // 2. Also send compact message for instant real-time SSE delivery if size permits
@@ -2652,10 +2841,11 @@ async function pushNotesToCloud() {
       noteSaveStatusText.textContent = isEn ? "Saved & Synced to Cloud" : "Đã lưu & đồng bộ cloud";
     }
   } catch (err) {
-    console.warn("Cloud sync push error:", err);
-    setCloudSyncStatus("synced", isEn ? "Saved (Local)" : "Đã lưu (Cục bộ)");
+    console.warn("Cloud sync push error, queuing for retry:", err);
+    enqueuePendingSync(payload);
+    setCloudSyncStatus("synced", isEn ? "Queued (Retry on Online)" : "Đã lưu (Hàng đợi Retry)");
     if (noteSaveStatusText) {
-      noteSaveStatusText.textContent = isEn ? "Saved (Local)" : "Đã lưu (Cục bộ)";
+      noteSaveStatusText.textContent = isEn ? "Queued for auto-retry" : "Đã lưu cục bộ (Tự động đồng bộ lại)";
     }
   }
 }
@@ -2798,6 +2988,30 @@ function mergeIncomingSyncPayload(cloudData, silent = false) {
     if (uid === "default_user" || uid === "admin" || uid.startsWith("user_04e7ca8d")) {
       localStorage.setItem("ccna_completed_items", JSON.stringify(completedItems));
     }
+  }
+
+  // 4. Merge Exam History & SM-2 SRS State
+  if (Array.isArray(cloudData.examHistory)) {
+    try {
+      const localHist = JSON.parse(localStorage.getItem(`ccna_exam_history_${uid}`) || "[]");
+      const hMap = new Map();
+      localHist.forEach((x) => x && x.id && hMap.set(x.id, x));
+      cloudData.examHistory.forEach((x) => x && x.id && hMap.set(x.id, x));
+      localStorage.setItem(`ccna_exam_history_${uid}`, JSON.stringify(Array.from(hMap.values())));
+    } catch {}
+  }
+  if (cloudData.srsState && typeof cloudData.srsState === "object") {
+    try {
+      const localSrs = JSON.parse(localStorage.getItem(`ccna_sm2_srs_${uid}`) || "{}");
+      Object.keys(cloudData.srsState).forEach((cid) => {
+        const inc = cloudData.srsState[cid];
+        const prev = localSrs[cid];
+        if (!prev || (inc.updatedAt || 0) >= (prev.updatedAt || 0)) {
+          localSrs[cid] = inc;
+        }
+      });
+      localStorage.setItem(`ccna_sm2_srs_${uid}`, JSON.stringify(localSrs));
+    } catch {}
   }
 
   updateNotesCountBadges();
@@ -3554,6 +3768,119 @@ function buildFlashcardDeck(targetModId = null, targetCategory = "all") {
   return deck;
 }
 
+// ============================================================================
+// ANKI SM-2 SPACED REPETITION ENGINE (PER-USER ISOLATED)
+// Ratings: 0 = Again (<10m), 3 = Hard (1d), 4 = Good (3d), 5 = Easy (7d)
+// ============================================================================
+function getSm2StorageKey() {
+  return `ccna_sm2_srs_${getActiveUserProfileId()}`;
+}
+
+function loadSm2State() {
+  try {
+    return JSON.parse(localStorage.getItem(getSm2StorageKey()) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveSm2State(state) {
+  try {
+    localStorage.setItem(getSm2StorageKey(), JSON.stringify(state));
+  } catch {}
+}
+
+function getFlashcardStableId(card) {
+  if (!card) return "fc_unknown";
+  if (card.id) return String(card.id);
+  const raw = `${card.modId || 0}_${card.type || "card"}_${String(card.front || "").replace(/<[^>]+>/g, "").slice(0, 48)}`;
+  return "fc_" + raw.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+}
+
+function computeSm2Schedule(prevRecord, quality) {
+  const now = Date.now();
+  const prev = prevRecord || { repetitions: 0, interval: 0, easeFactor: 2.5, nextReviewAt: 0 };
+  let repetitions = prev.repetitions || 0;
+  let interval = prev.interval || 0;
+  let easeFactor = prev.easeFactor || 2.5;
+  let nextReviewAt = now;
+
+  if (quality === 0) {
+    // Again: < 10 minutes
+    repetitions = 0;
+    interval = 0;
+    easeFactor = Math.max(1.3, easeFactor - 0.2);
+    nextReviewAt = now + 10 * 60 * 1000;
+  } else if (quality === 3) {
+    // Hard: 1 day (or 1.2x previous)
+    repetitions = Math.max(1, repetitions);
+    interval = interval <= 1 ? 1 : Math.max(1, Math.round(interval * 1.2));
+    easeFactor = Math.max(1.3, easeFactor - 0.15);
+    nextReviewAt = now + interval * 24 * 60 * 60 * 1000;
+  } else if (quality === 4) {
+    // Good: 3 days first, then interval * EF
+    repetitions += 1;
+    interval = repetitions === 1 ? 3 : Math.max(3, Math.round(interval * easeFactor));
+    nextReviewAt = now + interval * 24 * 60 * 60 * 1000;
+  } else {
+    // Easy (5): 7 days first, then interval * EF * 1.3
+    repetitions += 1;
+    easeFactor = Math.min(3.2, easeFactor + 0.15);
+    interval = repetitions === 1 ? 7 : Math.max(7, Math.round(interval * easeFactor * 1.3));
+    nextReviewAt = now + interval * 24 * 60 * 60 * 1000;
+  }
+
+  return {
+    repetitions,
+    interval,
+    easeFactor: Number(easeFactor.toFixed(2)),
+    nextReviewAt,
+    lastQuality: quality,
+    updatedAt: now
+  };
+}
+
+function getDueFlashcardsCount() {
+  const srs = loadSm2State();
+  const now = Date.now();
+  const allDeck = buildFlashcardDeck("all", "all");
+  let dueCount = 0;
+  allDeck.forEach((c) => {
+    const cid = getFlashcardStableId(c);
+    const rec = srs[cid];
+    if (!rec || (rec.nextReviewAt || 0) <= now) {
+      dueCount++;
+    }
+  });
+  // Cap displayed daily new-card recommendation to 20 if user hasn't reviewed any yet, or exact due count
+  const reviewedCount = Object.keys(srs).length;
+  if (reviewedCount === 0) return Math.min(20, allDeck.length);
+  return dueCount;
+}
+
+function rateCurrentFlashcardSm2(quality) {
+  const card = flashcardDeck[currentFlashcardIndex];
+  if (!card) return;
+  const cid = getFlashcardStableId(card);
+  const srs = loadSm2State();
+  srs[cid] = computeSm2Schedule(srs[cid], quality);
+  saveSm2State(srs);
+  if (typeof triggerAutoSync === "function") triggerAutoSync();
+
+  // Advance to next card smoothly
+  if (currentFlashcardIndex < flashcardDeck.length - 1) {
+    currentFlashcardIndex++;
+    isFlashcardFlipped = false;
+    renderCurrentFlashcard();
+  } else {
+    isFlashcardFlipped = false;
+    renderCurrentFlashcard();
+  }
+}
+
+window.getDueFlashcardsCount = getDueFlashcardsCount;
+window.rateCurrentFlashcardSm2 = rateCurrentFlashcardSm2;
+
 function renderCurrentFlashcard() {
   const isEn = currentLang === "en";
   const counterEl = document.getElementById("flashcard-counter");
@@ -3562,16 +3889,21 @@ function renderCurrentFlashcard() {
   const flipperEl = document.getElementById("flashcard-flipper");
   const prevBtn = document.getElementById("flashcard-prev-btn");
   const nextBtn = document.getElementById("flashcard-next-btn");
+  const sm2Bar = document.getElementById("flashcard-sm2-bar");
 
   if (!cardTextEl || flashcardDeck.length === 0) {
-    if (cardTextEl) cardTextEl.innerHTML = isEn ? "No flashcards match this filter criteria." : "Không có thẻ ghi nhớ nào phù hợp với bộ lọc đã chọn.";
+    if (cardTextEl) cardTextEl.innerHTML = isEn ? "No flashcards match this filter criteria." : "Tuyệt vời! Không có thẻ nào đến hạn hoặc phù hợp với bộ lọc này.";
     if (counterEl) counterEl.textContent = "0 / 0";
     if (prevBtn) prevBtn.disabled = true;
     if (nextBtn) nextBtn.disabled = true;
+    if (sm2Bar) sm2Bar.hidden = true;
     return;
   }
 
   const card = flashcardDeck[currentFlashcardIndex];
+  const cid = getFlashcardStableId(card);
+  const srsRec = loadSm2State()[cid];
+  const srsTag = srsRec ? ` • SM-2: EF ${srsRec.easeFactor} (${srsRec.interval}d)` : " • Thẻ mới";
   if (counterEl) counterEl.textContent = `${currentFlashcardIndex + 1} / ${flashcardDeck.length}`;
 
   if (prevBtn) prevBtn.disabled = currentFlashcardIndex === 0;
@@ -3580,15 +3912,17 @@ function renderCurrentFlashcard() {
   if (isFlashcardFlipped) {
     if (flipperEl) flipperEl.classList.add("is-flipped");
     if (hintPillEl) hintPillEl.textContent = isEn
-      ? `Answer & Explanation [${card.type} — Module ${card.modId}]`
-      : `Đáp án & Giải thích [${card.type} — Bài ${card.modId}]`;
+      ? `Answer & Explanation [${card.type} — Module ${card.modId}${srsTag}]`
+      : `Đáp án & Giải thích [${card.type} — Bài ${card.modId}${srsTag}]`;
     cardTextEl.innerHTML = card.back;
+    if (sm2Bar) sm2Bar.hidden = false;
   } else {
     if (flipperEl) flipperEl.classList.remove("is-flipped");
     if (hintPillEl) hintPillEl.textContent = isEn
-      ? `Question / Prompt [${card.type} — Module ${card.modId}] (Click or press Space to reveal)`
-      : `Câu hỏi / Khái niệm [${card.type} — Bài ${card.modId}] (Bấm để lật)`;
+      ? `Question / Prompt [${card.type} — Module ${card.modId}${srsTag}] (Click or press Space to reveal)`
+      : `Câu hỏi / Khái niệm [${card.type} — Bài ${card.modId}${srsTag}] (Bấm hoặc Space để lật)`;
     cardTextEl.innerHTML = card.front;
+    if (sm2Bar) sm2Bar.hidden = true;
   }
 }
 
@@ -3599,8 +3933,19 @@ function reloadFlashcardDeck() {
   if (scopeSelect) flashcardCurrentScope = scopeSelect.value;
   if (catSelect) flashcardCurrentCategory = catSelect.value;
 
-  const targetId = flashcardCurrentScope === "all" ? "all" : activeModuleId;
-  flashcardDeck = buildFlashcardDeck(targetId, flashcardCurrentCategory);
+  if (flashcardCurrentScope === "due") {
+    const srs = loadSm2State();
+    const now = Date.now();
+    const allCards = buildFlashcardDeck("all", flashcardCurrentCategory);
+    const dueCards = allCards.filter((c) => {
+      const rec = srs[getFlashcardStableId(c)];
+      return !rec || (rec.nextReviewAt || 0) <= now;
+    });
+    flashcardDeck = dueCards.slice(0, 30);
+  } else {
+    const targetId = flashcardCurrentScope === "all" ? "all" : activeModuleId;
+    flashcardDeck = buildFlashcardDeck(targetId, flashcardCurrentCategory);
+  }
   currentFlashcardIndex = 0;
   isFlashcardFlipped = false;
   renderCurrentFlashcard();
@@ -3612,7 +3957,10 @@ function openFlashcardsModal(targetModId = null) {
 
   const scopeSelect = document.getElementById("flashcard-scope-select");
   if (scopeSelect) {
-    if (targetModId === "all") {
+    if (targetModId === "due") {
+      scopeSelect.value = "due";
+      flashcardCurrentScope = "due";
+    } else if (targetModId === "all") {
       scopeSelect.value = "all";
       flashcardCurrentScope = "all";
     } else {
@@ -3702,6 +4050,15 @@ function initFlashcardsSystem() {
     });
   }
 
+  // Bind SM-2 Spaced Repetition rating buttons
+  document.querySelectorAll("#flashcard-sm2-bar .sm2-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const q = parseInt(btn.dataset.sm2, 10);
+      if (!isNaN(q)) rateCurrentFlashcardSm2(q);
+    });
+  });
+
   window.addEventListener("keydown", (e) => {
     const modal = document.getElementById("flashcard-modal");
     if (!modal || modal.hidden) return;
@@ -3711,6 +4068,10 @@ function initFlashcardsSystem() {
     } else if (e.key === " " && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA" && e.target.tagName !== "SELECT") {
       e.preventDefault();
       toggleFlip();
+    } else if (isFlashcardFlipped && ["1", "2", "3", "4"].includes(e.key)) {
+      e.preventDefault();
+      const map = { "1": 0, "2": 3, "3": 4, "4": 5 };
+      rateCurrentFlashcardSm2(map[e.key]);
     } else if (e.key === "ArrowLeft") {
       if (currentFlashcardIndex > 0) {
         currentFlashcardIndex--;

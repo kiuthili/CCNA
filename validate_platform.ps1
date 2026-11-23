@@ -92,6 +92,27 @@ Assert-Condition ($aiRaw -match '\.pt-step-item\[data-step-idx\]') "Clicking any
 Assert-Condition ($apiAiRaw -match 'MAX_PAYLOAD_BYTES' -and $apiAiRaw -match 'ALLOWED_MODELS' -and -not ($apiAiRaw -match 'Access-Control-Allow-Credentials')) "/api/ai-tutor.js enforces 4MB payload limit, model allowlist, and compliant CORS"
 Assert-Condition ($apiSyncRaw -match 'MAX_SYNC_PAYLOAD_BYTES' -and -not ($apiSyncRaw -match 'Access-Control-Allow-Credentials')) "/api/sync.js enforces 2MB payload limit, key sanitization, and compliant CORS"
 
+Write-Output "`n=== 6. FULL-STACK UPGRADE VALIDATION (STREAMING, SMART MERGE, AUTH, PWA, IOS SIM, TOOLKIT, SM-2, RADAR) ==="
+$apiAuthExists = Test-Path "d:\CCNA\api\auth.js"
+$apiAuthRaw = if ($apiAuthExists) { Get-Content -Path "d:\CCNA\api\auth.js" -Raw -Encoding UTF8 } else { "" }
+$cmdRaw = if (Test-Path "d:\CCNA\command_palette.js") { Get-Content -Path "d:\CCNA\command_palette.js" -Raw -Encoding UTF8 } else { "" }
+$iosRaw = if (Test-Path "d:\CCNA\ios_simulator.js") { Get-Content -Path "d:\CCNA\ios_simulator.js" -Raw -Encoding UTF8 } else { "" }
+$tkRaw = if (Test-Path "d:\CCNA\network_toolkit.js") { Get-Content -Path "d:\CCNA\network_toolkit.js" -Raw -Encoding UTF8 } else { "" }
+$examRaw = Get-Content -Path "d:\CCNA\exam_sim.js" -Raw -Encoding UTF8
+$indexRaw = Get-Content -Path "d:\CCNA\index.html" -Raw -Encoding UTF8
+
+Assert-Condition ($apiAiRaw -match 'streamGenerateContent\?alt=sse' -and $apiAiRaw -match 'cleanupIpRateLimitStore' -and $apiAiRaw -match 'followUpSuggestions') "/api/ai-tutor.js supports SSE streaming, IP TTL eviction, usageMetadata & follow-up suggestions"
+Assert-Condition ($apiSyncRaw -match 'mergeSyncPayloads' -and $apiSyncRaw -match 'deletedAt' -and $apiSyncRaw -match 'examHistory') "/api/sync.js implements smart per-entity delta/timestamp merge with tombstone support"
+Assert-Condition ($apiAuthExists -and $apiAuthRaw -match 'createHmac\("sha256"' -and $apiAuthRaw -match 'signSessionToken') "/api/auth.js implements HMAC-SHA256 signed multi-user authentication gateway"
+Assert-Condition ($appRaw -match 'ccna_sync_pending_queue' -and $appRaw -match 'addEventListener\("online"' -and $appRaw -match '/api/auth') "app.js implements offline sync queue + online auto-retry + /api/auth with local SHA-256 fallback"
+Assert-Condition ((Test-Path "d:\CCNA\manifest.json") -and (Test-Path "d:\CCNA\sw.js") -and $indexRaw -match 'manifest\.json' -and $indexRaw -match 'serviceWorker\.register') "PWA Offline-First manifest.json & Service Worker sw.js registered in index.html"
+Assert-Condition ($cmdRaw -match 'buildOmniSearchIndex' -and $cmdRaw -match 'openCommandPalette' -and $cmdRaw -match 'openShortcutsModal') "Global Command Palette (Ctrl+K) 7-source omni-search & Keyboard Shortcuts (?) modal active"
+Assert-Condition ($iosRaw -match 'class CiscoIosSession' -and $iosRaw -match 'extractLabTargetTasks' -and $iosRaw -match 'autocomplete') "Interactive Cisco IOS CLI Terminal Simulator with Tab, ? help & Live Lab Task Checker active"
+Assert-Condition ($tkRaw -match 'computeVlsmAllocation' -and $tkRaw -match 'renderBinaryBitGrid' -and $tkRaw -match 'buildPduSnapshotsForPath') "Visual Subnet/VLSM Architect & Interactive Packet Flow OSI 7-Layer PDU Inspector active"
+Assert-Condition ($appRaw -match 'computeSm2Schedule' -and $appRaw -match 'getDueFlashcardsCount' -and $indexRaw -match 'flashcard-sm2-bar') "Anki SM-2 Spaced Repetition Flashcard scheduler & rating UI active"
+Assert-Condition ($examRaw -match 'renderSixDomainRadarSvg' -and $examRaw -match 'startWeakSpotDrill' -and $acadRaw -match 'dash-sm2-banner') "6-Domain CCNA 200-301 Mastery Radar, Smart Weak-Spot Drill & Dashboard SM-2 reminder active"
+Assert-Condition ($aiRaw -match 'text/event-stream' -and $aiRaw -match 'followUpSuggestions') "ai_tutor.js consumes real-time SSE streaming tokens & renders follow-up suggestions"
+
 Write-Output "`n=================================================================="
 Write-Output ("VALIDATION SUMMARY: {0} PASSED | {1} FAILED" -f $passed, $failed)
 Write-Output "=================================================================="
