@@ -66,8 +66,8 @@
   }
   </script>
 
-  <link rel="stylesheet" href="assets/css/style.css?v=20261123_v12" />
-  <link rel="stylesheet" href="assets/css/theme_executive.css?v=20261123_v12" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20261123_v13" />
+  <link rel="stylesheet" href="assets/css/theme_executive.css?v=20261123_v13" />
 </head>
 <body class="not-authenticated">
   <!-- Clean & Bright Login Gateway Screen -->
@@ -182,6 +182,7 @@
           <button type="button" class="exec-menu-item" data-tool-action="exam"><span class="exec-mi-icon">🎯</span><span class="exec-mi-text">Phòng thi thử CCNA 200-301</span></button>
           <button type="button" class="exec-menu-item" data-tool-action="weak-drill"><span class="exec-mi-icon">🩺</span><span class="exec-mi-text">Luyện khắc phục điểm yếu</span></button>
           <div class="exec-menu-divider"></div>
+          <button type="button" class="exec-menu-item" data-tool-action="arcade"><span class="exec-mi-icon">🎮</span><span class="exec-mi-text">Game Cứu Mạng &amp; Đấu trường 60s</span></button>
           <button type="button" class="exec-menu-item" data-tool-action="guide"><span class="exec-mi-icon">📖</span><span class="exec-mi-text">Hướng dẫn sử dụng Web</span></button>
           <button type="button" class="exec-menu-item" data-tool-action="shortcuts"><span class="exec-mi-icon">❓</span><span class="exec-mi-text">Bảng phím tắt hệ thống</span><kbd>?</kbd></button>
           <button type="button" class="exec-menu-item" data-tool-action="zen"><span class="exec-mi-icon">🧘</span><span class="exec-mi-text">Chế độ tập trung (Zen)</span></button>
@@ -334,6 +335,10 @@
           <button type="button" class="acad-nav-btn extra-item" data-nav="guide" title="12. Hướng dẫn sử dụng Web & Quy trình học CCNA 5 bước">
             <span class="acad-nav-icon">🧭</span>
             <span class="acad-nav-text">Hướng dẫn</span>
+          </button>
+          <button type="button" class="acad-nav-btn extra-item" data-nav="arcade" title="13. Đấu trường Game Cứu Mạng, Tốc độ 60s & Thăng chức XP">
+            <span class="acad-nav-icon">🎮</span>
+            <span class="acad-nav-text">Chơi &amp; XP</span>
           </button>
         </nav>
 
@@ -831,8 +836,9 @@
   <!-- Interactive Engineer Tools & Command Palette -->
   <script src="js/features/command_palette.js?v=20261123_v12"></script>
   <script src="js/features/ios_simulator.js?v=20261123_v12"></script>
-  <script src="js/features/network_toolkit.js?v=20261123_v12"></script>
-  <script src="js/features/guided_learning.js?v=20261123_v12"></script>
+  <script src="js/features/network_toolkit.js?v=20261123_v13"></script>
+  <script src="js/features/guided_learning.js?v=20261123_v13"></script>
+  <script src="js/features/gamification_arcade.js?v=20261123_v13"></script>
   <script>
     if ("serviceWorker" in navigator && window.location.protocol.startsWith("http")) {
       window.addEventListener("load", () => {

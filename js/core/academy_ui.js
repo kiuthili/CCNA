@@ -881,6 +881,7 @@
             <button type="button" class="ws-btn primary today-big-cta" id="dash-today-start-btn" data-id="${nextMod.id}">
               ▶ Bắt đầu Học phần ${nextMod.id} ngay
             </button>
+            <button type="button" class="ws-btn" id="dash-open-arcade-btn">🎮 Chơi Game Cứu Mạng (+XP)</button>
             <button type="button" class="ws-btn" id="dash-open-guide-btn">📖 Xem hướng dẫn cách học</button>
           </div>
         </section>
@@ -989,6 +990,9 @@
 
     document.getElementById("dash-today-start-btn")?.addEventListener("click", (e) => {
       navigateToAcademySection("modules", Number(e.currentTarget.dataset.id));
+    });
+    document.getElementById("dash-open-arcade-btn")?.addEventListener("click", () => {
+      navigateToAcademySection("arcade");
     });
     document.getElementById("dash-open-guide-btn")?.addEventListener("click", () => {
       navigateToAcademySection("guide");
@@ -1762,6 +1766,12 @@
       if (breadcrumb) breadcrumb.textContent = "Hướng dẫn sử dụng Web";
       updateRouteHash("guide");
       renderUserGuidePage();
+    } else if (sectionName === "arcade") {
+      if (breadcrumb) breadcrumb.textContent = "🎮 Đấu trường RPG & Speed Arcade";
+      updateRouteHash("arcade");
+      if (typeof window.renderArcadeHubPage === "function") {
+        window.renderArcadeHubPage();
+      }
     }
 
     if (typeof closeMobileSidebar === "function") closeMobileSidebar();

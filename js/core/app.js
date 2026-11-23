@@ -490,6 +490,8 @@ function executeStudyToolAction(action) {
     if (typeof window.startWeakSpotDrill === "function") window.startWeakSpotDrill();
   } else if (action === "guide") {
     if (typeof window.navigateToAcademySection === "function") window.navigateToAcademySection("guide");
+  } else if (action === "arcade") {
+    if (typeof window.navigateToAcademySection === "function") window.navigateToAcademySection("arcade");
   } else if (action === "shortcuts") {
     if (typeof window.openShortcutsModal === "function") window.openShortcutsModal();
   } else if (action === "zen") {

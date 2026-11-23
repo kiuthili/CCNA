@@ -150,6 +150,16 @@
         run: () => typeof openCheatSheetModal === "function" && openCheatSheetModal("commands")
       },
       {
+        id: "act-arcade",
+        category: "action",
+        badge: "🎮 GAME",
+        icon: "🎮",
+        title: isEn ? "CCNA Incident RPG & 60s Speed Arcade" : "Đấu Trường Game Cứu Sự Cố Mạng & Tốc Độ 60s (+XP)",
+        subtitle: "Phá án sự cố công ty • Đoán Port/OSI/Subnet Combo x5 • Thăng chức Kỹ sư",
+        keywords: "game choi arcade rpg cuu su co mang xp rank podcast",
+        run: () => typeof window.navigateToAcademySection === "function" && window.navigateToAcademySection("arcade")
+      },
+      {
         id: "act-guide",
         category: "action",
         badge: "📖 GUIDE",

@@ -1430,3 +1430,232 @@ body {
 @media (max-width: 720px) {
   .guided-steps-track { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+
+/* ============================================================================
+   GAMIFICATION, INCIDENT RPG, 60s SPEED ARCADE, PODCAST & CONFETTI (v13)
+   ============================================================================ */
+.xp-progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+  max-width: 420px;
+}
+.xp-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f5c451, #fbbf24);
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.arcade-mode-tabs {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+.arcade-pane { display: none; }
+.arcade-pane.active { display: block; }
+
+/* Incident RPG */
+.rpg-mission-selector {
+  display: flex;
+  gap: 0.38rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.8rem;
+}
+.rpg-pill {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  padding: 0.34rem 0.65rem;
+  border-radius: 7px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.rpg-pill.active {
+  background: var(--exec-navy);
+  border-color: var(--exec-navy);
+  color: #ffffff;
+}
+.rpg-pill.solved:not(.active) {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #047857;
+}
+.rpg-stage-card, .speed-stage-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.2rem 1.35rem;
+  box-shadow: var(--shadow-soft);
+}
+.rpg-ticket-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.rpg-ticket-badge {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  padding: 0.18rem 0.55rem;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+.rpg-ticket-title { font-size: 1.08rem; font-weight: 700; color: var(--text-primary); }
+.rpg-options-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.rpg-opt-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  text-align: left;
+  padding: 0.72rem 0.9rem;
+  border-radius: 9px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+.rpg-opt-btn:hover:not(:disabled) { border-color: var(--exec-blue); background: var(--accent-light); }
+.rpg-opt-btn.correct { border-color: #16a34a; background: #ecfdf5; color: #065f46; font-weight: 600; }
+.rpg-opt-btn.wrong { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
+.rpg-opt-letter {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.76rem;
+  flex-shrink: 0;
+}
+.rpg-feedback-box {
+  margin-top: 0.9rem;
+  padding: 0.9rem 1rem;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.rpg-feedback-box.ok { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+.rpg-feedback-box.err { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+
+/* 60s Speed Arcade */
+.speed-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.75rem;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.speed-mode-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.speed-mode-btn:hover { border-color: var(--exec-navy); background: var(--accent-light); transform: translateY(-2px); }
+.speed-mode-btn span { font-size: 0.76rem; color: var(--text-muted); }
+.speed-hud { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.1rem; }
+.speed-hud-pill {
+  background: var(--bg-page);
+  border: 1px solid var(--border-color);
+  padding: 0.32rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+.speed-hud-pill.combo { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
+.speed-q-title { font-size: 1.12rem; font-weight: 700; text-align: center; margin: 1rem 0 1.2rem; color: var(--text-primary); }
+.speed-opts-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; max-width: 640px; margin: 0 auto; }
+.speed-opt-btn {
+  padding: 0.85rem 1rem;
+  border-radius: 9px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.speed-opt-btn:hover { border-color: var(--exec-blue); background: var(--accent-light); }
+.speed-opt-btn.correct { background: #16a34a; border-color: #16a34a; color: #fff; }
+.speed-opt-btn.wrong { background: #ef4444; border-color: #ef4444; color: #fff; }
+
+/* Badges Grid */
+.arcade-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.65rem;
+}
+.arcade-badge-card {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-page);
+}
+.arcade-badge-card.unlocked { border-color: #f5c451; background: #fffbeb; }
+.arcade-badge-card.locked { opacity: 0.55; filter: grayscale(0.8); }
+.ab-icon { font-size: 1.45rem; }
+
+/* Podcast Active Button */
+.podcast-play-btn.is-speaking {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+/* Floating XP Toast & Confetti Burst */
+.ccna-xp-toast {
+  position: fixed;
+  top: 66px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-16px);
+  background: #0f1d36;
+  color: #f5c451;
+  border: 1px solid rgba(245, 196, 81, 0.45);
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 10px 28px rgba(15, 29, 54, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3200;
+  transition: all 0.25s ease;
+}
+.ccna-xp-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.ccna-confetti-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3100;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  top: -12px;
+  width: 9px;
+  height: 14px;
+  border-radius: 2px;
+  animation: ccnaConfettiFall 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes ccnaConfettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(85vh) rotate(620deg); opacity: 0; }
+}

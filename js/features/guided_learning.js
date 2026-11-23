@@ -300,6 +300,9 @@
     detailEl.querySelector("#guided-next-step-btn")?.addEventListener("click", () => {
       recordStudyActivityToday();
       if (currentStep < 4) {
+        if (typeof window.awardCcnaXp === "function") {
+          window.awardCcnaXp(15, `Hoàn thành Bước ${currentStep}/4`);
+        }
         currentStep++;
         applyStepVisibility(detailEl, currentStep, mod);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -307,6 +310,9 @@
         // Complete current module & advance to next module
         if (mod && typeof completedItems !== "undefined" && !completedItems[`module-${mod.id}`] && typeof toggleItemCompleted === "function") {
           toggleItemCompleted(`module-${mod.id}`);
+          if (typeof window.awardCcnaXp === "function") {
+            window.awardCcnaXp(100, `Hoàn thành Học phần ${mod.id}!`);
+          }
         }
         if (mod && mod.id < 17 && typeof selectModule === "function") {
           currentStep = 1;
