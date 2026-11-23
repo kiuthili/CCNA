@@ -1261,10 +1261,10 @@
       <div class="ai-backdrop ai-tutor-backdrop" id="ai-tutor-backdrop" aria-hidden="true"></div>
 
       <aside class="ai-sidebar ai-tutor-modal" id="ai-tutor-modal" aria-label="AI Network Tutor" hidden>
-        <div class="ai-resizer" id="ai-resizer" title="Kéo sang trái/phải để thay đổi độ rộng AI Side Panel"></div>
+        <div class="ai-resizer" id="ai-resizer" title="Kéo sang trái/phải để thay đổi độ rộng khung chat AI"></div>
 
         <div class="ai-container ai-tutor-container">
-          <!-- Header -->
+          <!-- Compact Single-Line Header -->
           <header class="ai-tutor-header">
             <div class="ai-header-left">
               <div class="ai-avatar-wrap">
@@ -1273,83 +1273,79 @@
               </div>
               <div class="ai-header-info">
                 <div class="ai-header-title-row">
-                  <h3 class="ai-header-title">AI NETWORK TUTOR</h3>
-                  <span class="ai-model-badge" id="ai-active-model-badge">CONTEXT RAG 2.5</span>
+                  <h3 class="ai-header-title">AI Tutor</h3>
+                  <span class="ai-mode-pill" id="ai-active-mode-pill">📘 Learning</span>
                 </div>
-                <p class="ai-header-sub">Senior Network Engineer &amp; CCNA 200-301 Context-Aware Instructor</p>
+                <div class="ai-ctx-breadcrumb" id="ai-context-text" title="Ngữ cảnh bài học/Lab đang nạp tự động">Đang đồng bộ...</div>
               </div>
             </div>
 
             <div class="ai-header-actions">
-              <button type="button" class="ai-tool-btn" id="ai-conv-history-btn" title="Quản lý danh sách cuộc trò chuyện">
-                💬 Hội thoại
+              <button type="button" class="ai-tool-btn" id="ai-toggle-tools-btn" title="Mở/Đóng tùy chọn Chế độ AI, Phạm vi Context & Bước Lab">
+                🎛️ Chế độ
               </button>
-              <button type="button" class="ai-tool-btn" id="ai-new-conv-btn" title="Tạo cuộc trò chuyện mới cho bài này">
+              <button type="button" class="ai-tool-btn" id="ai-conv-history-btn" title="Lịch sử hội thoại">
+                💬
+              </button>
+              <button type="button" class="ai-tool-btn" id="ai-new-conv-btn" title="Tạo hội thoại mới">
                 + Mới
               </button>
-              <button type="button" class="ai-tool-btn" id="ai-settings-toggle-btn" title="Cài đặt API Key &amp; Model">
+              <button type="button" class="ai-tool-btn" id="ai-expand-width-btn" title="Mở rộng / Thu nhỏ khung chat AI để đọc thoải mái hơn">
+                ⤢
+              </button>
+              <button type="button" class="ai-tool-btn" id="ai-settings-toggle-btn" title="Cài đặt Gemini API Key">
                 ⚙️
               </button>
-              <button type="button" class="ai-close-btn" id="ai-tutor-close-btn" aria-label="Thu gọn AI Network Tutor" title="Thu gọn (Alt+A hoặc Esc)">
+              <button type="button" class="ai-close-btn" id="ai-tutor-close-btn" aria-label="Thu gọn AI Network Tutor" title="Đóng khung chat (Esc)">
                 ✕
               </button>
             </div>
           </header>
 
-          <!-- Live Context Indicator & Mode / Scope Controls (Part 10.9.B) -->
-          <div class="ai-context-dashboard" id="ai-context-dashboard">
-            <div class="ai-ctx-top-row">
-              <span class="ai-mode-pill" id="ai-active-mode-pill">📘 Learning Mode</span>
-              <span class="ai-ctx-breadcrumb" id="ai-context-text">Đang đồng bộ ngữ cảnh...</span>
-              <button type="button" class="ai-context-refresh-btn" id="ai-context-refresh-btn" title="Cập nhật ngữ cảnh trực tiếp">↻</button>
-            </div>
-
+          <!-- Collapsible Context & Mode Controls Drawer (Hidden by default to maximize chat reading area) -->
+          <div class="ai-context-dashboard" id="ai-context-dashboard" hidden>
             <div class="ai-ctx-controls-row">
               <select id="ai-mode-selector" class="ai-mini-select" aria-label="Chọn chế độ AI Network Tutor" title="Chuyển đổi giữa 6 chế độ AI chuyên biệt">
                 ${modeOptionsHtml}
               </select>
 
               <select id="ai-scope-selector" class="ai-mini-select" aria-label="Chọn phạm vi Context" title="Chọn phạm vi ngữ cảnh gửi cho AI">
-                <option value="auto">🎯 Phạm vi: Tự động theo trang hiện tại</option>
-                <option value="selection">✂️ Chỉ đoạn văn bản đang bôi đen</option>
-                <option value="section">📑 Mục (Section) đang đọc</option>
-                <option value="lesson">📘 Toàn bộ Bài học (Lesson) hiện tại</option>
-                <option value="lab">🧪 Toàn bộ Bài Lab &amp; Topology hiện tại</option>
-                <option value="course">🌐 Toàn khóa học CCNA 200-301</option>
+                <option value="auto">🎯 Phạm vi: Tự động theo trang</option>
+                <option value="selection">✂️ Đoạn văn đang bôi đen</option>
+                <option value="section">📑 Mục đang đọc</option>
+                <option value="lesson">📘 Toàn bộ Bài học</option>
+                <option value="lab">🧪 Toàn bộ Bài Lab</option>
+                <option value="course">🌐 Toàn khóa CCNA</option>
               </select>
+              <button type="button" class="ai-context-refresh-btn" id="ai-context-refresh-btn" title="Đồng bộ lại ngữ cảnh trang">↻ Làm mới</button>
             </div>
 
             <!-- Lab Step Selector (Shown automatically when user is on a Lab) -->
             <div class="ai-lab-step-bar" id="ai-lab-step-bar" hidden>
-              <label for="ai-lab-step-select">🔧 Bước Lab đang làm:</label>
+              <label for="ai-lab-step-select">🔧 Bước Lab:</label>
               <select id="ai-lab-step-select" class="ai-mini-select"></select>
-            </div>
-
-            <!-- Selected Text Snippet Banner (Shown when user selects text & clicks Ask AI) -->
-            <div class="ai-selected-snippet-box" id="ai-selected-snippet-box" hidden>
-              <div class="ai-snippet-head">
-                <span>✂️ <strong>Đoạn văn đang gắn vào Context:</strong></span>
-                <button type="button" id="ai-clear-snippet-btn" title="Bỏ đính kèm đoạn văn này">✕</button>
-              </div>
-              <div class="ai-snippet-text" id="ai-snippet-text"></div>
             </div>
           </div>
 
-          <!-- Contextual One-Click AI Actions Bar (Part 10.6) -->
-          <div class="ai-contextual-actions-bar" id="ai-contextual-actions-bar">
-            <!-- Dynamically populated based on Lesson vs Lab vs Notes -->
+          <!-- Selected Text Snippet Banner (Only visible when text snippet is attached) -->
+          <div class="ai-selected-snippet-box" id="ai-selected-snippet-box" hidden>
+            <div class="ai-snippet-head">
+              <span>✂️ <strong>Đoạn văn đang hỏi:</strong></span>
+              <button type="button" id="ai-clear-snippet-btn" title="Bỏ đính kèm đoạn văn này">✕</button>
+            </div>
+            <div class="ai-snippet-text" id="ai-snippet-text"></div>
           </div>
 
           <!-- Conversation History Drawer (Part 10.10) -->
           <div class="ai-conv-drawer" id="ai-conv-drawer" hidden>
             <div class="ai-conv-drawer-head">
-              <strong>💬 Lịch sử Hội thoại của bạn (Cô lập theo User &amp; Bài học)</strong>
+              <strong>💬 Lịch sử Hội thoại (Theo bài học)</strong>
               <input type="search" id="ai-conv-search-input" class="ai-conv-search" placeholder="Tìm kiếm cuộc trò chuyện..." />
             </div>
             <div class="ai-conv-list" id="ai-conv-list"></div>
           </div>
 
-          <!-- Chat Stream Area -->
+          <!-- Spacious Chat Stream Area -->
           <div class="ai-chat-stream" id="ai-chat-stream"></div>
 
           <!-- Image Attachment Preview Bar -->
@@ -1361,10 +1357,13 @@
             <div class="ai-attachments-scroll" id="ai-attachments-scroll"></div>
           </div>
 
-          <!-- Dynamic Context-Specific Suggested Questions (Part 10.9.D) -->
-          <div class="ai-quick-prompts" id="ai-quick-prompts"></div>
+          <!-- Collapsible Quick Actions & Suggested Prompts Drawer (Auto-shown on empty chat, or toggled via ✨ Gợi ý) -->
+          <div class="ai-suggestions-drawer" id="ai-suggestions-drawer">
+            <div class="ai-contextual-actions-bar" id="ai-contextual-actions-bar"></div>
+            <div class="ai-quick-prompts" id="ai-quick-prompts"></div>
+          </div>
 
-          <!-- Input Footer -->
+          <!-- Compact Input Footer -->
           <footer class="ai-tutor-footer">
             <div class="ai-input-wrapper">
               <label for="ai-image-upload-input" class="ai-image-btn" title="Đính kèm ảnh chụp Packet Tracer (hoặc bấm Ctrl+V)">
@@ -1372,11 +1371,15 @@
                 <input type="file" id="ai-image-upload-input" accept="image/*" multiple style="display:none;" />
               </label>
 
+              <button type="button" class="ai-suggest-toggle-btn" id="ai-suggest-toggle-btn" title="Ẩn/Hiện thanh gợi ý câu hỏi & tác vụ nhanh">
+                ✨
+              </button>
+
               <textarea
                 id="ai-user-prompt-input"
                 class="ai-prompt-textarea"
                 rows="1"
-                placeholder="Hỏi AI về bài học/Lab hiện tại, dán lệnh show hoặc bấm Ctrl+V dán ảnh Packet Tracer..."
+                placeholder="Nhập câu hỏi, lệnh CLI hoặc Ctrl+V dán ảnh Packet Tracer..."
               ></textarea>
 
               <button type="button" class="ai-send-btn" id="ai-send-msg-btn" title="Gửi câu hỏi (Enter)">
@@ -1521,25 +1524,34 @@
     const messages = conv.messages || [];
     const liveCtx = collectLivePageContext();
 
+    // Auto-show suggestions drawer when chat is empty; auto-hide once conversation starts (unless user toggled it)
+    const suggestDrawer = document.getElementById("ai-suggestions-drawer");
+    const suggestToggleBtn = document.getElementById("ai-suggest-toggle-btn");
+    if (suggestDrawer && suggestDrawer.dataset.userToggled !== "true") {
+      const shouldHide = messages.length > 0 || isGenerating;
+      suggestDrawer.hidden = shouldHide;
+      if (suggestToggleBtn) suggestToggleBtn.classList.toggle("active", !shouldHide);
+    }
+
     if (messages.length === 0 && !isGenerating) {
       const mInfo = AI_MODES[activeAiMode] || AI_MODES.learning;
       stream.innerHTML = `
         <div class="ai-welcome-card">
-          <div class="ai-welcome-icon">${mInfo.icon}</div>
-          <h4 class="ai-welcome-title">AI NETWORK TUTOR — ${escapeHtml(mInfo.short_vi)}</h4>
-          <p class="ai-welcome-desc">${escapeHtml(mInfo.desc_vi)}</p>
+          <div class="ai-welcome-head-inline">
+            <span class="ai-welcome-icon">${mInfo.icon}</span>
+            <div>
+              <h4 class="ai-welcome-title">Trợ lý AI — ${escapeHtml(mInfo.short_vi)}</h4>
+              <p class="ai-welcome-desc">${escapeHtml(mInfo.desc_vi)}</p>
+            </div>
+          </div>
           <div class="ai-welcome-features">
             <div class="ai-feat-item">
               <span class="feat-icon">🎯</span>
-              <span><strong>Đã nạp Context trực tiếp:</strong> <em>${escapeHtml(liveCtx.breadcrumb)}</em> (${escapeHtml(liveCtx.userActivity)}).</span>
-            </div>
-            <div class="ai-feat-item">
-              <span class="feat-icon">✂️</span>
-              <span><strong>Hỏi trực tiếp đoạn bôi đen:</strong> Bôi đen bất kỳ khái niệm hay lệnh CLI nào trong bài rồi bấm <strong>"🤖 Ask AI about this"</strong>!</span>
+              <span><strong>Ngữ cảnh đang mở:</strong> <em>${escapeHtml(liveCtx.breadcrumb)}</em></span>
             </div>
             <div class="ai-feat-item">
               <span class="feat-icon">📸</span>
-              <span><strong>Chẩn đoán đa phương thức:</strong> Dán ảnh chụp màn hình Packet Tracer (<code>Ctrl + V</code>) hoặc output lệnh <code>show</code> để bắt bệnh.</span>
+              <span>Bôi đen văn bản trong bài để hỏi nhanh hoặc bấm <code>Ctrl + V</code> dán ảnh chụp Packet Tracer / lệnh <code>show</code>.</span>
             </div>
           </div>
         </div>
@@ -1551,32 +1563,29 @@
     messages.forEach((msg, idx) => {
       const isUser = msg.role === "user";
       const sourcesHtml = !isUser && Array.isArray(msg.sources) && msg.sources.length > 0
-        ? `
-          <div class="ai-sources-box">
-            <div class="ai-sources-title">📌 Nguồn nội dung tham chiếu trong Academy (Click để mở):</div>
-            <div class="ai-sources-list">
-              ${msg.sources
-                .map(
-                  (s) => `
-                  <button type="button" class="ai-source-chip" data-jump-type="${escapeHtml(s.jumpType || "module")}" data-jump-id="${s.jumpId || 1}">
-                    🔗 ${escapeHtml(s.label)}
-                  </button>
-                `
-                )
-                .join("")}
-            </div>
-          </div>
-        `
+        ? msg.sources
+            .map(
+              (s) => `
+              <button type="button" class="ai-source-chip" data-jump-type="${escapeHtml(s.jumpType || "module")}" data-jump-id="${s.jumpId || 1}" title="Mở nội dung tham chiếu">
+                🔗 ${escapeHtml(s.label)}
+              </button>
+            `
+            )
+            .join("")
         : "";
 
       const assistantActionsHtml = !isUser && !msg.isError
         ? `
-          <div class="ai-msg-action-bar">
-            <button type="button" class="ai-msg-act-btn" data-msg-act="save-note" data-idx="${idx}" title="Lưu câu trả lời này vào My Notes">📝 Lưu vào My Notes</button>
-            <button type="button" class="ai-msg-act-btn" data-msg-act="make-fc" data-idx="${idx}" title="Tạo thẻ Flashcard từ câu trả lời này">🗂️ Tạo Flashcard</button>
-            <button type="button" class="ai-msg-act-btn" data-msg-act="regenerate" data-idx="${idx}" title="Tạo lại câu trả lời">🔄 Regenerate</button>
-            <button type="button" class="ai-msg-act-btn ${msg.feedback === "up" ? "active" : ""}" data-msg-act="fb-up" data-idx="${idx}" title="Hữu ích">👍</button>
-            <button type="button" class="ai-msg-act-btn ${msg.feedback === "down" ? "active" : ""}" data-msg-act="fb-down" data-idx="${idx}" title="Chưa chính xác">👎</button>
+          <div class="ai-msg-footer-bar">
+            ${sourcesHtml ? `<div class="ai-sources-inline">${sourcesHtml}</div>` : ""}
+            <div class="ai-msg-action-bar">
+              <button type="button" class="ai-msg-act-btn" data-msg-act="save-note" data-idx="${idx}" title="Lưu câu trả lời này vào My Notes">📝 Lưu Note</button>
+              <button type="button" class="ai-msg-act-btn" data-msg-act="make-fc" data-idx="${idx}" title="Tạo thẻ Flashcard">🗂️ Flashcard</button>
+              <button type="button" class="ai-msg-act-btn" data-msg-act="regenerate" data-idx="${idx}" title="Tạo lại câu trả lời">🔄</button>
+              <button type="button" class="ai-msg-act-btn ${msg.feedback === "up" ? "active" : ""}" data-msg-act="fb-up" data-idx="${idx}" title="Hữu ích">👍</button>
+              <button type="button" class="ai-msg-act-btn ${msg.feedback === "down" ? "active" : ""}" data-msg-act="fb-down" data-idx="${idx}" title="Chưa chính xác">👎</button>
+              <span class="ai-msg-time">${escapeHtml(msg.time || "")}</span>
+            </div>
           </div>
         `
         : "";
@@ -1584,18 +1593,18 @@
       const retryErrorHtml = msg.isError
         ? `
           <div class="ai-msg-action-bar">
-            <button type="button" class="ai-msg-act-btn primary" id="ai-retry-failed-btn">🔄 Thử gửi lại câu hỏi</button>
-            <button type="button" class="ai-msg-act-btn" id="ai-fallback-local-rag-btn">⚡ Chuyển sang Chế độ Trợ giảng Nội bộ (Instant RAG)</button>
+            <button type="button" class="ai-msg-act-btn primary" id="ai-retry-failed-btn">🔄 Thử gửi lại</button>
+            <button type="button" class="ai-msg-act-btn" id="ai-fallback-local-rag-btn">⚡ Dùng Trợ giảng Nội bộ (Instant RAG)</button>
           </div>
         `
         : "";
 
       html += `
         <div class="ai-message-row ${isUser ? "user" : "assistant"}">
-          <div class="ai-msg-avatar">${isUser ? "👤" : "🤖"}</div>
           <div class="ai-msg-content-wrap">
             <div class="ai-msg-sender">
-              ${isUser ? "Bạn" : `AI Network Tutor (${AI_MODES[msg.mode || activeAiMode]?.short_vi || "CCNA Instructor"})`}
+              <span>${isUser ? "👤 Bạn" : `🤖 AI Tutor (${AI_MODES[msg.mode || activeAiMode]?.short_vi || "CCNA"})`}</span>
+              ${isUser ? `<span class="ai-msg-time">${escapeHtml(msg.time || "")}</span>` : ""}
             </div>
             ${
               Array.isArray(msg.images) && msg.images.length > 0
@@ -1612,10 +1621,8 @@
             <div class="ai-msg-body">
               ${isUser ? escapeHtml(msg.text).replace(/\n/g, "<br/>") : formatMarkdown(msg.text)}
             </div>
-            ${sourcesHtml}
             ${assistantActionsHtml}
             ${retryErrorHtml}
-            <div class="ai-msg-time">${escapeHtml(msg.time || "")}</div>
           </div>
         </div>
       `;
@@ -2071,6 +2078,10 @@
     if (!modal) return;
     modal.hidden = false;
     document.body.classList.add("ai-sidebar-open");
+    // Auto-collapse left sidebar on laptop screens so lesson + AI chat both have generous reading width
+    if (window.innerWidth > 980 && window.innerWidth <= 1440) {
+      document.body.classList.add("sidebar-collapsed");
+    }
     // Only lock body scroll on mobile viewports where AI Tutor is a full-screen sheet
     if (window.innerWidth <= 980) {
       document.body.classList.add("modal-open");
@@ -2104,6 +2115,40 @@
     document.getElementById("ai-tutor-close-btn")?.addEventListener("click", closeAiTutorModal);
     document.getElementById("ai-tutor-backdrop")?.addEventListener("click", closeAiTutorModal);
 
+    // Toggle collapsible Context & Mode Drawer
+    const toggleContextToolsDrawer = () => {
+      const ctxDash = document.getElementById("ai-context-dashboard");
+      const toolsBtn = document.getElementById("ai-toggle-tools-btn");
+      if (ctxDash) {
+        ctxDash.hidden = !ctxDash.hidden;
+        if (toolsBtn) toolsBtn.classList.toggle("active", !ctxDash.hidden);
+      }
+    };
+    document.getElementById("ai-toggle-tools-btn")?.addEventListener("click", toggleContextToolsDrawer);
+    document.getElementById("ai-active-mode-pill")?.addEventListener("click", toggleContextToolsDrawer);
+
+    // Toggle Wide Reading Mode for AI Chat Panel
+    document.getElementById("ai-expand-width-btn")?.addEventListener("click", (e) => {
+      const isExpanded = document.body.classList.toggle("ai-sidebar-expanded");
+      const btn = e.currentTarget;
+      if (btn) {
+        btn.textContent = isExpanded ? "⤡" : "⤢";
+        btn.classList.toggle("active", isExpanded);
+      }
+      if (isExpanded && window.innerWidth <= 1560) {
+        document.body.classList.add("sidebar-collapsed");
+      }
+    });
+
+    // Toggle Quick Suggestions & Actions Drawer
+    document.getElementById("ai-suggest-toggle-btn")?.addEventListener("click", (e) => {
+      const drawer = document.getElementById("ai-suggestions-drawer");
+      if (!drawer) return;
+      drawer.hidden = !drawer.hidden;
+      drawer.dataset.userToggled = "true";
+      e.currentTarget.classList.toggle("active", !drawer.hidden);
+    });
+
     document.getElementById("ai-context-refresh-btn")?.addEventListener("click", () => {
       switchOrEnsureContextConversation();
       updateContextDisplay();
@@ -2134,6 +2179,8 @@
     });
 
     document.getElementById("ai-new-conv-btn")?.addEventListener("click", () => {
+      const suggestDrawer = document.getElementById("ai-suggestions-drawer");
+      if (suggestDrawer) suggestDrawer.dataset.userToggled = "";
       ensureActiveConversationForContext(true);
       renderChatMessages();
       renderConversationDrawer();

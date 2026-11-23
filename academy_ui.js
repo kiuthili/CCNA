@@ -1503,6 +1503,17 @@
       });
     });
 
+    // Bind Compact Menu Expand/Collapse Toggle in Left Sidebar
+    const menuMoreBtn = document.getElementById("sidebar-menu-more-btn");
+    const primaryNavEl = document.getElementById("academy-primary-nav");
+    if (menuMoreBtn && primaryNavEl) {
+      menuMoreBtn.addEventListener("click", () => {
+        const isCompact = primaryNavEl.classList.toggle("is-compact");
+        menuMoreBtn.setAttribute("aria-expanded", String(!isCompact));
+        menuMoreBtn.classList.toggle("active", !isCompact);
+      });
+    }
+
     // Keep 3 mode-tabs synchronized with 11-item primary nav
     document.getElementById("tab-modules-btn")?.addEventListener("click", () => {
       document.querySelectorAll("#academy-primary-nav .acad-nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.nav === "modules"));

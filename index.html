@@ -65,7 +65,7 @@
   }
   </script>
 
-  <link rel="stylesheet" href="style.css?v=20261112_v1" />
+  <link rel="stylesheet" href="style.css?v=20261123_v3" />
 </head>
 <body class="not-authenticated">
   <!-- Clean & Bright Login Gateway Screen -->
@@ -228,11 +228,15 @@
         <div class="sidebar-top-meta">
           <div class="sidebar-badge-group">
             <span class="sidebar-indicator-dot"></span>
-            <span class="sidebar-curriculum-label" id="app-title">Chương trình CCNA 200-301</span>
+            <span class="sidebar-curriculum-label" id="app-title">CCNA 200-301 ACADEMY</span>
           </div>
           <div class="sidebar-actions-group">
+            <button type="button" class="sidebar-menu-more-btn" id="sidebar-menu-more-btn" title="Mở rộng / Thu gọn toàn bộ 11 danh mục Academy" aria-expanded="false">
+              <span>🧭 Menu</span>
+              <span class="more-chevron">▾</span>
+            </button>
             <button type="button" class="sidebar-collapse-icon-btn" id="sidebar-collapse-btn" title="Thu gọn thanh bên (Ctrl+B)" aria-label="Thu gọn thanh bên">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
                 <line x1="9" x2="9" y1="3" y2="21"/>
                 <path d="m14 9-3 3 3 3"/>
@@ -242,51 +246,51 @@
           </div>
         </div>
 
-        <!-- Academy 11-Section Primary Navigation Grid (Part 6 Specification) -->
-        <nav class="academy-primary-nav" id="academy-primary-nav" aria-label="Điều hướng chính CCNA Network Academy">
-          <button type="button" class="acad-nav-btn" data-nav="dashboard" title="1. Dashboard tổng quan tiến độ">
+        <!-- Academy Primary Navigation (Compact Quick Bar by default, expandable to all 11 sections) -->
+        <nav class="academy-primary-nav is-compact" id="academy-primary-nav" aria-label="Điều hướng chính CCNA Network Academy">
+          <button type="button" class="acad-nav-btn quick-item" data-nav="dashboard" title="1. Dashboard tổng quan tiến độ">
             <span class="acad-nav-icon">📊</span>
-            <span class="acad-nav-text">1. Dashboard</span>
+            <span class="acad-nav-text">Tổng quan</span>
           </button>
-          <button type="button" class="acad-nav-btn" data-nav="roadmap" title="2. Lộ trình 8 Cấp độ (Learning Roadmap)">
+          <button type="button" class="acad-nav-btn quick-item" data-nav="roadmap" title="2. Lộ trình 8 Cấp độ (Learning Roadmap)">
             <span class="acad-nav-icon">🗺️</span>
-            <span class="acad-nav-text">2. Learning Roadmap</span>
+            <span class="acad-nav-text">Lộ trình</span>
           </button>
-          <button type="button" class="acad-nav-btn" data-nav="fundamentals" title="3. Kiến thức nền tảng nhập môn (Fundamentals)">
-            <span class="acad-nav-icon">🧱</span>
-            <span class="acad-nav-text">3. Fundamentals</span>
-          </button>
-          <button type="button" class="acad-nav-btn active" data-nav="modules" title="4. Toàn bộ 17 Học phần Lý thuyết CCNA">
-            <span class="acad-nav-icon">📘</span>
-            <span class="acad-nav-text">4. CCNA Modules</span>
-          </button>
-          <button type="button" class="acad-nav-btn" data-nav="labs" title="5. 35 Bài Lab Cisco Packet Tracer (3 Cấp độ)">
-            <span class="acad-nav-icon">🧪</span>
-            <span class="acad-nav-text">5. Practical Labs</span>
-          </button>
-          <button type="button" class="acad-nav-btn" data-nav="projects" title="6. Chuyên đề & Đồ án thực tế doanh nghiệp">
-            <span class="acad-nav-icon">🏢</span>
-            <span class="acad-nav-text">6. Real-world Projects</span>
-          </button>
-          <button type="button" class="acad-nav-btn" data-nav="troubleshooting" title="7. Trung tâm Xử lý sự cố (Troubleshooting)">
-            <span class="acad-nav-icon">🛠️</span>
-            <span class="acad-nav-text">7. Troubleshooting</span>
-          </button>
-          <button type="button" class="acad-nav-btn" data-nav="glossary" title="8. Từ điển thuật ngữ & Tra cứu CLI">
-            <span class="acad-nav-icon">📖</span>
-            <span class="acad-nav-text">8. Network Glossary</span>
-          </button>
-          <button type="button" class="acad-nav-btn" data-nav="practice" title="9. Luyện tập Trắc nghiệm, Subnetting & Thi thử">
-            <span class="acad-nav-icon">🎯</span>
-            <span class="acad-nav-text">9. Practice &amp; Quiz</span>
-          </button>
-          <button type="button" class="acad-nav-btn" data-nav="workspace" title="10. My Notes, Highlights, Flashcards & Thành tựu">
+          <button type="button" class="acad-nav-btn quick-item" data-nav="workspace" title="10. My Notes, Highlights, Flashcards & Thành tựu">
             <span class="acad-nav-icon">📝</span>
-            <span class="acad-nav-text">10. My Notes &amp; Progress</span>
+            <span class="acad-nav-text">Sổ tay</span>
           </button>
-          <button type="button" class="acad-nav-btn" data-nav="settings" title="11. Cài đặt hệ thống & Đồng bộ đám mây">
+          <button type="button" class="acad-nav-btn extra-item" data-nav="fundamentals" title="3. Kiến thức nền tảng nhập môn (Fundamentals)">
+            <span class="acad-nav-icon">🧱</span>
+            <span class="acad-nav-text">Nhập môn</span>
+          </button>
+          <button type="button" class="acad-nav-btn extra-item active" data-nav="modules" title="4. Toàn bộ 17 Học phần Lý thuyết CCNA">
+            <span class="acad-nav-icon">📘</span>
+            <span class="acad-nav-text">17 Học phần</span>
+          </button>
+          <button type="button" class="acad-nav-btn extra-item" data-nav="labs" title="5. 35 Bài Lab Cisco Packet Tracer (3 Cấp độ)">
+            <span class="acad-nav-icon">🧪</span>
+            <span class="acad-nav-text">35 Bài Lab</span>
+          </button>
+          <button type="button" class="acad-nav-btn extra-item" data-nav="projects" title="6. Chuyên đề & Đồ án thực tế doanh nghiệp">
+            <span class="acad-nav-icon">🏢</span>
+            <span class="acad-nav-text">10 Chuyên đề</span>
+          </button>
+          <button type="button" class="acad-nav-btn extra-item" data-nav="troubleshooting" title="7. Trung tâm Xử lý sự cố (Troubleshooting)">
+            <span class="acad-nav-icon">🛠️</span>
+            <span class="acad-nav-text">Xử lý sự cố</span>
+          </button>
+          <button type="button" class="acad-nav-btn extra-item" data-nav="glossary" title="8. Từ điển thuật ngữ & Tra cứu CLI">
+            <span class="acad-nav-icon">📖</span>
+            <span class="acad-nav-text">Thuật ngữ</span>
+          </button>
+          <button type="button" class="acad-nav-btn extra-item" data-nav="practice" title="9. Luyện tập Trắc nghiệm, Subnetting & Thi thử">
+            <span class="acad-nav-icon">🎯</span>
+            <span class="acad-nav-text">Luyện thi</span>
+          </button>
+          <button type="button" class="acad-nav-btn extra-item" data-nav="settings" title="11. Cài đặt hệ thống & Đồng bộ đám mây">
             <span class="acad-nav-icon">⚙️</span>
-            <span class="acad-nav-text">11. Settings</span>
+            <span class="acad-nav-text">Cài đặt</span>
           </button>
         </nav>
 
@@ -751,17 +755,17 @@
     </div>
   </div>
 
-  <script src="diagrams.js?v=20261123_v2"></script>
-  <script src="glossary.js?v=20261123_v2"></script>
-  <script src="labs.js?v=20261123_v2"></script>
-  <script src="exam_mastery.js?v=20261123_v2"></script>
-  <script src="en_translations.js?v=20261123_v2"></script>
-  <script src="exam_sim.js?v=20261123_v2"></script>
+  <script src="diagrams.js?v=20261123_v3"></script>
+  <script src="glossary.js?v=20261123_v3"></script>
+  <script src="labs.js?v=20261123_v3"></script>
+  <script src="exam_mastery.js?v=20261123_v3"></script>
+  <script src="en_translations.js?v=20261123_v3"></script>
+  <script src="exam_sim.js?v=20261123_v3"></script>
   <script src="local_config.js" onerror="void 0;"></script>
-  <script src="ai_tutor.js?v=20261123_v2"></script>
-  <script src="curriculum.js?v=20261123_v2"></script>
-  <script src="workspace.js?v=20261123_v2"></script>
-  <script src="app.js?v=20261123_v2"></script>
-  <script src="academy_ui.js?v=20261123_v2"></script>
+  <script src="ai_tutor.js?v=20261123_v3"></script>
+  <script src="curriculum.js?v=20261123_v3"></script>
+  <script src="workspace.js?v=20261123_v3"></script>
+  <script src="app.js?v=20261123_v3"></script>
+  <script src="academy_ui.js?v=20261123_v3"></script>
 </body>
 </html>
